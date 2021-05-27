@@ -1,0 +1,48 @@
+﻿@{
+    ViewData["Title"] = "Home";
+}
+
+<div>
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <p class="text-center">You have logged in successfully. Your claims are:</p>
+        foreach (var userClaim in User.Claims)
+        {
+            <p class="font-weight-bold">@userClaim.Type</p>
+            <p>@userClaim.Value</p>
+        }
+    }
+    else
+    {
+        <p>You are currently not logged-in.</p>
+        <div>
+            <input type="text" id="txtDomainHint" placeholder="Optional domain hint" />
+        </div>
+        <div>
+            Possible domain hints
+            <ul>
+                <li>
+                    ContextHandler-Test-KMDIdentityFederationTester
+                </li>
+                <li>
+                    NemLogin-DevTest-Public-KMD
+                </li>
+                <li>
+                    NemLogin-DevTest-Private-KMD
+                </li>
+            </ul>
+        </div>
+        <div>
+            <a id="lnkLogin" class="font-weight-bold" href="#">Click here to log-in</a>
+        </div>
+        
+        
+    }
+</div>
+
+<script type="text/javascript">
+    var loginUrl = '@Url.Action("Login", "Auth")';
+    document.getElementById('lnkLogin').onclick = function() {
+        window.location = loginUrl + "?domainHint=" + document.getElementById('txtDomainHint').value;
+    }
+</script>
