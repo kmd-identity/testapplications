@@ -5,10 +5,13 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 
 namespace KMD.Identity.TestApplications.OpenID.MVCCore.Controllers
 {
@@ -24,6 +27,26 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore.Controllers
         public IActionResult Index()
         {
             return View();
+        }
+
+        [Authorize]
+        public async Task<IActionResult> CallApi()
+        {
+            using (var httpClient = new HttpClient())
+            {
+                // If you have set options.SaveTokens = true (in Startup.cs) then you can retrieve access_token as stated below
+                //var rawAccessToken = await HttpContext.GetTokenAsync("AD FS", "access_token");
+
+                // Retrieving access_token from session because that's how we stored it in OnTokenResponseReceived in Startup.cs
+                var rawAccessToken = HttpContext.Session.GetString("access_token");
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", rawAccessToken);
+                var response = await httpClient.GetAsync("https://localhost:44377/api/claims");
+                var apiCallResult = await response.Content.ReadAsStringAsync();
+
+                ViewBag.Result = apiCallResult;
+
+                return View();
+            }
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

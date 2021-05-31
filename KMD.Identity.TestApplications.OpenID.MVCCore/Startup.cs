@@ -1,15 +1,12 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Http;
 
 namespace KMD.Identity.TestApplications.OpenID.MVCCore
 {
@@ -25,6 +22,7 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSession();
             services.AddAuthentication(options =>
             {
                 options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -33,11 +31,18 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore
             .AddCookie()
             .AddOpenIdConnect("AD FS", o =>
             {
-                o.ClientId = "d31a798f-d1b0-4673-9565-4da3573cd31d";
-                o.ClientSecret = "F4oKhIOAtsRLBIQyPip6BVOjzZbEUUz6PE7ZVDY_";
-                o.MetadataAddress = "https://identity.kmd.dk/adfs/.well-known/openid-configuration";
+                o.ClientId = Configuration["Security:ClientId"];
+                o.ClientSecret = Configuration["Security:ClientSecret"];
+                o.MetadataAddress = Configuration["Security:IdPMetadataUrl"];
                 o.ResponseType = "code";
                 o.UsePkce = true;
+                o.Scope.Clear();
+                o.Scope.Add(Configuration["Security:ApiScope"]);
+
+                // Setting this to true will create a big cookie with id_token and access_token
+                // If this is set to false (default value), then make sure you have an OnTokenResponseReceived to store the access_token
+                // If this is set to true then you can use await HttpContext.GetTokenAsync("AD FS", "access_token"); to retrieve the access_token, otherwise you will have to manually retrieve the access_token based on how you stored it in OnTokenResponseReceived
+                //options.SaveTokens = true;
 
                 o.Events = new OpenIdConnectEvents()
                 {
@@ -56,6 +61,14 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore
                         }
 
                         return Task.FromResult(0);
+                    },
+                    OnTokenResponseReceived = (context) =>
+                    {
+                        // This method is only relevant if you are not setting options.SaveTokens = true
+                        var accessToken = context.TokenEndpointResponse.AccessToken;
+                        context.HttpContext.Session.SetString("access_token", accessToken);
+
+                        return Task.CompletedTask;
                     }
                 };
             });
@@ -78,7 +91,7 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore
             }
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-
+            app.UseSession();
             app.UseRouting();
 
             app.UseAuthentication();

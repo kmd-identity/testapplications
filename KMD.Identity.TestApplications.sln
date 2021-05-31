@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KMD.Identity.TestApplicatio
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KMD.Identity.TestApplications.OpenID.MVCCore", "KMD.Identity.TestApplications.OpenID.MVCCore\KMD.Identity.TestApplications.OpenID.MVCCore.csproj", "{B2A4DC32-86C9-416C-9F09-5252CC4C8C13}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KMD.Identity.TestApplications.OpenID.API", "KMD.Identity.TestApplications.OpenID.API\KMD.Identity.TestApplications.OpenID.API.csproj", "{1B45368A-C27C-4404-BECE-1C01DE62C727}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{B2A4DC32-86C9-416C-9F09-5252CC4C8C13}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B2A4DC32-86C9-416C-9F09-5252CC4C8C13}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B2A4DC32-86C9-416C-9F09-5252CC4C8C13}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1B45368A-C27C-4404-BECE-1C01DE62C727}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B45368A-C27C-4404-BECE-1C01DE62C727}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B45368A-C27C-4404-BECE-1C01DE62C727}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1B45368A-C27C-4404-BECE-1C01DE62C727}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
