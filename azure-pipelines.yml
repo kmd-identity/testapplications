@@ -30,6 +30,6 @@ steps:
 
 - task: PublishBuildArtifacts@1
   inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    ArtifactName: 'drop'
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)\KMD.Identity.TestApplications.SAML.MVCCore'
+    ArtifactName: 'drop.KMD.Identity.TestApplications.SAML.MVCCore'
     publishLocation: 'Container'
