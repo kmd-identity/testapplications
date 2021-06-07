@@ -22,7 +22,7 @@ namespace KMD.Identity.TestApplications.OpenID.API.Controllers
         {
             return new
             {
-                Title = "Hello for API",
+                Title = "Hello from API",
                 Claims = User.Claims.Select(c => $"{c.Type}: {c.Value}").ToArray()
             };
         }
