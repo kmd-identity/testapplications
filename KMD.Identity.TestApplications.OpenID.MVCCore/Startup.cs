@@ -28,7 +28,10 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore
                 options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             })
-            .AddCookie()
+            .AddCookie(options =>
+            {
+                options.Cookie.SameSite = SameSiteMode.None;
+            })
             .AddOpenIdConnect("AD FS", o =>
             {
                 o.ClientId = Configuration["Security:ClientId"];

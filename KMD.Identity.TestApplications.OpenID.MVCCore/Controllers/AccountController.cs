@@ -22,5 +22,14 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore.Controllers
             await HttpContext.SignOutAsync("AD FS");
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         }
+
+        // This endpoint has been configured on KMD Identity.
+        // KMD Identity will call this endpoint when:
+        //      A: An user has logged out from this application
+        //      B: An user has logged out from a different application connected to KMD Identity
+        public async Task SingleLogout(string sid, string iss)
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        }
     }
 }
