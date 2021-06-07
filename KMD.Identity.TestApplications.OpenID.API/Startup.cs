@@ -20,6 +20,8 @@ namespace KMD.Identity.TestApplications.OpenID.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddApplicationInsightsTelemetry();
+
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
@@ -45,7 +47,7 @@ namespace KMD.Identity.TestApplications.OpenID.API
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
+            if (env.IsEnvironment("Local"))
             {
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
