@@ -1,0 +1,45 @@
+﻿@{
+    ViewData["Title"] = "KMD Identity main page";
+}
+
+<div class="px-4 py-2 my-2 text-center">
+    <h1 class="display-5 fw-bold">KMD Identity</h1>
+    <h4>Test applications</h4>
+</div>
+
+<div class="bg-dark text-secondary px-4 py-1 text-center">
+    <div class="py-4">
+        <h3 class="display-6 fw-bold text-white">SAML (Web)</h3>
+        <div class="col-lg-6 mx-auto">
+            <p class="fs-6 mb-4"><a href="@ViewBag.SAMLBaseUrl">@ViewBag.SAMLBaseUrl</a></p>
+            <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                <a href="@(ViewBag.SAMLBaseUrl+"Auth/Login")" class="btn btn-outline-info btn-lg px-4 me-sm-3 fw-bold" role="button" aria-pressed="true">Log-in</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="b-example-divider"></div>
+
+<div class="bg-dark text-secondary px-4 py-1 text-center">
+    <div class="py-4">
+        <h1 class="display-6 fw-bold text-white">OpenID (Web)</h1>
+        <div class="col-lg-6 mx-auto">
+            <p class="fs-6 mb-4"><a href="@ViewBag.OpenIDWebBaseUrl">@ViewBag.OpenIDWebBaseUrl</a></p>
+            <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                <a href="@(ViewBag.OpenIDWebBaseUrl+"Account/Login")" class="btn btn-outline-info btn-lg px-4 me-sm-3 fw-bold" role="button" aria-pressed="true">Log-in</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="b-example-divider"></div>
+
+<div class="bg-dark text-secondary px-4 py-1 text-center">
+    <div class="py-4">
+        <h1 class="display-6 fw-bold text-white">OpenID (SPA)</h1>
+        <div class="col-lg-6 mx-auto">
+            <p class="lead fs-6 mb-4 text-white">Coming in Q4 2021</p>
+        </div>
+    </div>
+</div>
