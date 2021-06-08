@@ -1,14 +1,11 @@
-﻿<h3>Identity claims</h3>
-
-@foreach (var claim in User.Claims)
-{
-    <p>@claim.Type - @claim.Value</p>
+﻿@{
+    ViewData["Title"] = "Call API";
 }
+
+<h3>Result from API (access_token)</h3>
 
 @if (ViewBag.Result != null)
 {
-    <hr />
-    <h3>Result from API</h3>
     <pre id="result"></pre>
 }
 
