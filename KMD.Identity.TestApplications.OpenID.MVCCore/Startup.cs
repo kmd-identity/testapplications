@@ -73,8 +73,23 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore
                         var accessToken = context.TokenEndpointResponse.AccessToken;
                         context.HttpContext.Session.SetString("access_token", accessToken);
 
+                        var idToken = context.TokenEndpointResponse.IdToken;
+                        context.HttpContext.Session.SetString("id_token", idToken);
+
                         return Task.CompletedTask;
-                    }
+                    },
+                    OnRedirectToIdentityProviderForSignOut = context =>
+                    {
+                        // Id token hint is needed to redirect back to application
+                        context.ProtocolMessage.IdTokenHint = context.HttpContext.Session.GetString("id_token");
+                        return Task.FromResult(0);
+                    },
+                    OnSignedOutCallbackRedirect = context =>
+                    {
+                        context.HttpContext.Session.Remove("id_token");
+                        context.HttpContext.Session.Remove("access_token");
+                        return Task.FromResult(0);
+                    },
                 };
             });
 
