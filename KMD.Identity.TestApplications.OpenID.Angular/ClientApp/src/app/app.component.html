@@ -350,6 +350,15 @@
 
   <div>
 
+    <div *ngIf="error">
+
+      <h3 style="color: red">There was an error</h3>
+
+      <pre>
+{{ error | json }}
+    </pre>
+    </div>
+
     <div *ngIf="apiResponse">
 
       <h3>Result from API (access_token)</h3>

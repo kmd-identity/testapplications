@@ -17,21 +17,37 @@ export class AppComponent implements OnInit {
   idToken = "";
   domainHint = "";
   apiResponse: any = null;
+  error: any = null;
 
   ngOnInit() {
     this.oidcSecurityService.checkAuth().subscribe(({ isAuthenticated, userData, accessToken, idToken }) => {
       this.isAuthenticated = isAuthenticated;
       this.userData = userData;
       this.accessToken = accessToken;
-      this.idToken = idToken
+      this.idToken = idToken;
+
+      if (!this.isAuthenticated) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const oidcError = urlParams.get('error');
+        const oidcErrorDescription = urlParams.get('error_description');
+
+        if (oidcError || oidcErrorDescription) {
+          this.error = {
+            'Error': oidcError,
+            'Description': oidcErrorDescription
+          }
+        }
+      }
     });
   }
 
   login() {
+    this.error = null;
     this.oidcSecurityService.authorize("identitykmddk", { customParams: { "domain_hint": this.domainHint } });
   }
 
   logout() {
+    this.error = null;
     this.oidcSecurityService.logoff("identitykmddk");
   }
 
