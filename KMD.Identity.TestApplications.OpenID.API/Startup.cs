@@ -41,6 +41,7 @@ namespace KMD.Identity.TestApplications.OpenID.API
                 {
                     options.MetadataAddress = Configuration["Security:IdPMetadataUrl"];
                     options.Audience = Configuration["Security:ApplicationIdentifier"];
+                    options.MapInboundClaims = false;
                 });
         }
 

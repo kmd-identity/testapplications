@@ -41,6 +41,7 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore
                 o.MetadataAddress = Configuration["Security:IdPMetadataUrl"];
                 o.ResponseType = "code";
                 o.UsePkce = true;
+                o.MapInboundClaims = false;
                 o.Scope.Clear();
                 o.Scope.Add(Configuration["Security:ApiScope"]);
 
