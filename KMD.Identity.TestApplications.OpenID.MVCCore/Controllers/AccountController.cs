@@ -19,7 +19,6 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore.Controllers
         [Authorize]
         public async Task Logout()
         {
-            var a = new AuthenticationProperties();
             await HttpContext.SignOutAsync("AD FS");
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         }
