@@ -7,6 +7,7 @@ using ITfoxtec.Identity.Saml2.Schemas;
 using ITfoxtec.Identity.Saml2.Schemas.Metadata;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
+using System.Collections.Generic;
 
 namespace KMD.Identity.TestApplications.SAML.MVCCore.Controllers
 {
@@ -31,6 +32,10 @@ namespace KMD.Identity.TestApplications.SAML.MVCCore.Controllers
                 SigningCertificates = new X509Certificate2[]
                 {
                     config.SigningCertificate
+                },
+                EncryptionCertificates = new X509Certificate2[]
+                {
+                    config.SigningCertificate //note same certificate as above 
                 },
                 SingleLogoutServices = new SingleLogoutService[]
                 {
