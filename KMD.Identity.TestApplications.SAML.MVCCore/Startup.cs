@@ -32,11 +32,13 @@ namespace KMD.Identity.TestApplications.SAML.MVCCore
             services.AddApplicationInsightsTelemetry();
 
             services.Configure<Saml2Configuration>(Configuration.GetSection("Saml2"));
+            //Note we're using the same certificate for signing and encryption 
             services.Configure<Saml2Configuration>(saml2Configuration =>
             {
                 if (AppEnvironment.IsEnvironment("Local"))
                 {
                     saml2Configuration.SigningCertificate = CertificateUtil.Load(AppEnvironment.MapToPhysicalFilePath(Configuration["Saml2:SigningCertificateFile"]), Configuration["Saml2:SigningCertificatePassword"]);
+                    saml2Configuration.DecryptionCertificate = CertificateUtil.Load(AppEnvironment.MapToPhysicalFilePath(Configuration["Saml2:SigningCertificateFile"]), Configuration["Saml2:SigningCertificatePassword"]);
                 }
                 else
                 {
@@ -46,6 +48,7 @@ namespace KMD.Identity.TestApplications.SAML.MVCCore
                         X509FindType.FindByThumbprint, Configuration["Saml2:SigningCertificateThumbprint"], false);
 
                     saml2Configuration.SigningCertificate = certCollection[0];
+                    saml2Configuration.DecryptionCertificate = certCollection[0];
                     certStore.Close();
                 }
                 
