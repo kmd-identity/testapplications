@@ -83,6 +83,8 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore
                     {
                         // Id token hint is needed to redirect back to application
                         context.ProtocolMessage.IdTokenHint = context.HttpContext.Session.GetString("id_token");
+                        // Client-id is required by kmd.identity
+                        context.ProtocolMessage.ClientId = Configuration["Security:ClientId"];
                         return Task.FromResult(0);
                     },
                     OnSignedOutCallbackRedirect = context =>

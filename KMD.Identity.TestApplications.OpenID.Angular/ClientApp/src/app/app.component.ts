@@ -43,12 +43,17 @@ export class AppComponent implements OnInit {
 
   login() {
     this.error = null;
-    this.oidcSecurityService.authorize("identitykmddk", { customParams: { "domain_hint": this.domainHint } });
+    this.oidcSecurityService.authorize("identitykmddk", { customParams: { "domain_hint": this.domainHint }});
   }
 
   logout() {
+    const authOptions = {
+      customParams: {
+        "client_id": this.appConfig.get("clientId"),
+      }
+    };
     this.error = null;
-    this.oidcSecurityService.logoff("identitykmddk");
+    this.oidcSecurityService.logoff("identitykmddk", authOptions);
   }
 
   async callApi() {
