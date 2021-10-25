@@ -25,7 +25,7 @@ namespace KMD.Identity.TestApplications.OpenID.Angular
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
             {
-                configuration.RootPath = "ClientApp/dist";
+                configuration.RootPath = "ClientApp/dist/identityApp";
             });
 
             services.AddOptions<SecurityConfig>().Bind(Configuration.GetSection("Security"));
