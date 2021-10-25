@@ -25,6 +25,7 @@ namespace KMD.Identity.TestApplications.MainPage.Controllers
         {
             ViewBag.SAMLBaseUrl = Configuration["SAML:BaseUrl"];
             ViewBag.OpenIDWebBaseUrl = Configuration["OpenIDWeb:BaseUrl"];
+            ViewBag.OpenIDSPABaseUrl = Configuration["OpenIDSPA:BaseUrl"];
 
             return View();
         }
