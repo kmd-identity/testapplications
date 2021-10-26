@@ -39,11 +39,16 @@ export class AppComponent implements OnInit {
         }
       }
     });
+
+    // A quick fix to initiate the log-in flow immediately from https://test.identity.kmd.dk/
+    if (window.location.search.indexOf('autologin') > -1) {
+      this.login();
+    }
   }
 
   login() {
     this.error = null;
-    this.oidcSecurityService.authorize("identitykmddk", { customParams: { "domain_hint": this.domainHint }});
+    this.oidcSecurityService.authorize("identitykmddk", { customParams: { "domain_hint": this.domainHint } });
   }
 
   logout() {
