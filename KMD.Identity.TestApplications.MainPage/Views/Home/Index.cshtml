@@ -41,7 +41,7 @@
         <div class="col-lg-6 mx-auto">
             <p class="fs-6 mb-4"><a href="@ViewBag.OpenIDSPABaseUrl">@ViewBag.OpenIDSPABaseUrl</a></p>
             <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
-                <a href="@ViewBag.OpenIDSPABaseUrl" class="btn btn-outline-info btn-lg px-4 me-sm-3 fw-bold" role="button" aria-pressed="true">Log-in</a>
+                <a href="@($"{ViewBag.OpenIDSPABaseUrl}?autologin=true")" class="btn btn-outline-info btn-lg px-4 me-sm-3 fw-bold" role="button" aria-pressed="true">Log-in</a>
             </div>
         </div>
     </div>
