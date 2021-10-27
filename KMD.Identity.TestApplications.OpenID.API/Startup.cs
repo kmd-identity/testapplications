@@ -1,3 +1,4 @@
+using KMD.Identity.TestApplications.OpenID.API.Handlers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -43,6 +44,8 @@ namespace KMD.Identity.TestApplications.OpenID.API
                     options.Audience = Configuration["Security:ApplicationIdentifier"];
                     options.MapInboundClaims = false;
                 });
+
+            services.AddSingleton<ICustomClaimsHandler, CustomClaimsHandler>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
