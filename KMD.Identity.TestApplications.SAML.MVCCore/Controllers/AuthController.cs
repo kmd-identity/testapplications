@@ -27,6 +27,7 @@ namespace KMD.Identity.TestApplications.SAML.MVCCore.Controllers
         {
             var binding = new Saml2RedirectBinding();
             binding.SetRelayStateQuery(new Dictionary<string, string> { { relayStateReturnUrl, returnUrl ?? Url.Content("~/") } });
+            config.SignAuthnRequest = true;
             return binding.Bind(new Saml2AuthnRequest(config)).ToActionResultWithDomainHint(domainHint);
         }
         
