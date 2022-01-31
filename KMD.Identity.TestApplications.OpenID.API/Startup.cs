@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using KMD.Identity.TestApplications.OpenID.API.Handlers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -34,6 +35,19 @@ namespace KMD.Identity.TestApplications.OpenID.API
                     Name = "Authorization",
                     Type = SecuritySchemeType.Http,
                     Scheme = "bearer"
+                });
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        }, new List<string>()
+                    }
                 });
             });
 
