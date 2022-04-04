@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using Microsoft.Identity.Client;
+using Microsoft.Identity.Client.Desktop;
 
 namespace KMD.Identity.TestApplications.OpenID.WinForms
 {
@@ -92,10 +93,31 @@ namespace KMD.Identity.TestApplications.OpenID.WinForms
             DialogResult = DialogResult.OK;
         }
 
-        private void bAuthenticateWebView2_Click(object sender, EventArgs e)
+        private async void bAuthenticateWebView2_Click(object sender, EventArgs e)
         {
-            MessageBox.Show(
-                @"Read more here: https://docs.microsoft.com/en-us/microsoft-edge/webview2/get-started/winforms");
+            // follow instruction from here: https://docs.microsoft.com/en-us/microsoft-edge/webview2/get-started/winforms and read more here: https://developer.microsoft.com/en-us/microsoft-edge/webview2/
+            // you must include the WebView Runtime installer together with your application setup file, to ensure, that user can use WebView2
+
+            var clientApp = PublicClientApplicationBuilder.Create(Properties.Settings.Default.ClientId)
+                .WithAdfsAuthority(Properties.Settings.Default.AuthorityUrl)
+                // Desktop Features enable WebView2
+                .WithDesktopFeatures()
+                // Perhaps have a list of ports and check if any of them are available on the machine. Make sure the list of ports are also defined on KMD Identity as "approved" redirect uris.
+                .WithRedirectUri(Properties.Settings.Default.RedirectUri)
+                .Build();
+
+            var authResult = await clientApp
+                .AcquireTokenInteractive(Properties.Settings.Default.Scopes.Cast<string>().ToArray())
+                // This time using WebView 2
+                .WithUseEmbeddedWebView(true)
+                .ExecuteAsync();
+
+            if (string.IsNullOrWhiteSpace(authResult.AccessToken) || string.IsNullOrWhiteSpace(authResult.AccessToken))
+                return;
+
+            UserContext.FromResult(authResult);
+
+            DialogResult = DialogResult.OK;
         }
     }
 }

@@ -81,7 +81,7 @@
             this.bAuthenticateWebView2.Name = "bAuthenticateWebView2";
             this.bAuthenticateWebView2.Size = new System.Drawing.Size(214, 41);
             this.bAuthenticateWebView2.TabIndex = 4;
-            this.bAuthenticateWebView2.Text = "Login with KMD Identity (WebView2)";
+            this.bAuthenticateWebView2.Text = "Login with KMD Identity (WebView2 - experimental)";
             this.bAuthenticateWebView2.UseVisualStyleBackColor = true;
             this.bAuthenticateWebView2.Click += new System.EventHandler(this.bAuthenticateWebView2_Click);
             // 
