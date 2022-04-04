@@ -29,7 +29,10 @@
         private void InitializeComponent()
         {
             this.lAuthRequired = new System.Windows.Forms.Label();
-            this.bAuthenticate = new System.Windows.Forms.Button();
+            this.bAuthenticateDefault = new System.Windows.Forms.Button();
+            this.bAuthenticateWindows = new System.Windows.Forms.Button();
+            this.bAuthenticateWithHint = new System.Windows.Forms.Button();
+            this.bAuthenticateWebView2 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // lAuthRequired
@@ -42,22 +45,55 @@
             this.lAuthRequired.TabIndex = 0;
             this.lAuthRequired.Text = "Authentication Required";
             // 
-            // bAuthenticate
+            // bAuthenticateDefault
             // 
-            this.bAuthenticate.Location = new System.Drawing.Point(43, 87);
-            this.bAuthenticate.Name = "bAuthenticate";
-            this.bAuthenticate.Size = new System.Drawing.Size(214, 41);
-            this.bAuthenticate.TabIndex = 1;
-            this.bAuthenticate.Text = "Login with KMD Identity";
-            this.bAuthenticate.UseVisualStyleBackColor = true;
-            this.bAuthenticate.Click += new System.EventHandler(this.bAuthenticate_Click);
+            this.bAuthenticateDefault.Location = new System.Drawing.Point(43, 87);
+            this.bAuthenticateDefault.Name = "bAuthenticateDefault";
+            this.bAuthenticateDefault.Size = new System.Drawing.Size(214, 41);
+            this.bAuthenticateDefault.TabIndex = 1;
+            this.bAuthenticateDefault.Text = "Login with KMD Identity (HRD + external browser)";
+            this.bAuthenticateDefault.UseVisualStyleBackColor = true;
+            this.bAuthenticateDefault.Click += new System.EventHandler(this.bAuthenticateDefault_Click);
+            // 
+            // bAuthenticateWindows
+            // 
+            this.bAuthenticateWindows.Location = new System.Drawing.Point(43, 134);
+            this.bAuthenticateWindows.Name = "bAuthenticateWindows";
+            this.bAuthenticateWindows.Size = new System.Drawing.Size(214, 41);
+            this.bAuthenticateWindows.TabIndex = 2;
+            this.bAuthenticateWindows.Text = "Login with KMD Identity (Windows Token)";
+            this.bAuthenticateWindows.UseVisualStyleBackColor = true;
+            this.bAuthenticateWindows.Click += new System.EventHandler(this.bAuthenticateWindows_Click);
+            // 
+            // bAuthenticateWithHint
+            // 
+            this.bAuthenticateWithHint.Location = new System.Drawing.Point(43, 181);
+            this.bAuthenticateWithHint.Name = "bAuthenticateWithHint";
+            this.bAuthenticateWithHint.Size = new System.Drawing.Size(214, 41);
+            this.bAuthenticateWithHint.TabIndex = 3;
+            this.bAuthenticateWithHint.Text = "Login with KMD Identity (IdP redirect)";
+            this.bAuthenticateWithHint.UseVisualStyleBackColor = true;
+            this.bAuthenticateWithHint.Click += new System.EventHandler(this.bAuthenticateWithHint_Click);
+            // 
+            // bAuthenticateWebView2
+            // 
+            this.bAuthenticateWebView2.Location = new System.Drawing.Point(43, 228);
+            this.bAuthenticateWebView2.Name = "bAuthenticateWebView2";
+            this.bAuthenticateWebView2.Size = new System.Drawing.Size(214, 41);
+            this.bAuthenticateWebView2.TabIndex = 4;
+            this.bAuthenticateWebView2.Text = "Login with KMD Identity (WebView2)";
+            this.bAuthenticateWebView2.UseVisualStyleBackColor = true;
+            this.bAuthenticateWebView2.Click += new System.EventHandler(this.bAuthenticateWebView2_Click);
             // 
             // LogonForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(316, 164);
-            this.Controls.Add(this.bAuthenticate);
+            this.ClientSize = new System.Drawing.Size(301, 283);
+            this.Controls.Add(this.bAuthenticateWebView2);
+            this.Controls.Add(this.bAuthenticateWithHint);
+            this.Controls.Add(this.bAuthenticateWindows);
+            this.Controls.Add(this.bAuthenticateDefault);
             this.Controls.Add(this.lAuthRequired);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
@@ -74,6 +110,9 @@
         #endregion
 
         private System.Windows.Forms.Label lAuthRequired;
-        private System.Windows.Forms.Button bAuthenticate;
+        private System.Windows.Forms.Button bAuthenticateDefault;
+        private System.Windows.Forms.Button bAuthenticateWindows;
+        private System.Windows.Forms.Button bAuthenticateWithHint;
+        private System.Windows.Forms.Button bAuthenticateWebView2;
     }
 }
