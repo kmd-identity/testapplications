@@ -34,7 +34,7 @@ namespace KMD.Identity.TestApplications.OpenID.Angular
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsEnvironment("Local"))
+            if (env.IsEnvironment("Development"))
             {
                 app.UseDeveloperExceptionPage();
             }
@@ -47,7 +47,7 @@ namespace KMD.Identity.TestApplications.OpenID.Angular
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            if (!env.IsEnvironment("Local"))
+            if (!env.IsEnvironment("Development"))
             {
                 app.UseSpaStaticFiles();
             }
@@ -67,7 +67,7 @@ namespace KMD.Identity.TestApplications.OpenID.Angular
 
                 spa.Options.SourcePath = "ClientApp";
 
-                if (env.IsEnvironment("Local"))
+                if (env.IsEnvironment("Development"))
                 {
                     spa.UseAngularCliServer(npmScript: "start");
                 }
