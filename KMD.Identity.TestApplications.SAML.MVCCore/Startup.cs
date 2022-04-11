@@ -35,7 +35,7 @@ namespace KMD.Identity.TestApplications.SAML.MVCCore
             //Note we're using the same certificate for signing and encryption 
             services.Configure<Saml2Configuration>(saml2Configuration =>
             {
-                if (AppEnvironment.IsEnvironment("Local"))
+                if (AppEnvironment.IsEnvironment("Development"))
                 {
                     saml2Configuration.SigningCertificate = CertificateUtil.Load(AppEnvironment.MapToPhysicalFilePath(Configuration["Saml2:SigningCertificateFile"]), Configuration["Saml2:SigningCertificatePassword"]);
                     saml2Configuration.DecryptionCertificate = CertificateUtil.Load(AppEnvironment.MapToPhysicalFilePath(Configuration["Saml2:SigningCertificateFile"]), Configuration["Saml2:SigningCertificatePassword"]);
@@ -81,7 +81,7 @@ namespace KMD.Identity.TestApplications.SAML.MVCCore
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsEnvironment("Local"))
+            if (env.IsEnvironment("Development"))
             {
                 app.UseDeveloperExceptionPage();
             }
