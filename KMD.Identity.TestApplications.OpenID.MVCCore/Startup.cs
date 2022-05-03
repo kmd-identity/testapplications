@@ -24,7 +24,11 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore
         {
             services.AddApplicationInsightsTelemetry();
 
-            services.AddSession();
+            services.AddSession(options =>
+            {
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+            });
+
             services.AddAuthentication(options =>
             {
                 options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
