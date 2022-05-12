@@ -33,6 +33,7 @@
             this.bIdToken = new System.Windows.Forms.ToolStripButton();
             this.bAccessToken = new System.Windows.Forms.ToolStripButton();
             this.bCallApi = new System.Windows.Forms.ToolStripButton();
+            this.logout = new System.Windows.Forms.ToolStripButton();
             this.tResult = new System.Windows.Forms.TextBox();
             this.tsMainMenu.SuspendLayout();
             this.SuspendLayout();
@@ -42,7 +43,8 @@
             this.tsMainMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.bIdToken,
             this.bAccessToken,
-            this.bCallApi});
+            this.bCallApi, 
+            this.logout });
             this.tsMainMenu.Location = new System.Drawing.Point(0, 0);
             this.tsMainMenu.Name = "tsMainMenu";
             this.tsMainMenu.Size = new System.Drawing.Size(800, 25);
@@ -79,6 +81,16 @@
             this.bCallApi.Text = "Call API";
             this.bCallApi.Click += new System.EventHandler(this.bCallApi_Click);
             // 
+            // logout
+            // 
+            this.logout.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.logout.Image = ((System.Drawing.Image)(resources.GetObject("logout.Image")));
+            this.logout.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.logout.Name = "logout";
+            this.logout.Size = new System.Drawing.Size(113, 22);
+            this.logout.Text = "Logout";
+            this.logout.Click += new System.EventHandler(this.logout_Click);
+            // 
             // tResult
             // 
             this.tResult.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -112,6 +124,7 @@
         private System.Windows.Forms.ToolStripButton bIdToken;
         private System.Windows.Forms.ToolStripButton bAccessToken;
         private System.Windows.Forms.ToolStripButton bCallApi;
+        private System.Windows.Forms.ToolStripButton logout;
         private System.Windows.Forms.TextBox tResult;
     }
 }
