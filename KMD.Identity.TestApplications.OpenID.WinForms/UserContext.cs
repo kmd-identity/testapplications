@@ -18,6 +18,11 @@ namespace KMD.Identity.TestApplications.OpenID.WinForms
             return userContext;
         }
 
+        public static void RemoveUser()
+        {
+            userContext = null;
+        }
+
         public static UserContext Current => userContext;
     }
 }

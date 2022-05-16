@@ -1,24 +1,26 @@
 ﻿using System;
 using System.IdentityModel.Tokens.Jwt;
-using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Windows.Forms;
 using Newtonsoft.Json;
+using HttpClient = System.Net.Http.HttpClient;
 
 namespace KMD.Identity.TestApplications.OpenID.WinForms
 {
     public partial class MainForm : Form
     {
-        public MainForm()
+        private readonly LogoutType logoutType;
+        public MainForm(LogoutType logoutType)
         {
             InitializeComponent();
+            this.logoutType = logoutType;
         }
 
         private void bIdToken_Click(object sender, EventArgs e)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var jsonToken = tokenHandler.ReadJwtToken(UserContext.Current.AuthenticatedUser.IdToken);
-            
+
             tResult.Text = JsonConvert.SerializeObject(jsonToken.Payload, Formatting.Indented);
         }
 
@@ -26,7 +28,7 @@ namespace KMD.Identity.TestApplications.OpenID.WinForms
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var jsonToken = tokenHandler.ReadJwtToken(UserContext.Current.AuthenticatedUser.AccessToken);
-            
+
             tResult.Text = JsonConvert.SerializeObject(jsonToken.Payload, Formatting.Indented);
         }
 
@@ -43,6 +45,21 @@ namespace KMD.Identity.TestApplications.OpenID.WinForms
 
             tResult.Text =
                 JsonConvert.SerializeObject(JsonConvert.DeserializeObject<dynamic>(content), Formatting.Indented);
+        }
+
+        private void logout_Click(object sender, EventArgs e)
+        {
+            //Some login types use browser, these also need you to sign out in browser
+            if (logoutType == LogoutType.UseBrowser)
+            {
+                var logoutUrl =
+                    $"https://identity.kmd.dk/adfs/oauth2/logout?id_token_hint={UserContext.Current.AuthenticatedUser.IdToken}&" +
+                    $"client_id={Properties.Settings.Default.ClientId}";
+
+                System.Diagnostics.Process.Start(logoutUrl);
+            }
+            UserContext.RemoveUser();
+            Close();
         }
     }
 }

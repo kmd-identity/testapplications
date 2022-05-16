@@ -18,7 +18,7 @@ namespace KMD.Identity.TestApplications.OpenID.WinForms
             var logonForm = new LogonForm();
             if (logonForm.ShowDialog() == DialogResult.OK)
             {
-                Application.Run(new MainForm());
+                Application.Run(new MainForm(logonForm.LogoutType));
             }
         }
     }
