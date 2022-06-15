@@ -3,7 +3,6 @@ using ITfoxtec.Identity.Saml2.MvcCore;
 using ITfoxtec.Identity.Saml2.Schemas;
 using KMD.Identity.TestApplications.SAML.MVCCore.Extensions;
 using KMD.Identity.TestApplications.SAML.MVCCore.Identity;
-using KMD.Identity.TestApplications.SAML.MVCCore.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -47,9 +46,14 @@ namespace KMD.Identity.TestApplications.SAML.MVCCore.Controllers
 
             var relayStateQuery = binding.GetRelayStateQuery();
             var returnUrl = relayStateQuery.ContainsKey(relayStateReturnUrl) ? relayStateQuery[relayStateReturnUrl] : Url.Content("~/");
-
-            var redirectUrl = RedirectUrlHelper.GetRedirectUrl(returnUrl, HttpContext);
-            return Redirect(redirectUrl == "/" ? Url.Content("~/") : redirectUrl);
+            if (Url.IsLocalUrl(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
+            else
+            {
+                return Redirect(Url.Content("~/"));
+            }
         }
 
         public async Task<IActionResult> Logout()
