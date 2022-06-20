@@ -1,14 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Security.Authentication;
-using System.Threading.Tasks;
-using ITfoxtec.Identity.Saml2;
+﻿using ITfoxtec.Identity.Saml2;
 using ITfoxtec.Identity.Saml2.MvcCore;
 using ITfoxtec.Identity.Saml2.Schemas;
 using KMD.Identity.TestApplications.SAML.MVCCore.Extensions;
 using KMD.Identity.TestApplications.SAML.MVCCore.Identity;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using System.Collections.Generic;
+using System.Security.Authentication;
+using System.Threading.Tasks;
 
 namespace KMD.Identity.TestApplications.SAML.MVCCore.Controllers
 {
@@ -29,7 +29,7 @@ namespace KMD.Identity.TestApplications.SAML.MVCCore.Controllers
             binding.SetRelayStateQuery(new Dictionary<string, string> { { relayStateReturnUrl, returnUrl ?? Url.Content("~/") } });
             return binding.Bind(new Saml2AuthnRequest(config)).ToActionResultWithDomainHint(domainHint);
         }
-        
+
         [HttpPost]
         public async Task<IActionResult> AssertionConsumerService()
         {
@@ -46,9 +46,16 @@ namespace KMD.Identity.TestApplications.SAML.MVCCore.Controllers
 
             var relayStateQuery = binding.GetRelayStateQuery();
             var returnUrl = relayStateQuery.ContainsKey(relayStateReturnUrl) ? relayStateQuery[relayStateReturnUrl] : Url.Content("~/");
-            return Redirect(returnUrl);
+            if (Url.IsLocalUrl(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
+            else
+            {
+                return Redirect(Url.Content("~/"));
+            }
         }
-        
+
         public async Task<IActionResult> Logout()
         {
             if (!User.Identity.IsAuthenticated)
