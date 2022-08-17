@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
+import { UserDelegationService } from './user-delegation.service';
 
 @Component({
   selector: 'app-user-delegation',
@@ -7,9 +8,19 @@ import { Component, OnInit } from '@angular/core';
 })
 export class UserDelegationComponent implements OnInit {
 
-  constructor() { }
+  @Input() accessToken: string = '';
+
+  delegationTokenClaims: any = '';
+
+  constructor(private userDelegationService: UserDelegationService) {
+    this.userDelegationService.delgationToken$.subscribe(tokenClaims => this.delegationTokenClaims = tokenClaims);
+   }
 
   ngOnInit(): void {
+  }
+
+  getDelegationToken() {
+    this.userDelegationService.requestDelegationToken();
   }
 
 }

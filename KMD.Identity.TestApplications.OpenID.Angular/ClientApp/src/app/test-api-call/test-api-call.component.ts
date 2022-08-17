@@ -14,8 +14,7 @@ export class TestApiCallComponent implements OnInit {
     this.testApiCallService.testApiResponse$.subscribe(response => this.apiResponse = response);
   }
 
-  ngOnInit(): void {
-    this.testApiCallService.testApiResponse$.subscribe(response => this.apiResponse = response);    
+  ngOnInit(): void { 
   }
 
 }

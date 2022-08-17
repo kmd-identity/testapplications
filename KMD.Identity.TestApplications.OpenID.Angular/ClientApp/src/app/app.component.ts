@@ -1,6 +1,8 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { unescapeIdentifier } from '@angular/compiler';
 import { OnInit, Component } from '@angular/core';
-import { OidcSecurityService } from 'angular-auth-oidc-client';
+import { OidcSecurityService, LoginResponse } from 'angular-auth-oidc-client';
+import { ConfigIds } from './auth/auth-config.module';
 import { AppConfig } from './config/app.config';
 import { TestApiCallService } from './test-api-call/test-api-call.service';
 
@@ -20,13 +22,18 @@ export class AppComponent implements OnInit {
   apiResponse: any = null;
   error: any = null;
   showTestApiCall: boolean = false;
+  performUserDelegation: boolean = false;
 
   ngOnInit() {
-    this.oidcSecurityService.checkAuth().subscribe(({ isAuthenticated, userData, accessToken, idToken }) => {
-      this.isAuthenticated = isAuthenticated;
-      this.userData = userData;
-      this.accessToken = accessToken;
-      this.idToken = idToken;
+    this.oidcSecurityService.checkAuth().subscribe((loginResponse: LoginResponse) => {
+        // todo: Limit this to only the ConfigIds.Code
+    // this.oidcSecurityService.checkAuthMultiple(ConfigIds.Code).subscribe((loginResponses: LoginResponse[]) => {
+      // const loginResponse = loginResponses.find(x => x.configId === ConfigIds.Code);
+      // if(loginResponse === undefined) {return;}
+      this.isAuthenticated = loginResponse.isAuthenticated;
+      this.userData = loginResponse.userData;
+      this.accessToken = loginResponse.accessToken;
+      this.idToken = loginResponse.idToken;
 
       if (!this.isAuthenticated) {
         const urlParams = new URLSearchParams(window.location.search);
@@ -50,7 +57,10 @@ export class AppComponent implements OnInit {
 
   login() {
     this.error = null;
-    this.oidcSecurityService.authorize("identitykmddk", { customParams: { "domain_hint": this.domainHint } });
+
+    this.domainHint = this.domainHint === "" ? "kmd-ad-prod" : this.domainHint; //todo: This must be removed before merging. It's here as a convenience while I develop.
+
+    this.oidcSecurityService.authorize(ConfigIds.Code, { customParams: { "domain_hint": this.domainHint } });
   }
 
   logout() {
@@ -60,12 +70,16 @@ export class AppComponent implements OnInit {
       }
     };
     this.error = null;
-    this.oidcSecurityService.logoff("identitykmddk", authOptions);
+    this.oidcSecurityService.logoff(ConfigIds.Code, authOptions);
   }
   
   callApi() {
     this.showTestApiCall = true;
     this.testApiCallService.callTestApi(this.accessToken);
+  }
+
+  beginUserDelegation() {
+    this.performUserDelegation = true;
   }
 }
 
