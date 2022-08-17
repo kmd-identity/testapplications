@@ -67,5 +67,9 @@ export class AppComponent implements OnInit {
     this.showTestApiCall = true;
     this.testApiCallService.callTestApi(this.accessToken);
   }
+
+  consentToUserDelegation() {
+    
+  }
 }
 
