@@ -2,6 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { OnInit, Component } from '@angular/core';
 import { OidcSecurityService } from 'angular-auth-oidc-client';
 import { AppConfig } from './config/app.config';
+import { TestApiCallService } from './test-api-call/test-api-call.service';
 
 @Component({
   selector: 'app-root',
@@ -9,7 +10,7 @@ import { AppConfig } from './config/app.config';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-  constructor(public oidcSecurityService: OidcSecurityService, public http: HttpClient, private appConfig: AppConfig) { }
+  constructor(public oidcSecurityService: OidcSecurityService, public http: HttpClient, private appConfig: AppConfig, private testApiCallService: TestApiCallService) { }
   title = 'IdentityApp';
   isAuthenticated = false;
   userData: any = null;
@@ -18,6 +19,7 @@ export class AppComponent implements OnInit {
   domainHint = "";
   apiResponse: any = null;
   error: any = null;
+  showTestApiCall: boolean = false;
 
   ngOnInit() {
     this.oidcSecurityService.checkAuth().subscribe(({ isAuthenticated, userData, accessToken, idToken }) => {
@@ -60,15 +62,10 @@ export class AppComponent implements OnInit {
     this.error = null;
     this.oidcSecurityService.logoff("identitykmddk", authOptions);
   }
-
-  async callApi() {
-
-    const bearerHeaders = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + this.accessToken
-    });
-
-    this.apiResponse = await this.http.get(this.appConfig.get('apiUrl'), { headers: bearerHeaders }).toPromise();
+  
+  callApi() {
+    this.showTestApiCall = true;
+    this.testApiCallService.callTestApi(this.accessToken);
   }
 }
 

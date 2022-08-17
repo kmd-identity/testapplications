@@ -29,44 +29,40 @@
       <app-error [error]="error"></app-error>
     </div>
 
-    <div *ngIf="apiResponse">
-
-      <h3>Result from API (access_token)</h3>
-
-      <pre>
-{{ apiResponse | json }}
-    </pre>
-    </div>
-
-    <div *ngIf="isAuthenticated">
+    <div *ngIf="isAuthenticated; else authenticationPrompt">
+      <div *ngIf="showTestApiCall">
+        <app-test-api-call></app-test-api-call>
+      </div>
       <app-user-claims [userClaims]="userData"></app-user-claims>
     </div>
-
-    <div *ngIf="!isAuthenticated">
-      <p>You are currently not logged-in.</p>
-      <div>
-        <input class="form-control" type="text" id="txtDomainHint" placeholder="Optional domain hint" [(ngModel)]="domainHint" />
-      </div>
-      <div>
-        Possible domain hints
-        <ul>
-          <li>
-            kmd-ad-prod
-          </li>
-          <li>
-            contexthandler-test-kmdidentitytestapplications
-          </li>
-          <li>
-            nemlogin-3-test-public
-          </li>
-          <li>
-            nemlogin-3-test-private
-          </li>
-        </ul>
-      </div>
-      <div>
-        <a id="lnkLogin" class="font-weight-bold" href="#" (click)="login()">Click here to log-in</a>
-      </div>
-    </div>
   </div>
+
+
+  <ng-template #authenticationPrompt>
+    <p>You are currently not logged-in.</p>
+    <div>
+      <input class="form-control" type="text" id="txtDomainHint" placeholder="Optional domain hint" [(ngModel)]="domainHint" />
+    </div>
+    <div>
+      Possible domain hints
+      <ul>
+        <li>
+          kmd-ad-prod
+        </li>
+        <li>
+          contexthandler-test-kmdidentitytestapplications
+        </li>
+        <li>
+          nemlogin-3-test-public
+        </li>
+        <li>
+          nemlogin-3-test-private
+        </li>
+      </ul>
+    </div>
+    <div>
+      <a id="lnkLogin" class="font-weight-bold" href="#" (click)="login()">Click here to log-in</a>
+    </div>
+  </ng-template>
+
 <router-outlet></router-outlet>

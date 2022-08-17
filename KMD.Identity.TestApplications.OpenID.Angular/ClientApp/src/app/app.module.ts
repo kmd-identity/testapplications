@@ -7,17 +7,17 @@ import { FormsModule } from '@angular/forms'
 import { HttpClientModule } from '@angular/common/http';
 import { AppConfig } from './config/app.config';
 import { UserDelegationComponent } from './user-delegation/user-delegation.component';
-import { ViewApiResponseComponent } from './view-api-response/view-api-response.component';
 import { ErrorComponent } from './error/error.component';
 import { UserClaimsComponent } from './user-claims/user-claims.component';
+import { TestApiCallComponent } from './test-api-call/test-api-call.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     UserDelegationComponent,
-    ViewApiResponseComponent,
     ErrorComponent,
     UserClaimsComponent,
+    TestApiCallComponent,
   ],
   imports: [
     BrowserModule,

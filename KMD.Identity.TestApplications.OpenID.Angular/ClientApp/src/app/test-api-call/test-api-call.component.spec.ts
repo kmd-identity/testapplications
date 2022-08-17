@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ViewApiResponseComponent } from './view-api-response.component';
+import { TestApiCallComponent } from './test-api-call.component';
 
-describe('ViewApiResponseComponent', () => {
-  let component: ViewApiResponseComponent;
-  let fixture: ComponentFixture<ViewApiResponseComponent>;
+describe('TestApiCallComponent', () => {
+  let component: TestApiCallComponent;
+  let fixture: ComponentFixture<TestApiCallComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ViewApiResponseComponent ]
+      declarations: [ TestApiCallComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ViewApiResponseComponent);
+    fixture = TestBed.createComponent(TestApiCallComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
