@@ -20,6 +20,6 @@ export class TestApiCallService {
       'Authorization': 'Bearer ' + accessToken
     });
 
-    this.httpClient.get(this.appConfig.get('apiUrl'), { headers: bearerHeaders }).subscribe(response => this.testApiResponse.next(response));
+    this.httpClient.get(this.appConfig.security.apiUrl, { headers: bearerHeaders }).subscribe(response => this.testApiResponse.next(response));
   }
 }

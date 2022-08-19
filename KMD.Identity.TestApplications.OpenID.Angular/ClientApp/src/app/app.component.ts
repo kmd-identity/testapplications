@@ -1,8 +1,6 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { unescapeIdentifier } from '@angular/compiler';
 import { OnInit, Component } from '@angular/core';
 import { OidcSecurityService, LoginResponse } from 'angular-auth-oidc-client';
-import { ConfigIds } from './auth/auth-config.module';
+import { ConfigIds, IdentityProviders } from './auth/auth-config.module';
 import { AppConfig } from './config/app.config';
 import { TestApiCallService } from './test-api-call/test-api-call.service';
 
@@ -12,7 +10,10 @@ import { TestApiCallService } from './test-api-call/test-api-call.service';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-  constructor(public oidcSecurityService: OidcSecurityService, public http: HttpClient, private appConfig: AppConfig, private testApiCallService: TestApiCallService) { }
+  constructor(
+    private oidcSecurityService: OidcSecurityService, 
+    private appConfig: AppConfig,
+    private testApiCallService: TestApiCallService) { }
   title = 'IdentityApp';
   isAuthenticated = false;
   userData: any = null;
@@ -23,13 +24,14 @@ export class AppComponent implements OnInit {
   error: any = null;
   showTestApiCall: boolean = false;
   performUserDelegation: boolean = false;
+  domainHints: string[] = [
+    IdentityProviders.KmdAd, 
+    IdentityProviders.ContextHandlerTestApplications, 
+    IdentityProviders.NemloginThreeTestPublic, 
+    IdentityProviders.NemloginThreeTestPrivate]
 
   ngOnInit() {
     this.oidcSecurityService.checkAuth().subscribe((loginResponse: LoginResponse) => {
-        // todo: Limit this to only the ConfigIds.Code
-    // this.oidcSecurityService.checkAuthMultiple(ConfigIds.Code).subscribe((loginResponses: LoginResponse[]) => {
-      // const loginResponse = loginResponses.find(x => x.configId === ConfigIds.Code);
-      // if(loginResponse === undefined) {return;}
       this.isAuthenticated = loginResponse.isAuthenticated;
       this.userData = loginResponse.userData;
       this.accessToken = loginResponse.accessToken;
@@ -58,7 +60,9 @@ export class AppComponent implements OnInit {
   login() {
     this.error = null;
 
-    this.domainHint = this.domainHint === "" ? "kmd-ad-prod" : this.domainHint; //todo: This must be removed before merging. It's here as a convenience while I develop.
+    // // todo: This will be removed when approaching completion of the work. For now, this is a developer convenience
+    // // todo: This MUST be removed before merging.
+    // this.domainHint = this.domainHint === "" ? IdentityProviders.KmdAd : this.domainHint;
 
     this.oidcSecurityService.authorize(ConfigIds.Code, { customParams: { "domain_hint": this.domainHint } });
   }
@@ -66,7 +70,7 @@ export class AppComponent implements OnInit {
   logout() {
     const authOptions = {
       customParams: {
-        "client_id": this.appConfig.get("clientId"),
+        "client_id": this.appConfig.security.clientId,
       }
     };
     this.error = null;
@@ -80,6 +84,13 @@ export class AppComponent implements OnInit {
 
   beginUserDelegation() {
     this.performUserDelegation = true;
+  }
+
+  userDelegationEnabled() {
+    return this.isAuthenticated
+      && this.appConfig.featureToggle.userDelegation
+      && this.userData 
+      && this.userData["identityprovider"] == IdentityProviders.KmdAd;
   }
 }
 

@@ -29,6 +29,7 @@ namespace KMD.Identity.TestApplications.OpenID.Angular
             });
 
             services.AddOptions<SecurityConfig>().Bind(Configuration.GetSection("Security"));
+            services.AddOptions<FeatureToggleConfig>().Bind(Configuration.GetSection("FeatureToggle"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

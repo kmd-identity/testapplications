@@ -16,9 +16,7 @@ export class UserDelegationService {
 
   public requestDelegationToken() {
     // maybe this isn't needed to be observable at all.
-    // const token = this.oidcSecurityService.getIdToken(ConfigIds.Code);
     let userData = this.oidcSecurityService.getUserData(ConfigIds.Code)
-    // const token = this.oidcSecurityService.getAccessToken(ConfigIds.Code);
     this.delegationToken.next(userData);
   }
 }

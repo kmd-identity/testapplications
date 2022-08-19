@@ -7,7 +7,13 @@ export const ConfigIds = {
   TokenExchange: "identitykmddkuserdelegation"
 };
 
-// this one compiles
+export const IdentityProviders = {
+  KmdAd: "kmd-ad-prod",
+  ContextHandlerTestApplications: "contexthandler-test-kmdidentitytestapplications",
+  NemloginThreeTestPublic: "nemlogin-3-test-public",
+  NemloginThreeTestPrivate: "nemlogin-3-test-private"
+}
+
 export const httpLoaderFactory = (appConfig: AppConfig) => {
   
   const origin: string = window.location.origin;
@@ -17,39 +23,39 @@ export const httpLoaderFactory = (appConfig: AppConfig) => {
       
       const codeResponseType: OpenIdConfiguration = {
         configId: ConfigIds.Code,
-        authority: appConfig.get('authority'),
+        authority: appConfig.security.authority,
         redirectUrl: origin,
         postLogoutRedirectUri: origin,
-        clientId: appConfig.get('clientId'),
-        scope: appConfig.get('apiScope'),
+        clientId: appConfig.security.clientId,
+        scope: appConfig.security.apiScope,
         responseType: 'code',
         autoUserInfo: false,
         silentRenew: true,
         useRefreshToken: true,
         renewTimeBeforeTokenExpiresInSeconds: 30
       }
-      
-      return Promise.resolve(codeResponseType)
-      });
+
+      return Promise.resolve(codeResponseType);
+    });
       
   const tokenExchangeTypeConfig$ = appConfig.ensureLoaded()
   .then(() => {
     const tokenExchangeResponseType : OpenIdConfiguration = {
       configId: ConfigIds.TokenExchange,
-      authority: appConfig.get('authority'),
+      authority: appConfig.security.authority,
       redirectUrl: origin,
       postLogoutRedirectUri: origin,
-      clientId: appConfig.get('clientId'),
-      scope: appConfig.get('apiScope'),
+      clientId: appConfig.security.clientId,
+      scope: appConfig.security.apiScope,
       responseType: 'token-exchange',
       autoUserInfo: false,
       silentRenew: true,
       useRefreshToken: true,
       renewTimeBeforeTokenExpiresInSeconds: 30
     }
-      
-    return Promise.resolve(tokenExchangeResponseType)
-    });
+
+    return Promise.resolve(tokenExchangeResponseType);
+  });
 
   return new StsConfigHttpLoader([codeResponseTypeConfig$, tokenExchangeTypeConfig$]);
 };

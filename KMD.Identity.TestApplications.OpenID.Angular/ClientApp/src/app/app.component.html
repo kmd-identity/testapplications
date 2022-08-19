@@ -14,8 +14,8 @@
           <li class="nav-item">
             <a class="nav-link text-dark" href="#" (click)="callApi()">Call API</a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link text-dark" href="#" (click)="beginUserDelegation()">User delegations</a>
+          <li *ngIf="userDelegationEnabled()" class="nav-item">
+            <a class="nav-link text-dark" href="#" (click)="beginUserDelegation()">User delegation</a>
           </li>
         </ul>
       </div>
@@ -25,54 +25,36 @@
 
 
 <div role="main">
-
   <div>
-
     <div *ngIf="error">
       <app-error [error]="error"></app-error>
     </div>
-
     <div *ngIf="isAuthenticated; else authenticationPrompt">
-      
       <div *ngIf="performUserDelegation">
         <app-user-delegation></app-user-delegation>
       </div>
-
       <div *ngIf="showTestApiCall">
         <app-test-api-call></app-test-api-call>
       </div>
-
       <app-user-claims [userClaims]="userData"></app-user-claims>
     </div>
   </div>
 </div>  
 
-
-  <ng-template #authenticationPrompt>
-    <p>You are currently not logged-in.</p>
-    <div>
-      <input class="form-control" type="text" id="txtDomainHint" placeholder="Optional domain hint" [(ngModel)]="domainHint" />
-    </div>
-    <div>
-      Possible domain hints
-      <ul>
-        <li>
-          kmd-ad-prod
-        </li>
-        <li>
-          contexthandler-test-kmdidentitytestapplications
-        </li>
-        <li>
-          nemlogin-3-test-public
-        </li>
-        <li>
-          nemlogin-3-test-private
-        </li>
-      </ul>
-    </div>
-    <div>
-      <a id="lnkLogin" class="font-weight-bold" href="#" (click)="login()">Click here to log-in</a>
-    </div>
-  </ng-template>
+<ng-template #authenticationPrompt>
+  <p>You are currently not logged-in.</p>
+  <div>
+    <input class="form-control" type="text" id="txtDomainHint" placeholder="Optional domain hint" [(ngModel)]="domainHint" />
+  </div>
+  <div>
+    Possible domain hints
+    <ul>
+      <li *ngFor='let domainHint of domainHints'>{{domainHint}}</li>
+    </ul>
+  </div>
+  <div>
+    <a id="lnkLogin" class="font-weight-bold" href="#" (click)="login()">Click here to log-in</a>
+  </div>
+</ng-template>
 
 <router-outlet></router-outlet>
