@@ -18,7 +18,7 @@ namespace KMD.Identity.TestApplications.OpenID.Angular.Controllers
 
         [HttpGet]
         [Route("[controller]/appconfig")]
-        public ApplicationConfig FeatureToggles()
+        public ApplicationConfig ApplicationConfig()
         {
             return new ApplicationConfig {FeatureToggle = _featureToggleConfig, Security = _securityConfig};
         }

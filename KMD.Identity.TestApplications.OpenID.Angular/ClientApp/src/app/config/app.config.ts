@@ -11,11 +11,6 @@ export class AppConfig {
   constructor(private http: HttpClient) {
   }
 
-  public get(key: string) : string{
-    
-    return this.config[key];
-  }
-
   public async ensureLoaded() {
     if (this.config == null) {
       await this.load();
