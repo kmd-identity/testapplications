@@ -1,7 +1,8 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { OnInit, Component } from '@angular/core';
-import { OidcSecurityService } from 'angular-auth-oidc-client';
+import { OidcSecurityService, LoginResponse } from 'angular-auth-oidc-client';
+import { ConfigIds, IdentityProviders } from './auth/auth-config.module';
 import { AppConfig } from './config/app.config';
+import { TestApiCallService } from './test-api-call/test-api-call.service';
 
 @Component({
   selector: 'app-root',
@@ -9,7 +10,10 @@ import { AppConfig } from './config/app.config';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-  constructor(public oidcSecurityService: OidcSecurityService, public http: HttpClient, private appConfig: AppConfig) { }
+  constructor(
+    private oidcSecurityService: OidcSecurityService, 
+    private appConfig: AppConfig,
+    private testApiCallService: TestApiCallService) { }
   title = 'IdentityApp';
   isAuthenticated = false;
   userData: any = null;
@@ -18,13 +22,20 @@ export class AppComponent implements OnInit {
   domainHint = "";
   apiResponse: any = null;
   error: any = null;
+  showTestApiCall: boolean = false;
+  performUserDelegation: boolean = false;
+  domainHints: string[] = [
+    IdentityProviders.KmdAd, 
+    IdentityProviders.ContextHandlerTestApplications, 
+    IdentityProviders.NemloginThreeTestPublic, 
+    IdentityProviders.NemloginThreeTestPrivate]
 
   ngOnInit() {
-    this.oidcSecurityService.checkAuth().subscribe(({ isAuthenticated, userData, accessToken, idToken }) => {
-      this.isAuthenticated = isAuthenticated;
-      this.userData = userData;
-      this.accessToken = accessToken;
-      this.idToken = idToken;
+    this.oidcSecurityService.checkAuth().subscribe((loginResponse: LoginResponse) => {
+      this.isAuthenticated = loginResponse.isAuthenticated;
+      this.userData = loginResponse.userData;
+      this.accessToken = loginResponse.accessToken;
+      this.idToken = loginResponse.idToken;
 
       if (!this.isAuthenticated) {
         const urlParams = new URLSearchParams(window.location.search);
@@ -48,27 +59,38 @@ export class AppComponent implements OnInit {
 
   login() {
     this.error = null;
-    this.oidcSecurityService.authorize("identitykmddk", { customParams: { "domain_hint": this.domainHint } });
+
+    // // todo: This will be removed when approaching completion of the work. For now, this is a developer convenience
+    // // todo: This MUST be removed before merging.
+    // this.domainHint = this.domainHint === "" ? IdentityProviders.KmdAd : this.domainHint;
+
+    this.oidcSecurityService.authorize(ConfigIds.Code, { customParams: { "domain_hint": this.domainHint } });
   }
 
   logout() {
     const authOptions = {
       customParams: {
-        "client_id": this.appConfig.get("clientId"),
+        "client_id": this.appConfig.security.clientId,
       }
     };
     this.error = null;
-    this.oidcSecurityService.logoff("identitykmddk", authOptions);
+    this.oidcSecurityService.logoff(ConfigIds.Code, authOptions);
+  }
+  
+  callApi() {
+    this.showTestApiCall = true;
+    this.testApiCallService.callTestApi(this.accessToken);
   }
 
-  async callApi() {
+  beginUserDelegation() {
+    this.performUserDelegation = true;
+  }
 
-    const bearerHeaders = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + this.accessToken
-    });
-
-    this.apiResponse = await this.http.get(this.appConfig.get('apiUrl'), { headers: bearerHeaders }).toPromise();
+  userDelegationEnabled() {
+    return this.isAuthenticated
+      && this.appConfig.featureToggle.userDelegation
+      && this.userData 
+      && this.userData["identityprovider"] == IdentityProviders.KmdAd;
   }
 }
 
