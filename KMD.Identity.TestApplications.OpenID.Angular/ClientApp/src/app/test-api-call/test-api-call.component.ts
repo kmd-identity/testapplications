@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { TestApiCallService } from './test-api-call.service';
 
 @Component({
@@ -7,7 +7,6 @@ import { TestApiCallService } from './test-api-call.service';
   styleUrls: ['./test-api-call.component.css']
 })
 export class TestApiCallComponent implements OnInit {
-
   apiResponse: any;
 
   constructor(private testApiCallService: TestApiCallService) { 
@@ -15,6 +14,7 @@ export class TestApiCallComponent implements OnInit {
   }
 
   ngOnInit(): void { 
+    this.testApiCallService.callTestApi();
   }
 
 }

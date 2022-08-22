@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { AuthModule, StsConfigLoader, StsConfigHttpLoader, OpenIdConfiguration } from 'angular-auth-oidc-client';
-import { AppConfig } from '../config/app.config';
+import { AppConfig } from './app.config';
 
 export const ConfigIds = {
   Code: "identitykmddk",

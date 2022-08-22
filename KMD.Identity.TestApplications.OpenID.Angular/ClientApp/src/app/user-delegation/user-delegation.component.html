@@ -1,7 +1,3 @@
-<div>
-    <a id="lnkDelegate" class="font-weight-bold" href="#" (click)="getDelegationToken()">Perform the most basic "delegation" call</a>
-</div>
-
 <div *ngIf="delegationTokenClaims">
     <h3>delegation token claims: (At least, this will become so, after implementation)</h3>
     <pre>{{delegationTokenClaims | json}}</pre>

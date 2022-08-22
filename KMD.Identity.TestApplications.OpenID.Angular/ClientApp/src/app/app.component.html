@@ -23,11 +23,10 @@
   </nav>
 </header>
 
-
 <div role="main">
   <div>
-    <div *ngIf="error">
-      <app-error [error]="error"></app-error>
+    <div *ngIf="isError">
+      <app-error></app-error>
     </div>
     <div *ngIf="isAuthenticated; else authenticationPrompt">
       <div *ngIf="performUserDelegation">
@@ -36,24 +35,14 @@
       <div *ngIf="showTestApiCall">
         <app-test-api-call></app-test-api-call>
       </div>
-      <app-user-claims [userClaims]="userData"></app-user-claims>
+      <app-user-claims></app-user-claims>
     </div>
   </div>
 </div>  
 
 <ng-template #authenticationPrompt>
-  <p>You are currently not logged-in.</p>
   <div>
-    <input class="form-control" type="text" id="txtDomainHint" placeholder="Optional domain hint" [(ngModel)]="domainHint" />
-  </div>
-  <div>
-    Possible domain hints
-    <ul>
-      <li *ngFor='let domainHint of domainHints'>{{domainHint}}</li>
-    </ul>
-  </div>
-  <div>
-    <a id="lnkLogin" class="font-weight-bold" href="#" (click)="login()">Click here to log-in</a>
+    <app-authenticate></app-authenticate>
   </div>
 </ng-template>
 

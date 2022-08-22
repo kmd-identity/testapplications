@@ -1,0 +1,13 @@
+<p>You are currently not logged-in.</p>
+<div>
+  <input class="form-control" type="text" id="txtDomainHint" placeholder="Optional domain hint" [(ngModel)]="domainHint" />
+</div>
+<div>
+  Possible domain hints
+  <ul>
+    <li *ngFor='let domainHint of domainHints'>{{domainHint}}</li>
+  </ul>
+</div>
+<div>
+  <a id="lnkLogin" class="font-weight-bold" href="#" (click)="login()">Click here to log-in</a>
+</div>
