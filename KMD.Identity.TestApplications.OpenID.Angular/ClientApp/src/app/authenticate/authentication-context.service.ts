@@ -10,31 +10,32 @@ import { ErrorService } from '../error.service';
 })
 export class AuthenticationContext {
 
-  private _accessToken: string = '';
   public accessToken(): string {
-    return this._accessToken;
+    return this.oidcSecurityService.getAccessToken(ConfigIds.Code);
   }
 
-  private _idToken: string = '';
   public idToken(): string {
-    return this._idToken;
+    return this.oidcSecurityService.getIdToken(ConfigIds.Code);
   }
+  
+  private codeLogin = new BehaviorSubject<LoginResponse | undefined>(undefined);
+  public codeLogin$ = this.codeLogin.asObservable();
 
-  private isAuthenticated = new BehaviorSubject<boolean>(false)
-  public isAuthenticated$ = this.isAuthenticated.asObservable();
+  private tokenExchangeLogin = new BehaviorSubject<LoginResponse | undefined>(undefined);
+  public tokenExchangeLogin$ = this.tokenExchangeLogin.asObservable();
 
   constructor(
     private oidcSecurityService: OidcSecurityService, 
     private errorService: ErrorService,
     private appConfig: AppConfig) { 
 
-      this.oidcSecurityService.checkAuth()
-        .subscribe((loginResponse: LoginResponse) => {
-          this.isAuthenticated.next(loginResponse.isAuthenticated);
-          this._accessToken = loginResponse.accessToken;
-          this._idToken = loginResponse.idToken;
+      this.oidcSecurityService.checkAuth().subscribe((loginResponse: LoginResponse) => {
 
-
+        if(loginResponse.configId === ConfigIds.Code) {
+          this.codeLogin.next(loginResponse);
+        } else if (loginResponse.configId === ConfigIds.UserDelegation) {
+          this.tokenExchangeLogin.next(loginResponse);
+        }
           if (!loginResponse.isAuthenticated) {
             const urlParams = new URLSearchParams(window.location.search);
             const oidcError = urlParams.get('error');
@@ -49,24 +50,26 @@ export class AuthenticationContext {
               this.errorService.raise(error);
             }
           }
-        })
+        });
     }
 
-  login(domainHint: string | null) {
+  login(configId: string, domainHint: string | undefined) {
     this.errorService.reset();
-    this.oidcSecurityService.authorize(ConfigIds.Code, { customParams: { "domain_hint": domainHint ?? "" } });
+    this.oidcSecurityService.authorize(configId, { customParams: { "domain_hint": domainHint ?? "" } });
   }
 
   logout() {
     const authOptions = {
       customParams: {
-        "client_id": this.appConfig.security.clientId,
+        client_id: this.appConfig.security.clientId
       }
     };
     
     this.errorService.reset();
-    this.oidcSecurityService.logoff(ConfigIds.Code, authOptions);
-    this.isAuthenticated.next(false);
+    this.oidcSecurityService.logoff(undefined, authOptions);
+    this.oidcSecurityService.logoffLocalMultiple();
+    this.codeLogin.next(undefined);
+    this.tokenExchangeLogin.next(undefined);
   }
 
   userData(): any {

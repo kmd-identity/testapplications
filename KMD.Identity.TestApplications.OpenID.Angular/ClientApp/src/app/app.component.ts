@@ -1,9 +1,9 @@
 import { OnInit, Component } from '@angular/core';
-import { OidcSecurityService } from 'angular-auth-oidc-client';
-import { IdentityProviders } from './config/auth-config.module';
+import { ConfigIds, IdentityProviders } from './config/auth-config.module';
 import { AppConfig } from './config/app.config';
 import { AuthenticationContext } from './authenticate/authentication-context.service';
 import { ErrorService } from './error.service';
+import { LoginResponse } from 'angular-auth-oidc-client';
 
 @Component({
   selector: 'app-root',
@@ -12,27 +12,42 @@ import { ErrorService } from './error.service';
 })
 export class AppComponent implements OnInit {
   constructor(
-    private oidcSecurityService: OidcSecurityService, 
     private authenticationContext: AuthenticationContext,
     private errorService: ErrorService,
     private appConfig: AppConfig) { }
 
   title = 'IdentityApp';
   isAuthenticated = false;
+  hasDelegated = false;
   userData: any = null;
   isError: boolean = false;
   showTestApiCall: boolean = false;
-  performUserDelegation: boolean = false;
+  showUserDelegation: boolean = false;
+  hackForceHideUserDelegation: boolean = false;
+  codeLogin: LoginResponse | undefined = undefined;
+  tokenExchangeLogin: LoginResponse | undefined = undefined;
 
   ngOnInit() {
     this.errorService.isError$.subscribe(isError => this.isError = isError);
-    this.authenticationContext.isAuthenticated$.subscribe(isAuthenticated => 
-      {
-        this.userData = this.authenticationContext.userData();
-        this.isAuthenticated = isAuthenticated;
+    this.authenticationContext.codeLogin$.subscribe(
+        loginResponse => {
+          this.codeLogin = loginResponse;
       });
 
-    // A quick fix to initiate the log-in flow immediately from https://test.identity.kmd.dk/
+      this.authenticationContext.tokenExchangeLogin$.subscribe(
+        loginResponse => {
+          this.tokenExchangeLogin = loginResponse;
+        }
+      )
+    this.InitiateAutoLogInFlowIfConfigured();
+  }
+
+  requireAuthentication(): boolean {
+    return !(this.codeLogin?.isAuthenticated)
+    && (!this.tokenExchangeLogin?.isAuthenticated)
+  }
+
+  InitiateAutoLogInFlowIfConfigured() {
     if (window.location.search.indexOf('autologin') > -1) {
       this.login();
     }
@@ -40,33 +55,43 @@ export class AppComponent implements OnInit {
 
   login() {
     this.showTestApiCall = false;
-    this.performUserDelegation = false;
+    this.showUserDelegation = false;
 
-    this.authenticationContext.login("");
+    this.authenticationContext.login(ConfigIds.Code, undefined);
   }
 
   logout() {
     this.showTestApiCall = false;
-    this.performUserDelegation = false;
+    this.showUserDelegation = false;
 
     this.authenticationContext.logout()
   }
   
   callApi() {
     this.showTestApiCall = true;
-    this.performUserDelegation = false;
+    this.showUserDelegation = false;
+    this.hackForceHideUserDelegation = true;
   }
 
   beginUserDelegation() {
+
     this.showTestApiCall = false;
-    this.performUserDelegation = true;
+    this.showUserDelegation = true;
+    this.hackForceHideUserDelegation = false;
+  }
+
+  public performUserDelegation(): boolean {
+    return !this.hackForceHideUserDelegation // todo: clean up this abomination
+    && (this.showUserDelegation 
+    || (this.userDelegationEnabled() && this.tokenExchangeLogin?.isAuthenticated))
   }
 
   userDelegationEnabled() {
-    return this.isAuthenticated
-      && this.appConfig.featureToggle.userDelegation
-      && this.userData 
-      && this.userData["identityprovider"] == IdentityProviders.KmdAd;
+
+    return this.appConfig.featureToggle.userDelegation
+      && this.authenticationContext.userData()
+      && this.authenticationContext.userData()["identityprovider"] == IdentityProviders.KmdAd
+      ;
   }
 }
 

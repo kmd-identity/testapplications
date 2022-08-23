@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { OidcSecurityService } from 'angular-auth-oidc-client';
+import { OidcSecurityService, AuthOptions } from 'angular-auth-oidc-client';
 import { BehaviorSubject } from 'rxjs';
 import { AuthenticationContext } from '../authenticate/authentication-context.service';
-import { ConfigIds } from '../config/auth-config.module';
+import { ConfigIds, IdentityProviders } from '../config/auth-config.module';
 
 @Injectable({
   providedIn: 'root'
@@ -14,12 +14,23 @@ export class UserDelegationService {
 
   constructor(
     private authenticationContext: AuthenticationContext,
-    private  oidcSecurityService: OidcSecurityService) { 
+    private oidcSecurityService: OidcSecurityService) {
+
+      this.authenticationContext.tokenExchangeLogin$.subscribe(loginResponse => {
+        const token = this.oidcSecurityService.getUserData(ConfigIds.UserDelegation);
+        this.delegationToken.next(token);
+      })
   }
 
-  public requestDelegationToken() {
-    // maybe this isn't needed to be observable at all.
-    let userData = this.oidcSecurityService.getUserData(ConfigIds.Code)
-    this.delegationToken.next(userData);
+  public requestTokenExchange() {
+
+    const authOption: AuthOptions = {
+      customParams: {
+      "userdelegation_actas_nameid": "myself-for-now-until-implementation-is-provided",
+      "userdelegation_actas_identityprovider": IdentityProviders.KmdAd,
+      "domain_hint": IdentityProviders.KmdAd,
+    }};
+    
+    this.oidcSecurityService.authorize(ConfigIds.UserDelegation, authOption);
   }
 }

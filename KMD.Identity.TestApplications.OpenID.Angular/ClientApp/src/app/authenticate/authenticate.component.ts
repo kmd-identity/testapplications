@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { IdentityProviders } from '../config/auth-config.module';
+import { ConfigIds, IdentityProviders } from '../config/auth-config.module';
 import { AuthenticationContext } from './authentication-context.service';
 
 @Component({
@@ -24,9 +24,9 @@ export class AuthenticateComponent implements OnInit {
   login() {
     // todo: This will be removed when approaching completion of the work. For now, this is a developer convenience
     // todo: This MUST be removed before merging.
-    const domainHint = this.domainHint === "" ? IdentityProviders.KmdAd : this.domainHint;
+    // this.domainHint = this.domainHint === "" ? IdentityProviders.KmdAd : this.domainHint;
 
-    this.authenticationContext.login(domainHint);
+    this.authenticationContext.login(ConfigIds.Code, this.domainHint);
   }
 
 }

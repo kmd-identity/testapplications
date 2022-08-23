@@ -16,6 +16,9 @@ export class UserDelegationComponent implements OnInit {
    }
 
   ngOnInit(): void {
-    this.userDelegationService.requestDelegationToken();
+
+    if(!this.delegationTokenClaims){
+      this.userDelegationService.requestTokenExchange();
+    }
   }
 }

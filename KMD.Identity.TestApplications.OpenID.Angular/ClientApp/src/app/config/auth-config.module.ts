@@ -4,7 +4,7 @@ import { AppConfig } from './app.config';
 
 export const ConfigIds = {
   Code: "identitykmddk",
-  TokenExchange: "identitykmddkuserdelegation"
+  UserDelegation: "identitykmddkuserdelegation"
 };
 
 export const IdentityProviders = {
@@ -37,17 +37,20 @@ export const httpLoaderFactory = (appConfig: AppConfig) => {
 
       return Promise.resolve(codeResponseType);
     });
+
+    // While this profile is identical to the one above, it allows us to reinitiate an authentication flow in the code that provides a user delegation token.
+    // For now I'd like to maintain this as a second user delegation OpenIdConfiguration, as it makes it easier to juggle the standard- and user delegation- tokens
       
   const tokenExchangeTypeConfig$ = appConfig.ensureLoaded()
   .then(() => {
     const tokenExchangeResponseType : OpenIdConfiguration = {
-      configId: ConfigIds.TokenExchange,
+      configId: ConfigIds.UserDelegation,
       authority: appConfig.security.authority,
       redirectUrl: origin,
       postLogoutRedirectUri: origin,
       clientId: appConfig.security.clientId,
       scope: appConfig.security.apiScope,
-      responseType: 'token-exchange',
+      responseType: 'code',
       autoUserInfo: false,
       silentRenew: true,
       useRefreshToken: true,

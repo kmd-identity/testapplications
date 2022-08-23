@@ -7,7 +7,7 @@
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-        <ul class="navbar-nav flex-grow-1" *ngIf="isAuthenticated">
+        <ul class="navbar-nav flex-grow-1" *ngIf="!requireAuthentication()">
           <li class="nav-item">
             <a class="nav-link text-dark" href="#" (click)="logout()">Logout</a>
           </li>
@@ -28,17 +28,19 @@
     <div *ngIf="isError">
       <app-error></app-error>
     </div>
-    <div *ngIf="isAuthenticated; else authenticationPrompt">
-      <div *ngIf="performUserDelegation">
-        <app-user-delegation></app-user-delegation>
-      </div>
-      <div *ngIf="showTestApiCall">
-        <app-test-api-call></app-test-api-call>
-      </div>
-      <app-user-claims></app-user-claims>
-    </div>
+      <ng-container *ngIf="requireAuthentication(); then authenticationPrompt; else authenticated"></ng-container>
   </div>
 </div>  
+
+<ng-template #authenticated>
+  <div *ngIf="performUserDelegation()">
+    <app-user-delegation></app-user-delegation>
+  </div>
+  <div *ngIf="showTestApiCall">
+    <app-test-api-call></app-test-api-call>
+  </div>
+  <app-user-claims></app-user-claims>
+</ng-template>
 
 <ng-template #authenticationPrompt>
   <div>
