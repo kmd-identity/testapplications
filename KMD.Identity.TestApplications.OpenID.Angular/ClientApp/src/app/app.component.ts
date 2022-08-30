@@ -1,8 +1,9 @@
 import { OnInit, Component } from '@angular/core';
-import { OidcSecurityService, LoginResponse } from 'angular-auth-oidc-client';
-import { ConfigIds, IdentityProviders } from './auth/auth-config.module';
+import { ConfigIds, IdentityProviders } from './config/auth-config.module';
 import { AppConfig } from './config/app.config';
-import { TestApiCallService } from './test-api-call/test-api-call.service';
+import { AuthenticationContext } from './authenticate/authentication-context.service';
+import { ErrorService } from './error.service';
+import { LoginResponse } from 'angular-auth-oidc-client';
 
 @Component({
   selector: 'app-root',
@@ -11,86 +12,86 @@ import { TestApiCallService } from './test-api-call/test-api-call.service';
 })
 export class AppComponent implements OnInit {
   constructor(
-    private oidcSecurityService: OidcSecurityService, 
-    private appConfig: AppConfig,
-    private testApiCallService: TestApiCallService) { }
+    private authenticationContext: AuthenticationContext,
+    private errorService: ErrorService,
+    private appConfig: AppConfig) { }
+
   title = 'IdentityApp';
   isAuthenticated = false;
+  hasDelegated = false;
   userData: any = null;
-  accessToken = "";
-  idToken = "";
-  domainHint = "";
-  apiResponse: any = null;
-  error: any = null;
+  isError: boolean = false;
   showTestApiCall: boolean = false;
-  performUserDelegation: boolean = false;
-  domainHints: string[] = [
-    IdentityProviders.KmdAd, 
-    IdentityProviders.ContextHandlerTestApplications, 
-    IdentityProviders.NemloginThreeTestPublic, 
-    IdentityProviders.NemloginThreeTestPrivate]
+  showUserDelegation: boolean = false;
+  hackForceHideUserDelegation: boolean = false;
+  codeLogin: LoginResponse | undefined = undefined;
+  tokenExchangeLogin: LoginResponse | undefined = undefined;
 
   ngOnInit() {
-    this.oidcSecurityService.checkAuth().subscribe((loginResponse: LoginResponse) => {
-      this.isAuthenticated = loginResponse.isAuthenticated;
-      this.userData = loginResponse.userData;
-      this.accessToken = loginResponse.accessToken;
-      this.idToken = loginResponse.idToken;
+    this.errorService.isError$.subscribe(isError => this.isError = isError);
+    this.authenticationContext.codeLogin$.subscribe(
+        loginResponse => {
+          this.codeLogin = loginResponse;
+      });
 
-      if (!this.isAuthenticated) {
-        const urlParams = new URLSearchParams(window.location.search);
-        const oidcError = urlParams.get('error');
-        const oidcErrorDescription = urlParams.get('error_description');
-
-        if (oidcError || oidcErrorDescription) {
-          this.error = {
-            'Error': oidcError,
-            'Description': oidcErrorDescription
-          }
+      this.authenticationContext.tokenExchangeLogin$.subscribe(
+        loginResponse => {
+          this.tokenExchangeLogin = loginResponse;
         }
-      }
-    });
+      )
+    this.InitiateAutoLogInFlowIfConfigured();
+  }
 
-    // A quick fix to initiate the log-in flow immediately from https://test.identity.kmd.dk/
+  requireAuthentication(): boolean {
+    return !(this.codeLogin?.isAuthenticated)
+    && (!this.tokenExchangeLogin?.isAuthenticated)
+  }
+
+  InitiateAutoLogInFlowIfConfigured() {
     if (window.location.search.indexOf('autologin') > -1) {
       this.login();
     }
   }
 
   login() {
-    this.error = null;
+    this.showTestApiCall = false;
+    this.showUserDelegation = false;
 
-    // // todo: This will be removed when approaching completion of the work. For now, this is a developer convenience
-    // // todo: This MUST be removed before merging.
-    // this.domainHint = this.domainHint === "" ? IdentityProviders.KmdAd : this.domainHint;
-
-    this.oidcSecurityService.authorize(ConfigIds.Code, { customParams: { "domain_hint": this.domainHint } });
+    this.authenticationContext.login(ConfigIds.Code, undefined);
   }
 
   logout() {
-    const authOptions = {
-      customParams: {
-        "client_id": this.appConfig.security.clientId,
-      }
-    };
-    this.error = null;
-    this.oidcSecurityService.logoff(ConfigIds.Code, authOptions);
+    this.showTestApiCall = false;
+    this.showUserDelegation = false;
+
+    this.authenticationContext.logout()
   }
   
   callApi() {
     this.showTestApiCall = true;
-    this.testApiCallService.callTestApi(this.accessToken);
+    this.showUserDelegation = false;
+    this.hackForceHideUserDelegation = true;
   }
 
   beginUserDelegation() {
-    this.performUserDelegation = true;
+
+    this.showTestApiCall = false;
+    this.showUserDelegation = true;
+    this.hackForceHideUserDelegation = false;
+  }
+
+  public performUserDelegation(): boolean {
+    return !this.hackForceHideUserDelegation // todo: clean up this abomination
+    && (this.showUserDelegation 
+    || (this.userDelegationEnabled() && this.tokenExchangeLogin?.isAuthenticated))
   }
 
   userDelegationEnabled() {
-    return this.isAuthenticated
-      && this.appConfig.featureToggle.userDelegation
-      && this.userData 
-      && this.userData["identityprovider"] == IdentityProviders.KmdAd;
+
+    return this.appConfig.featureToggle.userDelegation
+      && this.authenticationContext.userData()
+      && this.authenticationContext.userData()["identityprovider"] == IdentityProviders.KmdAd
+      ;
   }
 }
 

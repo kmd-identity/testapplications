@@ -7,7 +7,7 @@
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-        <ul class="navbar-nav flex-grow-1" *ngIf="isAuthenticated">
+        <ul class="navbar-nav flex-grow-1" *ngIf="!requireAuthentication()">
           <li class="nav-item">
             <a class="nav-link text-dark" href="#" (click)="logout()">Logout</a>
           </li>
@@ -23,37 +23,28 @@
   </nav>
 </header>
 
-
 <div role="main">
   <div>
-    <div *ngIf="error">
-      <app-error [error]="error"></app-error>
+    <div *ngIf="isError">
+      <app-error></app-error>
     </div>
-    <div *ngIf="isAuthenticated; else authenticationPrompt">
-      <div *ngIf="performUserDelegation">
-        <app-user-delegation></app-user-delegation>
-      </div>
-      <div *ngIf="showTestApiCall">
-        <app-test-api-call></app-test-api-call>
-      </div>
-      <app-user-claims [userClaims]="userData"></app-user-claims>
-    </div>
+      <ng-container *ngIf="requireAuthentication(); then authenticationPrompt; else authenticated"></ng-container>
   </div>
 </div>  
 
+<ng-template #authenticated>
+  <div *ngIf="performUserDelegation()">
+    <app-user-delegation></app-user-delegation>
+  </div>
+  <div *ngIf="showTestApiCall">
+    <app-test-api-call></app-test-api-call>
+  </div>
+  <app-user-claims></app-user-claims>
+</ng-template>
+
 <ng-template #authenticationPrompt>
-  <p>You are currently not logged-in.</p>
   <div>
-    <input class="form-control" type="text" id="txtDomainHint" placeholder="Optional domain hint" [(ngModel)]="domainHint" />
-  </div>
-  <div>
-    Possible domain hints
-    <ul>
-      <li *ngFor='let domainHint of domainHints'>{{domainHint}}</li>
-    </ul>
-  </div>
-  <div>
-    <a id="lnkLogin" class="font-weight-bold" href="#" (click)="login()">Click here to log-in</a>
+    <app-authenticate></app-authenticate>
   </div>
 </ng-template>
 

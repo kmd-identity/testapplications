@@ -1,4 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { OidcSecurityService } from 'angular-auth-oidc-client';
+import { ConfigIds } from '../config/auth-config.module';
 
 @Component({
   selector: 'app-user-claims',
@@ -7,10 +9,11 @@ import { Component, Input, OnInit } from '@angular/core';
 })
 export class UserClaimsComponent implements OnInit {
 
-  @Input() userClaims: any;
+  public userClaims: any;
 
-  constructor() { }
+  constructor(private oidcSecurityService: OidcSecurityService) { }
 
   ngOnInit(): void {
+    this.userClaims = this.oidcSecurityService.getUserData(ConfigIds.Code);
   }
 }

@@ -9,7 +9,6 @@ import { UserDelegationService } from './user-delegation.service';
 export class UserDelegationComponent implements OnInit {
 
   @Input() accessToken: string = '';
-
   delegationTokenClaims: any = '';
 
   constructor(private userDelegationService: UserDelegationService) {
@@ -17,10 +16,9 @@ export class UserDelegationComponent implements OnInit {
    }
 
   ngOnInit(): void {
-  }
 
-  getDelegationToken() {
-    this.userDelegationService.requestDelegationToken();
+    if(!this.delegationTokenClaims){
+      this.userDelegationService.requestTokenExchange();
+    }
   }
-
 }
