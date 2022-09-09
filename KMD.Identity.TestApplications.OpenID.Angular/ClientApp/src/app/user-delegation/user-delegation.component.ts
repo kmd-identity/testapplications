@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { IdentityProviders } from '../config/auth-config.module';
 import { UserDelegationService } from './user-delegation.service';
 
 @Component({
@@ -8,17 +9,18 @@ import { UserDelegationService } from './user-delegation.service';
 })
 export class UserDelegationComponent implements OnInit {
 
-  @Input() accessToken: string = '';
   delegationTokenClaims: any = '';
 
   constructor(private userDelegationService: UserDelegationService) {
     this.userDelegationService.delgationToken$.subscribe(tokenClaims => this.delegationTokenClaims = tokenClaims);
    }
 
-  ngOnInit(): void {
 
-    if(!this.delegationTokenClaims){
-      this.userDelegationService.requestTokenExchange();
-    }
+  tryPerformDelegation(consentGrantedMasqueade: boolean){
+    this.delegationTokenClaims = '';
+    this.userDelegationService.requestTokenExchange(IdentityProviders.KmdAd, IdentityProviders.KmdAd, consentGrantedMasqueade);
+  }
+   
+  ngOnInit(): void {
   }
 }
