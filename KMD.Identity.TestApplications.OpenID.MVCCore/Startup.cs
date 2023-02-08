@@ -69,7 +69,17 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore
 
                             context.Properties.Items.Remove(domainHintKey);
                         }
+                        const string uniloginLOAKey = "unilogin_loa";
+                        if (context.Properties.Items.ContainsKey(uniloginLOAKey))
+                        {
+                            var uniloginLOA = context.Properties.Items[uniloginLOAKey];
+                            if (!string.IsNullOrWhiteSpace(uniloginLOA))
+                            {
+                                context.ProtocolMessage.Parameters.Add(uniloginLOAKey, uniloginLOA);
+                            }
 
+                            context.Properties.Items.Remove(uniloginLOAKey);
+                        }
                         return Task.FromResult(0);
                     },
                     OnTokenResponseReceived = (context) =>

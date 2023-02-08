@@ -14,6 +14,10 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore.Controllers
         public async Task Login(string returnUrl = "/", string domainHint = null)
         {
             await HttpContext.ChallengeAsync("AD FS", new AuthenticationProperties() { RedirectUri = returnUrl, Items = { { "domain_hint", domainHint } } });
+
+            //To use the Unilogin connection with a different flow than the default (one factor), 
+            //add a query string parameter, to read more about this go to our Wiki, example below, additional code in Startup.cs: 
+            //await HttpContext.ChallengeAsync("AD FS", new AuthenticationProperties() { RedirectUri = returnUrl, Items = { { "domain_hint", domainHint }, {"unilogin_loa","TwoFactor"} } });
         }
 
         [Authorize]
