@@ -78,7 +78,7 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore
                                 context.ProtocolMessage.Parameters.Add(uniloginLOAKey, uniloginLOA);
                             }
 
-                            context.Properties.Items.Remove(domainHintKey);
+                            context.Properties.Items.Remove(uniloginLOAKey);
                         }
                         return Task.FromResult(0);
                     },
