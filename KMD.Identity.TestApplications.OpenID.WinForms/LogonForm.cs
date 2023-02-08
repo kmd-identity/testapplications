@@ -56,7 +56,7 @@ namespace KMD.Identity.TestApplications.OpenID.WinForms
                 .WithAdfsAuthority(Properties.Settings.Default.AuthorityUrl)
                 // Perhaps have a list of ports and check if any of them are available on the machine. Make sure the list of ports are also defined on KMD Identity as "approved" redirect uris.
                 .WithRedirectUri(Properties.Settings.Default.RedirectUri)
-                .WithExtraQueryParameters(new Dictionary<string, string>{{"unilogin_loa", "TwoFactor" }})
+                //.WithExtraQueryParameters(new Dictionary<string, string>{{"unilogin_loa", "TwoFactor" }})
                 .Build();
 
             var authResult = await clientApp
@@ -120,7 +120,7 @@ namespace KMD.Identity.TestApplications.OpenID.WinForms
                 .WithDesktopFeatures()
                 // Perhaps have a list of ports and check if any of them are available on the machine. Make sure the list of ports are also defined on KMD Identity as "approved" redirect uris.
                 .WithRedirectUri(Properties.Settings.Default.RedirectUri)
-                .WithExtraQueryParameters(new Dictionary<string, string>{{"unilogin_loa", "TwoFactor" }})
+               // .WithExtraQueryParameters(new Dictionary<string, string>{{"unilogin_loa", "TwoFactor" }})
                 .Build();
 
             var authResult = await clientApp
