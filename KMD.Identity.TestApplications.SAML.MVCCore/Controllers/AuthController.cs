@@ -31,7 +31,7 @@ namespace KMD.Identity.TestApplications.SAML.MVCCore.Controllers
 
             //To use the Unilogin connection with a different flow than the default (one factor), 
             //add a query string parameter, to read more about this go to our Wiki, example below: 
-            //return binding.Bind(request).ToActionResultWithParameters(domainHint, "TwoFactor");
+            //return binding.Bind(new Saml2AuthnRequest(config)).ToActionResultWithParameters(domainHint, "TwoFactor");
         }
 
         [HttpPost]
