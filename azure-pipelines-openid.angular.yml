@@ -21,9 +21,8 @@ steps:
     version: '5.0.x'
     
 - task: NodeTool@0
-    displayName: 'Set Node.js version to 16.19.0'
-    inputs:
-      versionSpec: '16.19.0'   
+  inputs:
+    versionSpec: '16.19.0'   
       
 - task: DotNetCoreCLI@2
   inputs:
