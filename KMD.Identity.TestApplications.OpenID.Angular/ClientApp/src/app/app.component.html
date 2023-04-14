@@ -14,9 +14,6 @@
           <li class="nav-item">
             <a class="nav-link text-dark" href="#" (click)="callApi()">Call API</a>
           </li>
-          <li *ngIf="userDelegationEnabled()" class="nav-item">
-            <a class="nav-link text-dark" href="#" (click)="beginUserDelegation()">User delegation</a>
-          </li>
         </ul>
       </div>
     </div>
@@ -33,9 +30,6 @@
 </div>  
 
 <ng-template #authenticated>
-  <div *ngIf="performUserDelegation()">
-    <app-user-delegation></app-user-delegation>
-  </div>
   <div *ngIf="showTestApiCall">
     <app-test-api-call></app-test-api-call>
   </div>

@@ -21,9 +21,6 @@ export class AuthenticationContext {
   private codeLogin = new BehaviorSubject<LoginResponse | undefined>(undefined);
   public codeLogin$ = this.codeLogin.asObservable();
 
-  private tokenExchangeLogin = new BehaviorSubject<LoginResponse | undefined>(undefined);
-  public tokenExchangeLogin$ = this.tokenExchangeLogin.asObservable();
-
   constructor(
     private oidcSecurityService: OidcSecurityService, 
     private errorService: ErrorService,
@@ -33,9 +30,7 @@ export class AuthenticationContext {
 
         if(loginResponse.configId === ConfigIds.Code) {
           this.codeLogin.next(loginResponse);
-        } else if (loginResponse.configId === ConfigIds.UserDelegation) {
-          this.tokenExchangeLogin.next(loginResponse);
-        }
+        } 
           if (!loginResponse.isAuthenticated) {
             const urlParams = new URLSearchParams(window.location.search);
             const oidcError = urlParams.get('error');
@@ -73,7 +68,6 @@ export class AuthenticationContext {
     this.oidcSecurityService.logoff(undefined, authOptions);
     this.oidcSecurityService.logoffLocalMultiple();
     this.codeLogin.next(undefined);
-    this.tokenExchangeLogin.next(undefined);
   }
 
   userData(): any {

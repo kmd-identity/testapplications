@@ -1,9 +1,0 @@
-<div>
-    <button class="button--medium" (click)="tryPerformDelegation(true)">Request Delegation Token (with a granted consent)</button>
-    <button class="button--medium" (click)="tryPerformDelegation(false)">Request Delegation Token (without granted consent)</button>
-</div>
-
-<div *ngIf="delegationTokenClaims">
-    <h3>delegation token claims: (At least, this will become so, after implementation)</h3>
-    <pre>{{delegationTokenClaims | json}}</pre>
-</div>

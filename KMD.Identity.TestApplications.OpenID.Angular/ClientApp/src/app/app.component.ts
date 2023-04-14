@@ -18,12 +18,9 @@ export class AppComponent implements OnInit {
 
   title = 'IdentityApp';
   isAuthenticated = false;
-  hasDelegated = false;
   userData: any = null;
   isError: boolean = false;
   showTestApiCall: boolean = false;
-  showUserDelegation: boolean = false;
-  hackForceHideUserDelegation: boolean = false;
   codeLogin: LoginResponse | undefined = undefined;
   tokenExchangeLogin: LoginResponse | undefined = undefined;
 
@@ -33,12 +30,7 @@ export class AppComponent implements OnInit {
         loginResponse => {
           this.codeLogin = loginResponse;
       });
-
-      this.authenticationContext.tokenExchangeLogin$.subscribe(
-        loginResponse => {
-          this.tokenExchangeLogin = loginResponse;
-        }
-      )
+      
     this.InitiateAutoLogInFlowIfConfigured();
   }
 
@@ -55,43 +47,18 @@ export class AppComponent implements OnInit {
 
   login() {
     this.showTestApiCall = false;
-    this.showUserDelegation = false;
 
     this.authenticationContext.login(ConfigIds.Code, undefined);
   }
 
   logout() {
     this.showTestApiCall = false;
-    this.showUserDelegation = false;
 
     this.authenticationContext.logout()
   }
   
   callApi() {
     this.showTestApiCall = true;
-    this.showUserDelegation = false;
-    this.hackForceHideUserDelegation = true;
-  }
-
-  beginUserDelegation() {
-
-    this.showTestApiCall = false;
-    this.showUserDelegation = true;
-    this.hackForceHideUserDelegation = false;
-  }
-
-  public performUserDelegation(): boolean {
-    return !this.hackForceHideUserDelegation // todo: clean up this abomination
-    && (this.showUserDelegation 
-    || (this.userDelegationEnabled() && this.tokenExchangeLogin?.isAuthenticated))
-  }
-
-  userDelegationEnabled() {
-
-    return this.appConfig.featureToggle.userDelegation
-      && this.authenticationContext.userData()
-      && this.authenticationContext.userData()["identityprovider"] == IdentityProviders.KmdAd
-      ;
   }
 }
 

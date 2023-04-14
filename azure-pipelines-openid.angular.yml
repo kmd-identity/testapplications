@@ -20,6 +20,10 @@ steps:
     packageType: 'sdk'
     version: '5.0.x'
     
+- task: NodeTool@0
+  inputs:
+    versionSpec: '16.19.0'   
+      
 - task: DotNetCoreCLI@2
   inputs:
     command: 'restore'

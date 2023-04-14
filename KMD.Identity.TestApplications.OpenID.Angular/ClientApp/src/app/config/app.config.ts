@@ -32,6 +32,5 @@ export interface SecurityConfig {
   apiScope: string;
 }
 
-export interface FeatureToggle  {
-  userDelegation: boolean;
+export interface FeatureToggle  { 
 }
