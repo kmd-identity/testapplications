@@ -7,7 +7,8 @@ using System.Linq;
 namespace KMD.Identity.TestApplications.SAML.MVCCore.Infrastructure.Saml
 {
     /// <summary>
-    /// This is an extension to ItFoxtec certificate validator, which will fail when building chain in specific situations:
+    /// This is an extension to the ItFoxtec certificate validator which allows you to soften the validation requirements for certificates.
+    /// The following scenarios will cause certificate validation to fail in the base class but can be ignored in this class using the validation flag:":
     /// - Root certificate is not trusted (case for OCES3)
     /// - Certificate revocation endpoint returns bad response
     /// - Self signed certificate is used (case for many ADFS)
