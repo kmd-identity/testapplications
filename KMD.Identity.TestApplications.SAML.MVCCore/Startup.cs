@@ -6,11 +6,13 @@ using Microsoft.Extensions.Hosting;
 using System;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
+using System.ServiceModel.Security;
 using ITfoxtec.Identity.Saml2;
 using ITfoxtec.Identity.Saml2.MvcCore;
 using ITfoxtec.Identity.Saml2.MvcCore.Configuration;
 using ITfoxtec.Identity.Saml2.Schemas.Metadata;
 using ITfoxtec.Identity.Saml2.Util;
+using KMD.Identity.TestApplications.SAML.MVCCore.Infrastructure.Saml;
 
 namespace KMD.Identity.TestApplications.SAML.MVCCore
 {
@@ -51,7 +53,22 @@ namespace KMD.Identity.TestApplications.SAML.MVCCore
                     saml2Configuration.DecryptionCertificate = certCollection[0];
                     certStore.Close();
                 }
-                
+
+                if (saml2Configuration.CertificateValidationMode == X509CertificateValidationMode.Custom)
+                {
+                    saml2Configuration.CustomCertificateValidator = new CustomSamlCertificateValidator(
+                        // - Root certificate is not trusted (case for OCES3)
+                        // - Self signed certificate is used (case for many ADFS)
+                        X509VerificationFlags.AllowUnknownCertificateAuthority
+                        // - Certificate revocation endpoint returns bad response
+                        | X509VerificationFlags.IgnoreCertificateAuthorityRevocationUnknown
+                        | X509VerificationFlags.IgnoreEndRevocationUnknown
+                    )
+                    {
+                        RevocationMode = saml2Configuration.RevocationMode
+                    };
+                }
+
                 saml2Configuration.AllowedAudienceUris.Add(saml2Configuration.Issuer);
 
                 var entityDescriptor = new EntityDescriptor();
