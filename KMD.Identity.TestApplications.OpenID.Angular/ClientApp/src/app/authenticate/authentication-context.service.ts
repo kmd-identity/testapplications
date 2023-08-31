@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { OidcSecurityService, LoginResponse } from 'angular-auth-oidc-client';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { AppConfig } from '../config/app.config';
 import { ConfigIds } from '../config/auth-config.module';
 import { ErrorService } from '../error.service';
@@ -10,11 +10,11 @@ import { ErrorService } from '../error.service';
 })
 export class AuthenticationContext {
 
-  public accessToken(): string {
+  public accessToken(): Observable<string> {
     return this.oidcSecurityService.getAccessToken(ConfigIds.Code);
   }
 
-  public idToken(): string {
+  public idToken(): Observable<string> {
     return this.oidcSecurityService.getIdToken(ConfigIds.Code);
   }
   
