@@ -13,6 +13,8 @@ using ITfoxtec.Identity.Saml2.MvcCore.Configuration;
 using ITfoxtec.Identity.Saml2.Schemas.Metadata;
 using ITfoxtec.Identity.Saml2.Util;
 using KMD.Identity.TestApplications.SAML.MVCCore.Infrastructure.Saml;
+using KMD.Identity.TestApplications.SAML.MVCCore.Extensions;
+using KMD.Identity.TestApplications.SAML.MVCCore.Config;
 
 namespace KMD.Identity.TestApplications.SAML.MVCCore
 {
@@ -33,21 +35,21 @@ namespace KMD.Identity.TestApplications.SAML.MVCCore
         {
             services.AddApplicationInsightsTelemetry();
 
-            services.Configure<Saml2Configuration>(Configuration.GetSection("Saml2"));
+            services.Configure<ExtendedSaml2Configuration>(Configuration.GetSection("Saml2"));
             //Note we're using the same certificate for signing and encryption 
-            services.Configure<Saml2Configuration>(saml2Configuration =>
+            services.Configure<ExtendedSaml2Configuration>(saml2Configuration =>
             {
                 if (AppEnvironment.IsEnvironment("Development"))
                 {
-                    saml2Configuration.SigningCertificate = CertificateUtil.Load(AppEnvironment.MapToPhysicalFilePath(Configuration["Saml2:SigningCertificateFile"]), Configuration["Saml2:SigningCertificatePassword"]);
-                    saml2Configuration.DecryptionCertificate = CertificateUtil.Load(AppEnvironment.MapToPhysicalFilePath(Configuration["Saml2:SigningCertificateFile"]), Configuration["Saml2:SigningCertificatePassword"]);
+                    saml2Configuration.SigningCertificate = CertificateUtil.Load(AppEnvironment.MapToPhysicalFilePath(saml2Configuration.SigningCertificateFile), saml2Configuration.SigningCertificatePassword);
+                    saml2Configuration.DecryptionCertificate = CertificateUtil.Load(AppEnvironment.MapToPhysicalFilePath(saml2Configuration.SigningCertificateFile), saml2Configuration.SigningCertificatePassword);
                 }
                 else
                 {
                     X509Store certStore = new X509Store(StoreName.My, StoreLocation.CurrentUser);
                     certStore.Open(OpenFlags.ReadOnly);
                     X509Certificate2Collection certCollection = certStore.Certificates.Find(
-                        X509FindType.FindByThumbprint, Configuration["Saml2:SigningCertificateThumbprint"], false);
+                        X509FindType.FindByThumbprint, saml2Configuration.SigningCertificateThumbprint, false);
 
                     saml2Configuration.SigningCertificate = certCollection[0];
                     saml2Configuration.DecryptionCertificate = certCollection[0];
@@ -71,23 +73,7 @@ namespace KMD.Identity.TestApplications.SAML.MVCCore
 
                 saml2Configuration.AllowedAudienceUris.Add(saml2Configuration.Issuer);
 
-                var entityDescriptor = new EntityDescriptor();
-                entityDescriptor.ReadIdPSsoDescriptorFromUrl(new Uri(Configuration["Saml2:IdPMetadata"]));
-                if (entityDescriptor.IdPSsoDescriptor != null)
-                {
-                    saml2Configuration.AllowedIssuer = entityDescriptor.EntityId;
-                    saml2Configuration.SingleSignOnDestination = entityDescriptor.IdPSsoDescriptor.SingleSignOnServices.First().Location;
-                    saml2Configuration.SingleLogoutDestination = entityDescriptor.IdPSsoDescriptor.SingleLogoutServices.First().Location;
-                    saml2Configuration.SignatureValidationCertificates.AddRange(entityDescriptor.IdPSsoDescriptor.SigningCertificates);
-                    if (entityDescriptor.IdPSsoDescriptor.WantAuthnRequestsSigned.HasValue)
-                    {
-                        saml2Configuration.SignAuthnRequest = entityDescriptor.IdPSsoDescriptor.WantAuthnRequestsSigned.Value;
-                    }
-                }
-                else
-                {
-                    throw new Exception("IdPSsoDescriptor not loaded from metadata.");
-                }
+                saml2Configuration.ReloadMetadata(new Uri(saml2Configuration.IdPMetadata));
             });
 
             services.AddSaml2(slidingExpiration: true);
