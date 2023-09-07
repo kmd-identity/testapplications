@@ -73,7 +73,7 @@ namespace KMD.Identity.TestApplications.SAML.MVCCore
 
                 saml2Configuration.AllowedAudienceUris.Add(saml2Configuration.Issuer);
 
-                saml2Configuration.ReloadMetadata(new Uri(saml2Configuration.IdPMetadata));
+                saml2Configuration.ReloadMetadata(new Uri(saml2Configuration.IdPMetadataUrl));
             });
 
             services.AddSaml2(slidingExpiration: true);

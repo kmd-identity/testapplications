@@ -38,7 +38,7 @@ namespace KMD.Identity.TestApplications.SAML.MVCCore.Extensions
             }
             catch (InvalidSignatureException)
             {
-                var metadataUrl = new Uri(saml2Configuration.IdPMetadata);
+                var metadataUrl = new Uri(saml2Configuration.IdPMetadataUrl);
                 saml2Configuration.ReloadMetadata(metadataUrl);
                 binding.Unbind(request, saml2AuthnResponse);
             }
