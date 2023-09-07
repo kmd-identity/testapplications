@@ -7,16 +7,16 @@ using ITfoxtec.Identity.Saml2.Schemas;
 using ITfoxtec.Identity.Saml2.Schemas.Metadata;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
-using System.Collections.Generic;
+using KMD.Identity.TestApplications.SAML.MVCCore.Config;
 
 namespace KMD.Identity.TestApplications.SAML.MVCCore.Controllers
 {
     [AllowAnonymous]
     public class MetadataController : Controller
     {
-        private readonly Saml2Configuration config;
+        private readonly ExtendedSaml2Configuration config;
 
-        public MetadataController(IOptions<Saml2Configuration> configAccessor)
+        public MetadataController(IOptions<ExtendedSaml2Configuration> configAccessor)
         {
             config = configAccessor.Value;
         }
