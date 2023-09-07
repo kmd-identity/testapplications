@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { AuthModule, StsConfigLoader, StsConfigHttpLoader, OpenIdConfiguration } from 'angular-auth-oidc-client';
 import { AppConfig } from './app.config';
+import { from } from 'rxjs';
 
 export const ConfigIds = {
   Code: "identitykmddk"
@@ -17,7 +18,7 @@ export const httpLoaderFactory = (appConfig: AppConfig) => {
 
   const origin: string = window.location.origin;
 
-  const codeResponseTypeConfig$ = appConfig.ensureLoaded()
+  const codeResponseTypeConfig$ = from(appConfig.ensureLoaded()
     .then(() => {
 
       const codeResponseType: OpenIdConfiguration = {
@@ -35,8 +36,7 @@ export const httpLoaderFactory = (appConfig: AppConfig) => {
       }
 
       return Promise.resolve(codeResponseType);
-    });
-
+    }));
 
   return new StsConfigHttpLoader([codeResponseTypeConfig$]);
 };
