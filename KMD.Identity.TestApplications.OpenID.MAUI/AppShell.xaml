@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="KMD.Identity.TestApplications.OpenID.MAUI.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:KMD.Identity.TestApplications.OpenID.MAUI"
+    Shell.FlyoutBehavior="Disabled"
+    Shell.Title="KMD Identity Test Application">
+
+    <TabBar>
+        <Tab Title="Home">
+            <ShellContent
+                Title="KMD Identity Test Application"
+                ContentTemplate="{DataTemplate local:MainPage}"
+                Route="MainPage"/>
+        </Tab>
+        <Tab IsVisible="{Binding IsAuthenticated}" Title="Call API">
+            <ShellContent
+                Title="KMD Identity Test Application"
+                ContentTemplate="{DataTemplate local:MainPage}"
+                Route="MainPage"
+               />
+        </Tab>
+        <Tab IsVisible="{Binding IsAuthenticated}" Title="Logout">
+            <ShellContent
+                Title="KMD Identity Test Application"
+                ContentTemplate="{DataTemplate local:LogoutPage}"
+                Route="LogoutPage"/>
+        </Tab>
+    </TabBar>
+</Shell>

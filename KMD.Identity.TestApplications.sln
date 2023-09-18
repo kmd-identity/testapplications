@@ -15,6 +15,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KMD.Identity.TestApplicatio
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KMD.Identity.TestApplications.OpenID.WinForms", "KMD.Identity.TestApplications.OpenID.WinForms\KMD.Identity.TestApplications.OpenID.WinForms.csproj", "{A811920F-E007-4355-B155-E602E6361D2A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KMD.Identity.TestApplications.OpenID.MAUI", "KMD.Identity.TestApplications.OpenID.MAUI\KMD.Identity.TestApplications.OpenID.MAUI.csproj", "{4A30282E-0DA0-486F-915C-B0DC850098A2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,12 @@ Global
 		{A811920F-E007-4355-B155-E602E6361D2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A811920F-E007-4355-B155-E602E6361D2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A811920F-E007-4355-B155-E602E6361D2A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4A30282E-0DA0-486F-915C-B0DC850098A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A30282E-0DA0-486F-915C-B0DC850098A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4A30282E-0DA0-486F-915C-B0DC850098A2}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{4A30282E-0DA0-486F-915C-B0DC850098A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4A30282E-0DA0-486F-915C-B0DC850098A2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4A30282E-0DA0-486F-915C-B0DC850098A2}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
