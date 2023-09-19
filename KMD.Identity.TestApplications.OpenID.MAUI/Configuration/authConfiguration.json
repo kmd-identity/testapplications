@@ -3,6 +3,8 @@
   "AuthorityUrl": "https://identity.kmd.dk/adfs",
   "RedirectUrl": "kmdidentity://postlogin",
   "Scopes": [
-    "openid"
+    "openid",
+    "urn:kmd-identity-test-application-api.prod/user_impersonation",
+    "allatclaims"
   ]
 }

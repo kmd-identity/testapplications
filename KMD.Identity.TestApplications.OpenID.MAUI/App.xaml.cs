@@ -8,13 +8,13 @@ namespace KMD.Identity.TestApplications.OpenID.MAUI
     {
         private readonly AuthConfiguration settings;
         private IPublicClientApplication identityClient;
-        private readonly AuthViewModel authViewModel = new AuthViewModel();
+        public readonly AuthViewModel AuthViewModel = new AuthViewModel();
 
         public App(AuthConfiguration settings)
         {
             this.settings = settings;
             InitializeComponent();
-            BindingContext = authViewModel;
+            BindingContext = AuthViewModel;
             MainPage = new AppShell();
         }
 
@@ -78,7 +78,7 @@ namespace KMD.Identity.TestApplications.OpenID.MAUI
                 }
             }
 
-            authViewModel.AfterAuthentication(result);
+            AuthViewModel.AfterAuthentication(result);
         }
 
         public async Task Logout()
@@ -89,7 +89,7 @@ namespace KMD.Identity.TestApplications.OpenID.MAUI
                 await identityClient.RemoveAsync(account);
             }
 
-            authViewModel.AfterLogout();
+            AuthViewModel.AfterLogout();
         }
     }
 }

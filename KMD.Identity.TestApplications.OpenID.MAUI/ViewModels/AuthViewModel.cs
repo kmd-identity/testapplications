@@ -22,6 +22,8 @@ public class AuthViewModel : INotifyPropertyChanged
         set => SetField(ref claims, value);
     }
 
+    public string AccessToken { get; set; }
+
     public event PropertyChangedEventHandler PropertyChanged;
 
     protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
@@ -48,11 +50,13 @@ public class AuthViewModel : INotifyPropertyChanged
         }
 
         Claims = string.Join(Environment.NewLine, result.ClaimsPrincipal.Claims.Select(c => $"{c.Type}: {c.Value}"));
+        AccessToken = result.AccessToken;
     }
 
     public void AfterLogout()
     {
         IsAuthenticated = false;
         Claims = string.Empty;
+        AccessToken = string.Empty;
     }
 }

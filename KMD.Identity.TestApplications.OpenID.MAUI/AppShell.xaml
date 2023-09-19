@@ -5,8 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:KMD.Identity.TestApplications.OpenID.MAUI"
     xmlns:models="clr-namespace:KMD.Identity.TestApplications.OpenID.MAUI.ViewModels"
-    Shell.FlyoutBehavior="Disabled"
-    Shell.Title="KMD Identity Test Application">
+    Shell.FlyoutBehavior="Disabled">
     <Shell.TitleView>
         <Grid>
             <Label 
@@ -25,16 +24,12 @@
         </Grid>
     </Shell.TitleView>
     <TabBar>
-        <Tab Title="Home">
-            <ShellContent
-                ContentTemplate="{DataTemplate local:MainPage}"
-                Route="MainPage"/>
+        <Tab Title="Home" Route="MainPage">
+            <ShellContent ContentTemplate="{DataTemplate local:MainPage}"
+                />
         </Tab>
-        <Tab Title="Call API" IsVisible="{Binding Source={RelativeSource AncestorType={x:Type models:AuthViewModel}}, Path=IsAuthenticated}">
-            <ShellContent
-                ContentTemplate="{DataTemplate local:MainPage}"
-                Route="MainPage"
-               />
+        <Tab Title="API" IsVisible="{Binding Source={RelativeSource AncestorType={x:Type models:AuthViewModel}}, Path=IsAuthenticated}" Route="ApiPage">
+            <ShellContent ContentTemplate="{DataTemplate local:ApiPage}"/>
         </Tab>
     </TabBar>
 </Shell>
