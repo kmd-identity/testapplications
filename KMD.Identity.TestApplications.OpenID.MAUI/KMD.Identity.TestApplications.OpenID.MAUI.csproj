@@ -62,10 +62,4 @@
 		<PackageReference Include="Microsoft.Identity.Client" Version="4.56.0" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <MauiXaml Update="LogoutPage.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	</ItemGroup>
-
 </Project>

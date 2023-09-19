@@ -49,4 +49,10 @@ public class AuthViewModel : INotifyPropertyChanged
 
         Claims = string.Join(Environment.NewLine, result.ClaimsPrincipal.Claims.Select(c => $"{c.Type}: {c.Value}"));
     }
+
+    public void AfterLogout()
+    {
+        IsAuthenticated = false;
+        Claims = string.Empty;
+    }
 }

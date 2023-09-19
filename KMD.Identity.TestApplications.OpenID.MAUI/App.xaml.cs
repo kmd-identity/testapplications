@@ -44,7 +44,7 @@ namespace KMD.Identity.TestApplications.OpenID.MAUI
                     .Build();
 #endif
             }
-
+            
             var accounts = await identityClient.GetAccountsAsync();
             AuthenticationResult result = null;
             bool tryInteractiveLogin = false;
@@ -83,7 +83,13 @@ namespace KMD.Identity.TestApplications.OpenID.MAUI
 
         public async Task Logout()
         {
+            var accounts = await identityClient.GetAccountsAsync();
+            foreach (var account in accounts)
+            {
+                await identityClient.RemoveAsync(account);
+            }
 
+            authViewModel.AfterLogout();
         }
     }
 }

@@ -7,26 +7,34 @@
     xmlns:models="clr-namespace:KMD.Identity.TestApplications.OpenID.MAUI.ViewModels"
     Shell.FlyoutBehavior="Disabled"
     Shell.Title="KMD Identity Test Application">
-
+    <Shell.TitleView>
+        <Grid>
+            <Label 
+                Text="KMD Identity Test Application" 
+                TextColor="White" 
+                VerticalTextAlignment="Center" 
+                HorizontalOptions="Start"></Label>
+            <Button 
+                Text="Logout" 
+                IsVisible="{Binding Source={RelativeSource AncestorType={x:Type models:AuthViewModel}}, Path=IsAuthenticated}" 
+                Clicked="Button_OnClicked"
+                BorderColor="White"
+                BorderWidth="1"
+                Margin="5"
+                HorizontalOptions="End"></Button>
+        </Grid>
+    </Shell.TitleView>
     <TabBar>
         <Tab Title="Home">
             <ShellContent
-                Title="KMD Identity Test Application"
                 ContentTemplate="{DataTemplate local:MainPage}"
                 Route="MainPage"/>
         </Tab>
         <Tab Title="Call API" IsVisible="{Binding Source={RelativeSource AncestorType={x:Type models:AuthViewModel}}, Path=IsAuthenticated}">
             <ShellContent
-                Title="KMD Identity Test Application"
                 ContentTemplate="{DataTemplate local:MainPage}"
                 Route="MainPage"
                />
-        </Tab>
-        <Tab Title="Logout" IsVisible="{Binding Source={RelativeSource AncestorType={x:Type models:AuthViewModel}}, Path=IsAuthenticated}">
-            <ShellContent
-                Title="KMD Identity Test Application"
-                ContentTemplate="{DataTemplate local:LogoutPage}"
-                Route="LogoutPage"/>
         </Tab>
     </TabBar>
 </Shell>
