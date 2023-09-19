@@ -4,6 +4,7 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:KMD.Identity.TestApplications.OpenID.MAUI"
+    xmlns:models="clr-namespace:KMD.Identity.TestApplications.OpenID.MAUI.ViewModels"
     Shell.FlyoutBehavior="Disabled"
     Shell.Title="KMD Identity Test Application">
 
@@ -14,14 +15,14 @@
                 ContentTemplate="{DataTemplate local:MainPage}"
                 Route="MainPage"/>
         </Tab>
-        <Tab IsVisible="{Binding IsAuthenticated}" Title="Call API">
+        <Tab Title="Call API" IsVisible="{Binding Source={RelativeSource AncestorType={x:Type models:AuthViewModel}}, Path=IsAuthenticated}">
             <ShellContent
                 Title="KMD Identity Test Application"
                 ContentTemplate="{DataTemplate local:MainPage}"
                 Route="MainPage"
                />
         </Tab>
-        <Tab IsVisible="{Binding IsAuthenticated}" Title="Logout">
+        <Tab Title="Logout" IsVisible="{Binding Source={RelativeSource AncestorType={x:Type models:AuthViewModel}}, Path=IsAuthenticated}">
             <ShellContent
                 Title="KMD Identity Test Application"
                 ContentTemplate="{DataTemplate local:LogoutPage}"

@@ -1,65 +1,58 @@
 ﻿using Microsoft.Identity.Client;
-using System.Diagnostics;
 using KMD.Identity.TestApplications.OpenID.MAUI.ViewModels;
+using KMD.Identity.TestApplications.OpenID.MAUI.Configuration;
 
 namespace KMD.Identity.TestApplications.OpenID.MAUI
 {
     public partial class App : Application
     {
-        public static IPublicClientApplication IdentityClient { get; set; }
+        private readonly AuthConfiguration settings;
+        private IPublicClientApplication identityClient;
+        private readonly AuthViewModel authViewModel = new AuthViewModel();
 
-        public static MainPageViewModel ViewModel { get; set; } = new MainPageViewModel();
-
-        public App()
+        public App(AuthConfiguration settings)
         {
+            this.settings = settings;
             InitializeComponent();
-
+            BindingContext = authViewModel;
             MainPage = new AppShell();
         }
 
-        private class Constants
+        public async Task Login()
         {
-            public static string ApplicationId { get; set; } = "6c133e1c-e215-4780-bea8-2b62678581f4";
-            public static string AuthorityUrl { get; set; } = "https://identity.kmd.dk/adfs";
-            public static string RedirectUrl { get; set; } = "kmdidentity://postlogin";
-            public static string[] Scopes { get; set; } = new[] { "openid" };
-        }
-
-        public static async Task<AuthenticationResult> GetAuthenticationToken()
-        {
-            if (IdentityClient == null)
+            if (identityClient == null)
             {
 #if ANDROID
-        IdentityClient = PublicClientApplicationBuilder
-            .Create(Constants.ApplicationId)
-            .WithAdfsAuthority(Constants.AuthorityUrl)
-            .WithRedirectUri(Constants.RedirectUrl)
+        identityClient = PublicClientApplicationBuilder
+            .Create(settings.ApplicationId)
+            .WithAdfsAuthority(settings.AuthorityUrl)
+            .WithRedirectUri(settings.RedirectUrl)
             .WithParentActivityOrWindow(() => Platform.CurrentActivity)
             .Build();
 #elif IOS
-        IdentityClient = PublicClientApplicationBuilder
-            .Create(Constants.ApplicationId)
-            .WithAdfsAuthority(Constants.AuthorityUrl)
-            .WithRedirectUri(Constants.RedirectUrl)
+        identityClient = PublicClientApplicationBuilder
+            .Create(settings.ApplicationId)
+            .WithAdfsAuthority(settings.AuthorityUrl)
+            .WithRedirectUri(settings.RedirectUrl)
             .WithIosKeychainSecurityGroup("com.microsoft.adalcache")
             .Build();
 #else
-                IdentityClient = PublicClientApplicationBuilder
-                    .Create(Constants.ApplicationId)
-                    .WithAdfsAuthority(Constants.AuthorityUrl)
-                    .WithRedirectUri(Constants.RedirectUrl)
+                identityClient = PublicClientApplicationBuilder
+                    .Create(settings.ApplicationId)
+                    .WithAdfsAuthority(settings.AuthorityUrl)
+                    .WithRedirectUri(settings.RedirectUrl)
                     .Build();
 #endif
             }
 
-            var accounts = await IdentityClient.GetAccountsAsync();
+            var accounts = await identityClient.GetAccountsAsync();
             AuthenticationResult result = null;
             bool tryInteractiveLogin = false;
 
             try
             {
-                result = await IdentityClient
-                    .AcquireTokenSilent(Constants.Scopes, accounts.FirstOrDefault())
+                result = await identityClient
+                    .AcquireTokenSilent(settings.Scopes, accounts.FirstOrDefault())
                     .ExecuteAsync();
             }
             catch (MsalUiRequiredException)
@@ -68,24 +61,29 @@ namespace KMD.Identity.TestApplications.OpenID.MAUI
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MSAL Silent Error: {ex.Message}");
+                await MainPage!.DisplayAlert("Error", $"MSAL Silent Error: {ex.Message}", "Close");
             }
 
             if (tryInteractiveLogin)
             {
                 try
                 {
-                    result = await IdentityClient
-                        .AcquireTokenInteractive(Constants.Scopes)
+                    result = await identityClient
+                        .AcquireTokenInteractive(settings.Scopes)
                         .ExecuteAsync();
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"MSAL Interactive Error: {ex.Message}");
+                    await MainPage!.DisplayAlert("Error", $"\"MSAL Interactive Error: {ex.Message}", "Close");
                 }
             }
 
-            return result;
+            authViewModel.AfterAuthentication(result);
+        }
+
+        public async Task Logout()
+        {
+
         }
     }
 }

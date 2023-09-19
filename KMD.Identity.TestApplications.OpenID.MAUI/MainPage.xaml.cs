@@ -9,13 +9,12 @@ namespace KMD.Identity.TestApplications.OpenID.MAUI
         public MainPage()
         {   
             InitializeComponent();
-            BindingContext = App.ViewModel;
         }
 
         private async void OnLoginStart(object sender, EventArgs e)
         {
-            var result = await App.GetAuthenticationToken();
-            App.ViewModel.AfterAuthentication(result);
+            var parentApp = (App)Application.Current!;
+            await parentApp.Login();
         }
     }
 }

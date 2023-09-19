@@ -5,7 +5,6 @@
         public AppShell()
         {
             InitializeComponent();
-            BindingContext = App.ViewModel;
         }
     }
 }

@@ -5,7 +5,7 @@ using Environment = System.Environment;
 
 namespace KMD.Identity.TestApplications.OpenID.MAUI.ViewModels;
 
-public class MainPageViewModel : INotifyPropertyChanged
+public class AuthViewModel : INotifyPropertyChanged
 {
     private bool isAuthenticated;
     private string claims;

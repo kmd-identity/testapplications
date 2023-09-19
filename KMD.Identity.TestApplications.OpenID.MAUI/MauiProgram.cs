@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using KMD.Identity.TestApplications.OpenID.MAUI.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.Maui.LifecycleEvents;
 using Microsoft.Identity.Client;
 
@@ -32,6 +33,8 @@ namespace KMD.Identity.TestApplications.OpenID.MAUI
 #if DEBUG
 		builder.Logging.AddDebug();
 #endif
+
+            builder.Services.AddSingleton(ConfigurationLoader.Load<AuthConfiguration>("AuthConfiguration.json"));
 
             return builder.Build();
         }

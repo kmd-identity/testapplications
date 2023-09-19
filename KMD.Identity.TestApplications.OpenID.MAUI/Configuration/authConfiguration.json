@@ -1,0 +1,8 @@
+{
+  "ApplicationId": "6c133e1c-e215-4780-bea8-2b62678581f4",
+  "AuthorityUrl": "https://identity.kmd.dk/adfs",
+  "RedirectUrl": "kmdidentity://postlogin",
+  "Scopes": [
+    "openid"
+  ]
+}

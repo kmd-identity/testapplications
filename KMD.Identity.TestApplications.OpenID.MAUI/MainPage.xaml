@@ -3,6 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="KMD.Identity.TestApplications.OpenID.MAUI.MainPage"
              xmlns:Converters="clr-namespace:KMD.Identity.TestApplications.OpenID.MAUI.Converters"
+             xmlns:local="clr-namespace:KMD.Identity.TestApplications.OpenID.MAUI"
+             xmlns:models="clr-namespace:KMD.Identity.TestApplications.OpenID.MAUI.ViewModels"
              >
     <ScrollView>
         <StackLayout>
@@ -10,8 +12,7 @@
                 Spacing="25"
                 Padding="30,0"
                 VerticalOptions="Center"
-                IsVisible="{Binding IsAuthenticated, Converter={Converters:InverseBoolConverter}}">
-
+                IsVisible="{Binding Source={RelativeSource AncestorType={x:Type models:AuthViewModel}}, Path=IsAuthenticated, Converter={Converters:InverseBoolConverter}}">
                 <Label
                     Text="You are currently not logged-in."
                     SemanticProperties.HeadingLevel="Level1"
@@ -20,7 +21,7 @@
 
                 <Button
                     x:Name="LoginBtn"
-                    Text="Click me"
+                    Text="Log-in"
                     SemanticProperties.Hint="Click here to log-in"
                     Clicked="OnLoginStart"
                     HorizontalOptions="Center" />
@@ -30,8 +31,7 @@
                 Spacing="25"
                 Padding="30,0"
                 VerticalOptions="Center"
-                IsVisible="{Binding IsAuthenticated}">
-
+                IsVisible="{Binding Source={RelativeSource AncestorType={x:Type models:AuthViewModel}}, Path=IsAuthenticated}">
                 <Label
                     Text="You have logged in successfully. Your claims are:"
                     SemanticProperties.HeadingLevel="Level1"
