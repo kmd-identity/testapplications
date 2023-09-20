@@ -44,10 +44,23 @@
                     SemanticProperties.HeadingLevel="Level1"
                     FontSize="32"
                     HorizontalOptions="Center" />
-
-                <Label
-                    Text="{Binding Source={RelativeSource AncestorType={x:Type models:AuthViewModel}}, Path= Claims}">
-                </Label>
+                <ListView ItemsSource="{Binding Source={RelativeSource AncestorType={x:Type models:AuthViewModel}}, Path= Claims}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <ViewCell>
+                                <StackLayout>
+                                    <Label Text="{Binding Type}"
+                                           FontAttributes="Bold" 
+                                           FontSize="12"/>
+                                    <Label Text="{Binding Value}"
+                                           FontAttributes="Italic"
+                                           VerticalOptions="End" 
+                                           FontSize="10"/>
+                                </StackLayout>
+                            </ViewCell>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
 
             </VerticalStackLayout>
         </StackLayout>

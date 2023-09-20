@@ -1,6 +1,7 @@
 ﻿using Microsoft.Identity.Client;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Security.Claims;
 using Environment = System.Environment;
 
 namespace KMD.Identity.TestApplications.OpenID.MAUI.ViewModels;
@@ -8,7 +9,7 @@ namespace KMD.Identity.TestApplications.OpenID.MAUI.ViewModels;
 public class AuthViewModel : INotifyPropertyChanged
 {
     private bool isAuthenticated;
-    private string claims;
+    private Claim[] claims;
 
     public bool IsAuthenticated
     {
@@ -16,7 +17,7 @@ public class AuthViewModel : INotifyPropertyChanged
         set => SetField(ref isAuthenticated, value);
     }
 
-    public string Claims
+    public Claim[] Claims
     {
         get => claims;
         set => SetField(ref claims, value);
@@ -46,11 +47,11 @@ public class AuthViewModel : INotifyPropertyChanged
 
         if (!IsAuthenticated)
         {
-            Claims = string.Empty;
+            Claims = Array.Empty<Claim>();
             return;
         }
 
-        Claims = string.Join(Environment.NewLine, result.ClaimsPrincipal.Claims.Select(c => $"{c.Type}: {c.Value}"));
+        Claims = result!.ClaimsPrincipal!.Claims.ToArray();
         AccessToken = result.AccessToken;
         IdToken = result.IdToken;
     }
@@ -58,7 +59,7 @@ public class AuthViewModel : INotifyPropertyChanged
     public void AfterLogout()
     {
         IsAuthenticated = false;
-        Claims = string.Empty;
+        Claims = Array.Empty<Claim>();
         AccessToken = string.Empty;
         IdToken = string.Empty;
     }

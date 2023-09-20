@@ -15,7 +15,7 @@
             Margin="5"/>
             <Label
             HorizontalOptions="Center"
-            Text="{Binding ApiResult}"/>
+            Text="{Binding ApiResult}" Margin="10"/>
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>
