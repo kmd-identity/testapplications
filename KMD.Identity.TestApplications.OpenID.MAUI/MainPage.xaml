@@ -5,6 +5,7 @@
              xmlns:Converters="clr-namespace:KMD.Identity.TestApplications.OpenID.MAUI.Converters"
              xmlns:local="clr-namespace:KMD.Identity.TestApplications.OpenID.MAUI"
              xmlns:models="clr-namespace:KMD.Identity.TestApplications.OpenID.MAUI.ViewModels"
+             Loaded="MainPage_OnLoaded"
              >
     <ScrollView>
         <StackLayout>
@@ -18,7 +19,13 @@
                     SemanticProperties.HeadingLevel="Level1"
                     FontSize="32"
                     HorizontalOptions="Center" />
-
+                <Entry
+                    Placeholder="Optional domain hint"
+                    Text="{Binding DomainHint, Mode=TwoWay}">
+                </Entry>
+                <Label Text="Possible domain hints:"></Label>
+                <Label Text=" - kmd-ad-prod"></Label>
+                <Label Text=" - nemlogin-3-test-private"></Label>
                 <Button
                     x:Name="LoginBtn"
                     Text="Log-in"
@@ -39,7 +46,7 @@
                     HorizontalOptions="Center" />
 
                 <Label
-                    Text="{Binding Claims}">
+                    Text="{Binding Source={RelativeSource AncestorType={x:Type models:AuthViewModel}}, Path= Claims}">
                 </Label>
 
             </VerticalStackLayout>

@@ -6,30 +6,20 @@
     xmlns:local="clr-namespace:KMD.Identity.TestApplications.OpenID.MAUI"
     xmlns:models="clr-namespace:KMD.Identity.TestApplications.OpenID.MAUI.ViewModels"
     Shell.FlyoutBehavior="Disabled">
-    <Shell.TitleView>
-        <Grid>
-            <Label 
-                Text="KMD Identity Test Application" 
-                TextColor="White" 
-                VerticalTextAlignment="Center" 
-                HorizontalOptions="Start"></Label>
-            <Button 
-                Text="Logout" 
-                IsVisible="{Binding Source={RelativeSource AncestorType={x:Type models:AuthViewModel}}, Path=IsAuthenticated}" 
-                Clicked="Button_OnClicked"
-                BorderColor="White"
-                BorderWidth="1"
-                Margin="5"
-                HorizontalOptions="End"></Button>
-        </Grid>
-    </Shell.TitleView>
     <TabBar>
         <Tab Title="Home" Route="MainPage">
-            <ShellContent ContentTemplate="{DataTemplate local:MainPage}"
-                />
+            <ShellContent ContentTemplate="{DataTemplate local:MainPage}">
+                <Shell.TitleView>
+                    <local:Header></local:Header>
+                </Shell.TitleView>
+            </ShellContent>
         </Tab>
         <Tab Title="API" IsVisible="{Binding Source={RelativeSource AncestorType={x:Type models:AuthViewModel}}, Path=IsAuthenticated}" Route="ApiPage">
-            <ShellContent ContentTemplate="{DataTemplate local:ApiPage}"/>
+            <ShellContent ContentTemplate="{DataTemplate local:ApiPage}">
+                <Shell.TitleView>
+                    <local:Header></local:Header>
+                </Shell.TitleView>
+            </ShellContent>
         </Tab>
     </TabBar>
 </Shell>

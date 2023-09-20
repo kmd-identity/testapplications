@@ -18,7 +18,7 @@ namespace KMD.Identity.TestApplications.OpenID.MAUI
             MainPage = new AppShell();
         }
 
-        public async Task Login()
+        public async Task Login(string domainHint)
         {
             if (identityClient == null)
             {
@@ -44,7 +44,7 @@ namespace KMD.Identity.TestApplications.OpenID.MAUI
                     .Build();
 #endif
             }
-            
+
             var accounts = await identityClient.GetAccountsAsync();
             AuthenticationResult result = null;
             bool tryInteractiveLogin = false;
@@ -68,9 +68,11 @@ namespace KMD.Identity.TestApplications.OpenID.MAUI
             {
                 try
                 {
-                    result = await identityClient
-                        .AcquireTokenInteractive(settings.Scopes)
-                        .ExecuteAsync();
+                    var context = identityClient.AcquireTokenInteractive(settings.Scopes);
+                    if (!string.IsNullOrWhiteSpace(domainHint))
+                        context = context.WithExtraQueryParameters(new Dictionary<string, string>() { { "domain_hint", domainHint } });
+
+                    result = await context.ExecuteAsync();
                 }
                 catch (Exception ex)
                 {
