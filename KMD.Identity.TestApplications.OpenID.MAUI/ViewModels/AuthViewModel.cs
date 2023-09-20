@@ -23,6 +23,7 @@ public class AuthViewModel : INotifyPropertyChanged
     }
 
     public string AccessToken { get; set; }
+    public string IdToken { get; set; }
 
     public event PropertyChangedEventHandler PropertyChanged;
 
@@ -51,6 +52,7 @@ public class AuthViewModel : INotifyPropertyChanged
 
         Claims = string.Join(Environment.NewLine, result.ClaimsPrincipal.Claims.Select(c => $"{c.Type}: {c.Value}"));
         AccessToken = result.AccessToken;
+        IdToken = result.IdToken;
     }
 
     public void AfterLogout()
@@ -58,5 +60,6 @@ public class AuthViewModel : INotifyPropertyChanged
         IsAuthenticated = false;
         Claims = string.Empty;
         AccessToken = string.Empty;
+        IdToken = string.Empty;
     }
 }

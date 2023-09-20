@@ -6,5 +6,6 @@
         public string AuthorityUrl { get; set; }
         public string RedirectUrl { get; set; }
         public string[] Scopes { get; set; }
+        public string PostLogoutRedirectUrl { get; set; }
     }
 }

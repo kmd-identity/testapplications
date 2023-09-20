@@ -36,7 +36,7 @@ namespace KMD.Identity.TestApplications.OpenID.MAUI
 
             builder.Services.AddSingleton(ConfigurationLoader.Load<AuthConfiguration>("AuthConfiguration.json"));
             builder.Services.AddSingleton(ConfigurationLoader.Load<ApiConfiguration>("ApiConfiguration.json"));
-            builder.Services.AddTransient<ApiPage>();
+            builder.Services.AddSingleton<ApiPage>();
 
             return builder.Build();
         }

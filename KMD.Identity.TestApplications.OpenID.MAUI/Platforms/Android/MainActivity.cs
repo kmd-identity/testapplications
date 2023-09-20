@@ -1,6 +1,5 @@
 ﻿using Android.App;
 using Android.Content.PM;
-using Android.OS;
 
 namespace KMD.Identity.TestApplications.OpenID.MAUI
 {
