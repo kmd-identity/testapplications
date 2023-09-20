@@ -15,35 +15,46 @@ namespace KMD.Identity.TestApplications.OpenID.MAUI
             this.settings = settings;
             InitializeComponent();
             BindingContext = AuthViewModel;
-            MainPage = new AppShell();
+            MainPage = new Login();
+        }
+
+        public async Task<AuthenticationResult> CheckActiveRefreshToken()
+        {
+            EnsureIdentityClientInitialized();
+            
+            var accounts = await identityClient.GetAccountsAsync();
+            AuthenticationResult result = null;
+
+            try
+            {
+                result = await identityClient
+                    .AcquireTokenSilent(settings.Scopes, accounts.FirstOrDefault())
+                    .ExecuteAsync();
+            }
+            catch (MsalUiRequiredException)
+            {
+                return null;
+            }
+            catch (Exception ex)
+            {
+                await MainPage!.DisplayAlert("Error", $"MSAL Silent Error: {ex.Message}", "Close");
+            }
+
+            return result;
+        }
+
+        public async Task ContinueWithValidToken(AuthenticationResult result)
+        {
+            AuthViewModel.AfterAuthentication(result);
+            if (AuthViewModel.IsAuthenticated)
+            {
+                MainPage = new AppShell();
+            }
         }
 
         public async Task Login(string domainHint)
         {
-            if (identityClient == null)
-            {
-#if ANDROID
-        identityClient = PublicClientApplicationBuilder
-            .Create(settings.ApplicationId)
-            .WithAdfsAuthority(settings.AuthorityUrl)
-            .WithRedirectUri(settings.RedirectUrl)
-            .WithParentActivityOrWindow(() => Platform.CurrentActivity)
-            .Build();
-#elif IOS
-        identityClient = PublicClientApplicationBuilder
-            .Create(settings.ApplicationId)
-            .WithAdfsAuthority(settings.AuthorityUrl)
-            .WithRedirectUri(settings.RedirectUrl)
-            .WithIosKeychainSecurityGroup("com.microsoft.adalcache")
-            .Build();
-#else
-                identityClient = PublicClientApplicationBuilder
-                    .Create(settings.ApplicationId)
-                    .WithAdfsAuthority(settings.AuthorityUrl)
-                    .WithRedirectUri(settings.RedirectUrl)
-                    .Build();
-#endif
-            }
+            EnsureIdentityClientInitialized();
 
             var accounts = await identityClient.GetAccountsAsync();
             AuthenticationResult result = null;
@@ -81,6 +92,10 @@ namespace KMD.Identity.TestApplications.OpenID.MAUI
             }
 
             AuthViewModel.AfterAuthentication(result);
+            if (AuthViewModel.IsAuthenticated)
+            {
+                MainPage = new AppShell();
+            }
         }
 
         public async Task Logout()
@@ -92,6 +107,36 @@ namespace KMD.Identity.TestApplications.OpenID.MAUI
             }
 
             AuthViewModel.AfterLogout();
+            MainPage = new Login();
+        }
+
+        private void EnsureIdentityClientInitialized()
+        {
+
+            if (identityClient == null)
+            {
+#if ANDROID
+                identityClient = PublicClientApplicationBuilder
+                    .Create(settings.ApplicationId)
+                    .WithAdfsAuthority(settings.AuthorityUrl)
+                    .WithRedirectUri(settings.RedirectUrl)
+                    .WithParentActivityOrWindow(() => Platform.CurrentActivity)
+                    .Build();
+#elif IOS
+        identityClient = PublicClientApplicationBuilder
+            .Create(settings.ApplicationId)
+            .WithAdfsAuthority(settings.AuthorityUrl)
+            .WithRedirectUri(settings.RedirectUrl)
+            .WithIosKeychainSecurityGroup("com.microsoft.adalcache")
+            .Build();
+#else
+                identityClient = PublicClientApplicationBuilder
+                    .Create(settings.ApplicationId)
+                    .WithAdfsAuthority(settings.AuthorityUrl)
+                    .WithRedirectUri(settings.RedirectUrl)
+                    .Build();
+#endif
+            }
         }
     }
 }

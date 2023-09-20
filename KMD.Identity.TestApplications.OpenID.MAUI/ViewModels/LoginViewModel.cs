@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace KMD.Identity.TestApplications.OpenID.MAUI.ViewModels
 {
-    public class MainPageViewModel: INotifyPropertyChanged
+    public class LoginViewModel: INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 

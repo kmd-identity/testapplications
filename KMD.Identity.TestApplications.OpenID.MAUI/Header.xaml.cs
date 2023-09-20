@@ -16,8 +16,7 @@ public partial class Header : ContentView
         var idToken = app.AuthViewModel.IdToken;
 
         await app.Logout();
-        await Shell.Current.GoToAsync("//MainPage");
-
+        
         var configuration = Application.Current!.Handler!.MauiContext!.Services.GetService<AuthConfiguration>();
         var logoutUrl =
             $"{configuration.AuthorityUrl}/oauth2/logout?id_token_hint={idToken}" +
