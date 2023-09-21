@@ -40,8 +40,8 @@
             IsVisible="{Binding HasValidToken}">
             <Button
                 x:Name="BiometricButton"
-                Text="Use biometric"
-                SemanticProperties.Hint="Use biometric"
+                Text="Use biometrics"
+                SemanticProperties.Hint="Use biometrics"
                 Clicked="BiometricButton_OnClicked"
                 HorizontalOptions="Center"
                 IsVisible="{Binding HasBiometric}"/>
