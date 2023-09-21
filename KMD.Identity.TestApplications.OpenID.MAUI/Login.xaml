@@ -11,9 +11,14 @@
         Padding="30,0"
         VerticalOptions="Center">
         <Label
-            Text="You are currently not logged-in."
+            Text="KMD Identity Test Application"
             SemanticProperties.HeadingLevel="Level1"
             FontSize="32"
+            HorizontalOptions="Center" />
+        <Label
+            Text="You are currently not logged-in."
+            SemanticProperties.HeadingLevel="Level1"
+            FontSize="14"
             HorizontalOptions="Center" />
         <Entry
             Placeholder="Optional domain hint"
