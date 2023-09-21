@@ -14,6 +14,23 @@ public partial class Login : ContentPage
         InitializeComponent();
     }
 
+    public async Task ShowBiometricLogin()
+    {
+        var request = new AuthenticationRequestConfiguration("Login using biometrics", "Confirm login with your biometrics");
+        request.AllowAlternativeAuthentication = false;
+        var result = await CrossFingerprint.Current.AuthenticateAsync(request);
+        if (result.Authenticated)
+        {
+            await ContinueWithValidToken();
+        }
+    }
+
+    public async Task ContinueWithValidToken()
+    {
+        var parentApp = (App)Application.Current!;
+        await parentApp.ContinueWithValidToken(viewModel.AuthenticationResult);
+    }
+
     private async void OnLoginStart(object sender, EventArgs e)
     {
         var parentApp = (App)Application.Current!;
@@ -26,22 +43,30 @@ public partial class Login : ContentPage
         BindingContext = viewModel;
 
         var parentApp = (App)Application.Current!;
-        var currentToken = await parentApp.CheckActiveRefreshToken();
+        viewModel.AuthenticationResult = await parentApp.ReuseActiveRefreshToken();
+        viewModel.HasValidToken = parentApp.AuthViewModel.IsAuthenticated;
+        viewModel.HasBiometric = await CrossFingerprint.Current.IsAvailableAsync(false);
 
-        if (currentToken?.ClaimsPrincipal?.Claims?.Any() == true)
+        if (viewModel.HasValidToken)
         {
-            var isAvailable = await CrossFingerprint.Current.IsAvailableAsync(true);
-            if (isAvailable)
+            if (viewModel.HasBiometric)
             {
-                var request = new AuthenticationRequestConfiguration("Login using biometrics", "Confirm login with your biometrics");
-                request.AllowAlternativeAuthentication = false;
-                request.CancelTitle = "Cancel";
-                var result = await CrossFingerprint.Current.AuthenticateAsync(request);
-                if (result.Authenticated)
-                {
-                    await parentApp.ContinueWithValidToken(currentToken);
-                }
+                await ShowBiometricLogin();
+            }
+            else
+            {
+                await ContinueWithValidToken();
             }
         }
+    }
+
+    private async void BiometricButton_OnClicked(object sender, EventArgs e)
+    {
+        await ShowBiometricLogin();
+    }
+
+    private async void LogoutButton_OnClicked(object sender, EventArgs e)
+    {
+        await ((App)Application.Current!).Logout();
     }
 }

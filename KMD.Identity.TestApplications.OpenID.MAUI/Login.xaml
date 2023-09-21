@@ -9,8 +9,7 @@
     <VerticalStackLayout
         Spacing="25"
         Padding="30,0"
-        VerticalOptions="Center"
-        IsVisible="{Binding Source={RelativeSource AncestorType={x:Type models:AuthViewModel}}, Path=IsAuthenticated, Converter={converters:InverseBoolConverter}}">
+        VerticalOptions="Center">
         <Label
             Text="You are currently not logged-in."
             SemanticProperties.HeadingLevel="Level1"
@@ -29,6 +28,25 @@
             SemanticProperties.Hint="Click here to log-in"
             Clicked="OnLoginStart"
             HorizontalOptions="Center" />
+        <StackLayout 
+            Spacing="25"
+            Padding="30,0"
+            VerticalOptions="Center"
+            IsVisible="{Binding HasValidToken}">
+            <Button
+                x:Name="BiometricButton"
+                Text="Use biometric"
+                SemanticProperties.Hint="Use biometric"
+                Clicked="BiometricButton_OnClicked"
+                HorizontalOptions="Center"
+                IsVisible="{Binding HasBiometric}"/>
+            <Button
+                x:Name="LogoutButton"
+                Text="Logout"
+                SemanticProperties.Hint="Logout"
+                Clicked="LogoutButton_OnClicked"
+                HorizontalOptions="Center"/>
+        </StackLayout>
 
     </VerticalStackLayout>
 </ContentPage>

@@ -18,7 +18,7 @@ namespace KMD.Identity.TestApplications.OpenID.MAUI
             MainPage = new Login();
         }
 
-        public async Task<AuthenticationResult> CheckActiveRefreshToken()
+        public async Task<AuthenticationResult> ReuseActiveRefreshToken()
         {
             EnsureIdentityClientInitialized();
             
@@ -30,6 +30,8 @@ namespace KMD.Identity.TestApplications.OpenID.MAUI
                 result = await identityClient
                     .AcquireTokenSilent(settings.Scopes, accounts.FirstOrDefault())
                     .ExecuteAsync();
+
+                AuthViewModel.AfterAuthentication(result);
             }
             catch (MsalUiRequiredException)
             {
@@ -55,40 +57,20 @@ namespace KMD.Identity.TestApplications.OpenID.MAUI
         public async Task Login(string domainHint)
         {
             EnsureIdentityClientInitialized();
-
-            var accounts = await identityClient.GetAccountsAsync();
+            
             AuthenticationResult result = null;
-            bool tryInteractiveLogin = false;
-
+            
             try
             {
-                result = await identityClient
-                    .AcquireTokenSilent(settings.Scopes, accounts.FirstOrDefault())
-                    .ExecuteAsync();
-            }
-            catch (MsalUiRequiredException)
-            {
-                tryInteractiveLogin = true;
+                var context = identityClient.AcquireTokenInteractive(settings.Scopes);
+                if (!string.IsNullOrWhiteSpace(domainHint))
+                    context = context.WithExtraQueryParameters(new Dictionary<string, string>() { { "domain_hint", domainHint } });
+
+                result = await context.WithPrompt(Prompt.ForceLogin).ExecuteAsync();
             }
             catch (Exception ex)
             {
-                await MainPage!.DisplayAlert("Error", $"MSAL Silent Error: {ex.Message}", "Close");
-            }
-
-            if (tryInteractiveLogin)
-            {
-                try
-                {
-                    var context = identityClient.AcquireTokenInteractive(settings.Scopes);
-                    if (!string.IsNullOrWhiteSpace(domainHint))
-                        context = context.WithExtraQueryParameters(new Dictionary<string, string>() { { "domain_hint", domainHint } });
-
-                    result = await context.ExecuteAsync();
-                }
-                catch (Exception ex)
-                {
-                    await MainPage!.DisplayAlert("Error", $"\"MSAL Interactive Error: {ex.Message}", "Close");
-                }
+                await MainPage!.DisplayAlert("Error", $"\"MSAL Interactive Error: {ex.Message}", "Close");
             }
 
             AuthViewModel.AfterAuthentication(result);
@@ -100,6 +82,8 @@ namespace KMD.Identity.TestApplications.OpenID.MAUI
 
         public async Task Logout()
         {
+            var idToken = AuthViewModel.IdToken;
+
             var accounts = await identityClient.GetAccountsAsync();
             foreach (var account in accounts)
             {
@@ -108,6 +92,12 @@ namespace KMD.Identity.TestApplications.OpenID.MAUI
 
             AuthViewModel.AfterLogout();
             MainPage = new Login();
+            
+            var logoutUrl =
+                $"{settings.AuthorityUrl}/oauth2/logout?id_token_hint={idToken}" +
+                $"&client_id={settings.ApplicationId}" +
+                $"&post_logout_redirect_uri={settings.PostLogoutRedirectUrl}";
+            await Browser.Default.OpenAsync(logoutUrl, BrowserLaunchMode.SystemPreferred);
         }
 
         private void EnsureIdentityClientInitialized()
