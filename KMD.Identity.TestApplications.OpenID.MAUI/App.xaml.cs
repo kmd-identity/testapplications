@@ -21,7 +21,7 @@ namespace KMD.Identity.TestApplications.OpenID.MAUI
         public async Task<AuthenticationResult> ReuseActiveRefreshToken()
         {
             EnsureIdentityClientInitialized();
-            
+
             var accounts = await identityClient.GetAccountsAsync();
             AuthenticationResult result = null;
 
@@ -57,16 +57,27 @@ namespace KMD.Identity.TestApplications.OpenID.MAUI
         public async Task Login(string domainHint)
         {
             EnsureIdentityClientInitialized();
-            
+
             AuthenticationResult result = null;
-            
+
             try
             {
                 var context = identityClient.AcquireTokenInteractive(settings.Scopes);
-                if (!string.IsNullOrWhiteSpace(domainHint))
-                    context = context.WithExtraQueryParameters(new Dictionary<string, string>() { { "domain_hint", domainHint } });
 
-                result = await context.WithPrompt(Prompt.ForceLogin).ExecuteAsync();
+                var extraParameters = new Dictionary<string, string>();
+                if (!string.IsNullOrWhiteSpace(domainHint))
+                    extraParameters.Add("domain_hint", domainHint);
+#if ANDROID
+                extraParameters.Add("platform", "android");
+#elif IOS
+                extraParameters.Add("platform", "ios");
+#else
+                extraParameters.Add("platform", "windows");
+#endif
+
+                result = await context
+                    .WithExtraQueryParameters(extraParameters)
+                    .WithPrompt(Prompt.ForceLogin).ExecuteAsync();
             }
             catch (Exception ex)
             {
@@ -92,7 +103,7 @@ namespace KMD.Identity.TestApplications.OpenID.MAUI
 
             AuthViewModel.AfterLogout();
             MainPage = new Login();
-            
+
             var logoutUrl =
                 $"{settings.AuthorityUrl}/oauth2/logout?id_token_hint={idToken}" +
                 $"&client_id={settings.ApplicationId}" +
