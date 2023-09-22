@@ -74,16 +74,17 @@ namespace KMD.Identity.TestApplications.OpenID.API
 
             app.UseHttpsRedirection();
 
-            app.UseAuthentication();
-            app.UseRouting();
-            app.UseAuthorization();
-
             app.UseCors(options =>
             {
                 options.AllowAnyOrigin();
                 options.AllowAnyHeader();
                 options.AllowAnyMethod();
             });
+
+            app.UseAuthentication();
+            app.UseRouting();
+            app.UseAuthorization();
+
 
             app.UseEndpoints(endpoints =>
             {
