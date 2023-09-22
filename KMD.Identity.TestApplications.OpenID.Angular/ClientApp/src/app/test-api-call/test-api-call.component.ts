@@ -13,8 +13,8 @@ export class TestApiCallComponent implements OnInit {
     this.testApiCallService.testApiResponse$.subscribe(response => this.apiResponse = response);
   }
 
-  ngOnInit(): void { 
-    this.testApiCallService.callTestApi();
+  async ngOnInit() { 
+    await this.testApiCallService.callTestApi();
   }
 
 }
