@@ -65,9 +65,10 @@ export class AuthenticationContext {
     };
     
     this.errorService.reset();
-    this.oidcSecurityService.logoff(undefined, authOptions);
+    this.oidcSecurityService.logoff(undefined, authOptions).subscribe(() => {
+      this.codeLogin.next(undefined);
+    });
     this.oidcSecurityService.logoffLocalMultiple();
-    this.codeLogin.next(undefined);
   }
 
   userData(): any {
