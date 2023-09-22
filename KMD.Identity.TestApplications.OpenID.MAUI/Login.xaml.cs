@@ -1,4 +1,3 @@
-using AndroidX.Lifecycle;
 using KMD.Identity.TestApplications.OpenID.MAUI.ViewModels;
 using Plugin.Fingerprint;
 using Plugin.Fingerprint.Abstractions;

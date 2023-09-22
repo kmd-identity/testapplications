@@ -108,7 +108,14 @@ namespace KMD.Identity.TestApplications.OpenID.MAUI
                 $"{settings.AuthorityUrl}/oauth2/logout?id_token_hint={idToken}" +
                 $"&client_id={settings.ApplicationId}" +
                 $"&post_logout_redirect_uri={settings.PostLogoutRedirectUrl}";
+
+#if ANDROID
+                await Browser.Default.OpenAsync(logoutUrl, BrowserLaunchMode.SystemPreferred);
+#elif IOS
+            ((AppDelegate)AppDelegate.Current).HandleLogout(logoutUrl);
+#else
             await Browser.Default.OpenAsync(logoutUrl, BrowserLaunchMode.SystemPreferred);
+#endif
         }
 
         private void EnsureIdentityClientInitialized()
@@ -128,7 +135,7 @@ namespace KMD.Identity.TestApplications.OpenID.MAUI
             .Create(settings.ApplicationId)
             .WithAdfsAuthority(settings.AuthorityUrl)
             .WithRedirectUri(settings.RedirectUrl)
-            .WithIosKeychainSecurityGroup("com.microsoft.adalcache")
+            .WithIosKeychainSecurityGroup("dk.kmd.identity.testapplication.ios")
             .Build();
 #else
                 identityClient = PublicClientApplicationBuilder
