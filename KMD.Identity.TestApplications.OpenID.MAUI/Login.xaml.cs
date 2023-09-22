@@ -1,4 +1,5 @@
 using KMD.Identity.TestApplications.OpenID.MAUI.ViewModels;
+using Microsoft.Identity.Client;
 using Plugin.Fingerprint;
 using Plugin.Fingerprint.Abstractions;
 
@@ -44,7 +45,16 @@ public partial class Login : ContentPage
         var parentApp = (App)Application.Current!;
         viewModel.AuthenticationResult = await parentApp.ReuseActiveRefreshToken();
         viewModel.HasValidToken = parentApp.AuthViewModel.IsAuthenticated;
-        viewModel.HasBiometric = await CrossFingerprint.Current.IsAvailableAsync(false);
+#if ANDROID
+       viewModel.HasBiometric = await CrossFingerprint.Current.IsAvailableAsync(false);
+#elif IOS
+        //INFO - Plugin.Fingerprint may work for ios with some specific configuration
+        // https://github.com/smstuebe/xamarin-fingerprint
+        viewModel.HasBiometric = false;
+#else
+        viewModel.HasBiometric = false;
+#endif
+
 
         if (viewModel.HasValidToken)
         {

@@ -43,5 +43,7 @@
 			<string>Editor</string>
 		</dict>
 	</array>
+  <key>NSFaceIDUsageDescription</key>
+  <string>Need your face to unlock secrets!</string>
 </dict>
 </plist>
