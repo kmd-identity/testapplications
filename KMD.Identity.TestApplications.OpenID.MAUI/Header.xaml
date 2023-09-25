@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:models="clr-namespace:KMD.Identity.TestApplications.OpenID.MAUI.ViewModels"
+             x:Class="KMD.Identity.TestApplications.OpenID.MAUI.Header">
+    <Grid x:Key="Header">
+        <Label 
+            Text="KMD Identity Test Application" 
+            TextColor="White" 
+            VerticalTextAlignment="Center" 
+            HorizontalOptions="Start"></Label>
+        <Button 
+            Text="Logout" 
+            IsVisible="{Binding Source={RelativeSource AncestorType={x:Type models:AuthViewModel}}, Path=IsAuthenticated}" 
+            Clicked="Button_OnClicked"
+            BorderColor="White"
+            BorderWidth="1"
+            Margin="5"
+            HorizontalOptions="End"></Button>
+    </Grid>
+</ContentView>

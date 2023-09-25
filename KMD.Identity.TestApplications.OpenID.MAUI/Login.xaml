@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:converters="clr-namespace:KMD.Identity.TestApplications.OpenID.MAUI.Converters"
+             xmlns:models="clr-namespace:KMD.Identity.TestApplications.OpenID.MAUI.ViewModels"
+             x:Class="KMD.Identity.TestApplications.OpenID.MAUI.Login"
+             Title="Login"
+             Loaded="Login_OnLoaded">
+    <VerticalStackLayout
+        Spacing="25"
+        Padding="30,0"
+        VerticalOptions="Center">
+        <Label
+            Text="KMD Identity Test Application"
+            SemanticProperties.HeadingLevel="Level1"
+            FontSize="32"
+            HorizontalOptions="Center" />
+        <Label
+            Text="You are currently not logged-in."
+            SemanticProperties.HeadingLevel="Level1"
+            FontSize="14"
+            HorizontalOptions="Center" />
+        <Entry
+            Placeholder="Optional domain hint"
+            Text="{Binding DomainHint, Mode=TwoWay}">
+        </Entry>
+        <Label Text="Possible domain hints:"></Label>
+        <Label Text=" - kmd-ad-prod"></Label>
+        <Label Text=" - nemlogin-3-test-public"></Label>
+        <Button
+            x:Name="LoginBtn"
+            Text="Log-in"
+            SemanticProperties.Hint="Click here to log-in"
+            Clicked="OnLoginStart"
+            HorizontalOptions="Center" />
+        <StackLayout 
+            Spacing="25"
+            Padding="30,0"
+            VerticalOptions="Center"
+            IsVisible="{Binding HasValidToken}">
+            <Button
+                x:Name="BiometricButton"
+                Text="Use biometrics"
+                SemanticProperties.Hint="Use biometrics"
+                Clicked="BiometricButton_OnClicked"
+                HorizontalOptions="Center"
+                IsVisible="{Binding HasBiometric}"/>
+            <Button
+                x:Name="LogoutButton"
+                Text="Logout"
+                SemanticProperties.Hint="Logout"
+                Clicked="LogoutButton_OnClicked"
+                HorizontalOptions="Center"/>
+        </StackLayout>
+
+    </VerticalStackLayout>
+</ContentPage>
