@@ -26,7 +26,7 @@
         </Entry>
         <Label Text="Possible domain hints:"></Label>
         <Label Text=" - kmd-ad-prod"></Label>
-        <Label Text=" - nemlogin-3-test-private"></Label>
+        <Label Text=" - nemlogin-3-test-public"></Label>
         <Button
             x:Name="LoginBtn"
             Text="Log-in"
