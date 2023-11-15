@@ -8,5 +8,7 @@ namespace KMD.Identity.TestApplications.OpenID.API.Handlers
     public interface ICustomClaimsHandler
     {
         Task<ICustomClaimsResult> Handle(Claim[] claims);
+        Task<ICustomClaimsResult> ReturnRequireCpr(Claim[] claims);
+
     }
 }

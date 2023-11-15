@@ -30,10 +30,18 @@ namespace KMD.Identity.TestApplications.OpenID.API.Controllers
         /// WARNING. This endpoint must be accessible from the internet.
         /// </summary>
         /// <returns></returns>
+        [Route("GetCustomClaims")]
         [HttpGet]
         public async Task<object> CustomClaims()
         {
             return await this.customClaimsHandler.Handle(User.Claims.ToArray());
+        }
+
+        [Route("ReturnRequireCpr")]
+        [HttpGet]
+        public async Task<object> ReturnRequireCprCustomClaim()
+        {
+            return await this.customClaimsHandler.ReturnRequireCpr(User.Claims.ToArray());
         }
     }
 }

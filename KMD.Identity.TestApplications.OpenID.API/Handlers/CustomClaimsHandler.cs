@@ -72,5 +72,15 @@ namespace KMD.Identity.TestApplications.OpenID.API.Handlers
                 }
             };
         }
+        public async Task<ICustomClaimsResult> ReturnRequireCpr(Claim[] claims)
+        {
+            //Return require cpr claim for the user to be prompted to enter CPR if logging in using the nemlogin-3-private connection.
+            return new RequireCprResult()
+            {
+                requirecpr = "true"
+            };
+
+        }
+
     }
 }
