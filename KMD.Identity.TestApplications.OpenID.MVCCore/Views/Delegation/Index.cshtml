@@ -1,0 +1,120 @@
+﻿@model KMD.Identity.TestApplications.OpenID.MVCCore.Models.Delegation.AccessDelegationsViewModel
+@using KMD.Identity.TestApplications.OpenID.MVCCore.Extensions
+@using KMD.Identity.TestApplications.OpenID.MVCCore.Models.Delegation
+@{
+    ViewData["Title"] = "Delegation";
+}
+
+<div>
+    <p>Citizen (Subject) can delegate access to Case worker (Actor)</p>
+    <p> - You need to logout and login again with Role "Citizen" (use KMD Identity TestIdP to simulate roles)</p>
+    <p>Citizen (Subject) can view delegated access (own)</p>
+    <p>Citizen (Subject) can view audit of delegated access (own)</p>
+    <p>Citizen (Subject) can revoke delegated access (own)</p>
+
+    <p>Case worker (Actor) can view delegated access</p>
+    <p> - You need to logout and login again with Role "CaseWorker" (use KMD Identity TestIdP to simulate roles)</p>
+    <p>Case worker (Actor) can act on behalf of Citizen (Subject)</p>
+    <p>Case worker (Actor) can view audit of delegated access (own)</p>
+    <p>Case worker (Actor) can revoke delegated access</p>
+</div>
+
+@if (User.HasRole("Citizen"))
+{
+    <h1><b>Your now a Citizen</b></h1>
+    <div class="row">
+        <div class="col-10"></div>
+        <div class="col-2"><a id="btnDelegateAccess" class="btn btn-primary" href='@Url.Action("DelegateAccess", "Delegation")'>Delegate Access</a></div>
+    </div>
+
+    <h2>Delegated access</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Access Delegation ID</th>
+                <th scope="col">Flow ID</th>
+                <th scope="col">Status</th>
+                <th scope="col">Delegated At</th>
+                <th scope="col">Revoked At</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var ud in Model.DelegatedAccess)
+            {
+                <tr>
+                    <td>@ud.AccessDelegationId</td>
+                    <td>@ud.FlowId</td>
+                    <td>@ud.Status.ToString()</td>
+                    <td>@(ud.DelegatedAt.HasValue ? ud.DelegatedAt.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm") : "")</td>
+                    <td>@(ud.RevokedAt.HasValue ? ud.RevokedAt.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm") : "")</td>
+                    <td>
+                        @if (ud.Status != AccessDelegationStatus.Revoked)
+                        {
+                            <a id="btnRevokeAccess_@ud.AccessDelegationId" class="btn btn-sm btn-secondary btnRevokeAccess" href='@Url.Action("RevokeAccess", "Delegation", new { accessDelegationId = @ud.AccessDelegationId })'>Revoke</a>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+
+    @* --Perform operation on behalf - DOESN'T Work
+
+    --LIST
+    Columns Who|What|When|Revoke|View Audit
+
+
+    --Audit
+        When|What
+
+
+    Revoke
+    - Are you sure you want to Revoke Delegated Access
+    - YES/NO *@
+}
+
+@if (User.HasRole("CaseWorker"))
+{
+    <p>Your now a Case Worker</p>
+
+    @* LIST of delegated access
+    Columns Who| What | When | Revoke | View Audit | Act (javascript confirm)
+
+    --Audit
+    When|What
+
+
+    --Perform operation on behalf
+
+
+    Revoke
+    - Are you sure you want to Revoke Delegated Access
+        - YES/NO *@
+}
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script type="text/javascript">
+    $(function () {
+
+        $("#btnDelegateAccess").on("click", function (e) {
+            var link = this;
+
+            e.preventDefault();
+
+            if (confirm("Are you sure you want to Delegate Access?")) {
+                window.location = link.href;
+            }
+        });
+        
+        $(".btnRevokeAccess").on("click", function (e) {
+            var link = this;
+
+            e.preventDefault();
+
+            if (confirm("Are you sure you want to Revoke Access?")) {
+                window.location = link.href;
+            }
+        });
+    });
+</script>

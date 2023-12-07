@@ -80,6 +80,18 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore
 
                             context.Properties.Items.Remove(uniloginLOAKey);
                         }
+
+                        const string flowIdKey = "flowid";
+                        if (context.Properties.Items.ContainsKey(flowIdKey))
+                        {
+                            var flowId = context.Properties.Items[flowIdKey];
+                            if (!string.IsNullOrWhiteSpace(flowId))
+                            {
+                                context.ProtocolMessage.Parameters.Add(flowIdKey, flowId);
+                            }
+
+                            context.Properties.Items.Remove(flowIdKey);
+                        }
                         return Task.FromResult(0);
                     },
                     OnTokenResponseReceived = (context) =>
