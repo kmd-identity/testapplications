@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
 using KMD.Identity.TestApplications.OpenID.API.Models;
 using KMD.Identity.TestApplications.OpenID.API.Models.Delegation;
 using KMD.Identity.TestApplications.OpenID.API.Repositories.Delegation;
@@ -20,8 +18,12 @@ namespace KMD.Identity.TestApplications.OpenID.API.Services.Delegation
             this.auditService = auditService;
         }
 
-        public AccessDelegation New(IEnumerable<Claim> subjectClaims, string operation)
+        public OperationResult<AccessDelegation> New(string subject, string operation)
         {
+            var currentSubjectDelegations = delegationRepository.FindBySubject(subject);
+            if(currentSubjectDelegations.Any(s=>s.Status != AccessDelegationStatus.Revoked ))
+                return OperationResult<AccessDelegation>.Fail("Only one delegation possible. Revoke previous.");
+
             var accessDelegation = new AccessDelegation
             {
                 AccessDelegationId = Guid.NewGuid(),
@@ -33,13 +35,13 @@ namespace KMD.Identity.TestApplications.OpenID.API.Services.Delegation
                 Status = AccessDelegationStatus.New,
                 UserData = new AccessDelegationUserData
                 {
-                    Sub = subjectClaims.First(c => c.Type.Equals("sub", StringComparison.InvariantCultureIgnoreCase)).Value
+                    Sub = subject
                 }
             };
 
             delegationRepository.StoreAccessDelegation(accessDelegation);
 
-            return accessDelegation;
+            return OperationResult<AccessDelegation>.Pass(accessDelegation);
         }
 
         public OperationResult<AccessDelegation> StartDelegatingAccess(Guid flowId, string subject)

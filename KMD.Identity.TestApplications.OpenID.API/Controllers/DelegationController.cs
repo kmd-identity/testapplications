@@ -42,8 +42,10 @@ namespace KMD.Identity.TestApplications.OpenID.API.Controllers
         {
             if (!User.HasRole("Citizen")) return OperationResult<AccessDelegation>.Fail("User is not a Citizen");
 
-            var accessDelegation = delegationService.New(User.Claims, "all");
-            var result = delegationService.StartDelegatingAccess(accessDelegation.FlowId, User.GetSubject());
+            var initialResult = delegationService.New(User.GetSubject(), "all");
+            if (!initialResult.Success) return initialResult;
+
+            var result = delegationService.StartDelegatingAccess(initialResult.Result.FlowId, User.GetSubject());
             
             return result;
         }
