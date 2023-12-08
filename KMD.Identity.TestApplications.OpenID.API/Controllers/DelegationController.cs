@@ -149,7 +149,8 @@ namespace KMD.Identity.TestApplications.OpenID.API.Controllers
                 {
                     DelegationMessage = $"Now you're acting as: {result.Result.UserData.Sub} for scope: {result.Result.Scope.OperationName}",
                     DelegationSub = result.Result.UserData.Sub,
-                    DelegationScope = result.Result.Scope.OperationName
+                    DelegationScope = result.Result.Scope.OperationName,
+                    DelegationId = result.Result.AccessDelegationId
                 };
             }
 

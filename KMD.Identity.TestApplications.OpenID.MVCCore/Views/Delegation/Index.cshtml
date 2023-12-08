@@ -127,6 +127,19 @@
 
 </div>
 
+@if (User.HasRole("Citizen") || Model.OperatesOnBehalf)
+{
+    <div class="row">
+        This operation for some reason cannot be completed by Citizen (Subject). Only Case Worker (Actor) acting on behalf Citizen (Subject) can do it.
+    </div>
+    <div class="row">
+        <a class="btn btn-secondary bntPay" href='@Url.Action("Pay", "Delegation")'>Make a Payment</a>
+    </div>
+    <div id="payResult" class="row">
+
+    </div>
+}
+
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script type="text/javascript">
     $(function () {
@@ -167,6 +180,14 @@
             e.preventDefault();
 
             $("#auditContainer").load(link.href);
+        });
+
+        $(".bntPay").on("click", function (e) {
+            var link = this;
+
+            e.preventDefault();
+
+            $("#payResult").load(link.href);
         });
     });
 </script>

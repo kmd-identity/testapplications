@@ -42,6 +42,12 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore.Controllers
             else if (User.HasRole("CaseWorker"))
             {
                 model.DelegatedAccess = (await ApiGet<ApiCallResult<AccessDelegation[]>>("/api/delegation/delegated")).Result;
+
+                var delegationSub = User.Claims.FirstOrDefault(c => c.Type.Equals("DelegationSub", StringComparison.InvariantCultureIgnoreCase))?.Value;
+                if (!string.IsNullOrWhiteSpace(delegationSub))
+                {
+                    model.DelegationSubject = delegationSub;
+                }
             }
 
             var delegationErrors = new List<string>();
@@ -117,6 +123,14 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore.Controllers
         public async Task<IActionResult> AuditInformation(Guid accessDelegationId)
         {
             var result = await ApiGet<ApiCallResult<AuditItem[]>>($"/api/audit/delegation?accessDelegationId={accessDelegationId}");
+
+            return PartialView(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Pay()
+        {
+            var result = await ApiGet<ApiCallResult<decimal[]>>("/api/financial/pay");
 
             return PartialView(result);
         }
