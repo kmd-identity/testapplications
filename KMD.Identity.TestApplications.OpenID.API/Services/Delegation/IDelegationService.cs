@@ -13,6 +13,6 @@ namespace KMD.Identity.TestApplications.OpenID.API.Services.Delegation
         OperationResult FinishDelegatingAccess(Guid flowId, string subject);
         OperationResult Revoke(bool isCitizen, bool isCaseWorker, string subject, Guid accessDelegationId);
         OperationResult<AccessDelegationAct> StartActing(Guid accessDelegationId, string actor);
-        OperationResult FinishActing(Guid flowId, string actor);
+        OperationResult<AccessDelegation> FinishActing(Guid flowId, string actor);
     }
 }

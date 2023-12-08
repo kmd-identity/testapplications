@@ -17,6 +17,7 @@ using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using KMD.Identity.TestApplications.OpenID.MVCCore.Models.Delegation;
 using KMD.Identity.TestApplications.OpenID.MVCCore.Models;
+using KMD.Identity.TestApplications.OpenID.MVCCore.Models.Audit;
 
 namespace KMD.Identity.TestApplications.OpenID.MVCCore.Controllers
 {
@@ -110,6 +111,14 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore.Controllers
             }
 
             await HttpContext.ChallengeAsync("AD FS", new AuthenticationProperties() { RedirectUri = returnUrl, Items = { { "flowid", $"{result.Result.FlowId}" } } });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> AuditInformation(Guid accessDelegationId)
+        {
+            var result = await ApiGet<ApiCallResult<AuditItem[]>>($"/api/audit/delegation?accessDelegationId={accessDelegationId}");
+
+            return PartialView(result);
         }
 
         private async Task<T> ApiGet<T>(string path)

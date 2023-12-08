@@ -1,6 +1,5 @@
 ﻿@model KMD.Identity.TestApplications.OpenID.MVCCore.Models.Delegation.DelegationViewModel
 @using KMD.Identity.TestApplications.OpenID.MVCCore.Extensions
-@using KMD.Identity.TestApplications.OpenID.MVCCore.Models.Delegation
 @{
     ViewData["Title"] = "Delegation";
 }
@@ -71,22 +70,13 @@
                 {
                 <a id="btnRevokeAccess_@ud.AccessDelegationId" class="btn btn-sm btn-secondary btnRevokeAccess" href='@Url.Action("RevokeAccess", "Delegation", new { accessDelegationId = @ud.AccessDelegationId })'>Revoke</a>
                 } *@
-                        <a id="btnRevokeAccess_@ud.AccessDelegationId" class="btn btn-sm btn-secondary btnRevokeAccess" href='@Url.Action("RevokeAccess", "Delegation", new { accessDelegationId = @ud.AccessDelegationId })'>Revoke</a>
+                        <a class="btn btn-sm btn-secondary btnRevokeAccess" href='@Url.Action("RevokeAccess", "Delegation", new { accessDelegationId = @ud.AccessDelegationId })'>Revoke</a>
+                        <a class="btn btn-sm btn-secondary btnShowAudit" href='@Url.Action("AuditInformation", "Delegation", new { accessDelegationId = @ud.AccessDelegationId })'>Show Audit</a>
                     </td>
                 </tr>
             }
         </tbody>
     </table>
-
-
-    @* --Perform operation on behalf - DOESN'T Work
-
-    --LIST
-    Columns Who|What|When|Revoke|View Audit
-
-
-    --Audit
-        When|What*@
 }
 
 @if (User.HasRole("CaseWorker"))
@@ -123,28 +113,20 @@
                 {
                 <a id="btnAct_@ud.AccessDelegationId" class="btn btn-sm btn-secondary btnAct" href='@Url.Action("Act", "Delegation", new { accessDelegationId = @ud.AccessDelegationId })'>Act</a>
                 } *@
-                        <a id="btnRevokeAccess_@ud.AccessDelegationId" class="btn btn-sm btn-secondary btnRevokeAccess" href='@Url.Action("RevokeAccess", "Delegation", new { accessDelegationId = @ud.AccessDelegationId })'>Revoke</a>
-                        <a id="btnAct_@ud.AccessDelegationId" class="btn btn-sm btn-secondary btnAct" href='@Url.Action("Act", "Delegation", new { accessDelegationId = @ud.AccessDelegationId })'>Act</a>
+                        <a class="btn btn-sm btn-secondary btnRevokeAccess" href='@Url.Action("RevokeAccess", "Delegation", new { accessDelegationId = @ud.AccessDelegationId })'>Revoke</a>
+                        <a class="btn btn-sm btn-secondary btnAct" href='@Url.Action("Act", "Delegation", new { accessDelegationId = @ud.AccessDelegationId })'>Act</a>
+                        <a class="btn btn-sm btn-secondary btnShowAudit" href='@Url.Action("AuditInformation", "Delegation", new { accessDelegationId = @ud.AccessDelegationId })'>Show Audit</a>
                     </td>
                 </tr>
             }
         </tbody>
     </table>
-
-    @* LIST of delegated access
-    Columns Who| What | When | Revoke | View Audit | Act (javascript confirm)
-
-    --Audit
-    When|What
-
-
-    --Perform operation on behalf
-
-
-    Revoke
-    - Are you sure you want to Revoke Delegated Access
-        - YES/NO *@
 }
+
+<div id="auditContainer" class="row">
+
+</div>
+
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script type="text/javascript">
     $(function () {
@@ -177,6 +159,14 @@
             if (confirm("Are you sure you want to Act on Behalf of Subject?")) {
                 window.location = link.href;
             }
+        });
+        
+        $(".btnShowAudit").on("click", function (e) {
+            var link = this;
+
+            e.preventDefault();
+
+            $("#auditContainer").load(link.href);
         });
     });
 </script>

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using KMD.Identity.TestApplications.OpenID.API.Handlers;
 using KMD.Identity.TestApplications.OpenID.API.Repositories.Delegation;
+using KMD.Identity.TestApplications.OpenID.API.Services.Audit;
 using KMD.Identity.TestApplications.OpenID.API.Services.Delegation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -64,6 +65,7 @@ namespace KMD.Identity.TestApplications.OpenID.API
             services.AddSingleton<ICustomClaimsHandler, CustomClaimsHandler>();
             services.AddSingleton<IDelegationRepository, InMemoryDelegationRepository>();
             services.AddSingleton<IDelegationService, DelegationService>();
+            services.AddSingleton<IAuditService, InMemoryAuditService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -6,6 +6,7 @@ using KMD.Identity.TestApplications.OpenID.API.Extensions;
 using KMD.Identity.TestApplications.OpenID.API.Models;
 using KMD.Identity.TestApplications.OpenID.API.Models.Delegation;
 using KMD.Identity.TestApplications.OpenID.API.Repositories.Delegation;
+using KMD.Identity.TestApplications.OpenID.API.Services.Audit;
 using KMD.Identity.TestApplications.OpenID.API.Services.Delegation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -21,15 +22,18 @@ namespace KMD.Identity.TestApplications.OpenID.API.Controllers
         private readonly ILogger<DelegationController> _logger;
         private readonly IDelegationService delegationService;
         private readonly IDelegationRepository delegationRepository;
+        private readonly IAuditService auditService;
 
         public DelegationController(
             ILogger<DelegationController> logger,
             IDelegationService delegationService,
-            IDelegationRepository delegationRepository)
+            IDelegationRepository delegationRepository,
+            IAuditService auditService)
         {
             _logger = logger;
             this.delegationService = delegationService;
             this.delegationRepository = delegationRepository;
+            this.auditService = auditService;
         }
 
         [Route("/api/delegation/delegateaccess")]
@@ -40,7 +44,7 @@ namespace KMD.Identity.TestApplications.OpenID.API.Controllers
 
             var accessDelegation = delegationService.New(User.Claims, "all");
             var result = delegationService.StartDelegatingAccess(accessDelegation.FlowId, User.GetSubject());
-
+            
             return result;
         }
 
@@ -79,6 +83,8 @@ namespace KMD.Identity.TestApplications.OpenID.API.Controllers
         [HttpPost]
         public async Task<OperationResult<AccessDelegationAct>> Act(Guid accessDelegationId)
         {
+            auditService.Add(accessDelegationId, User.GetSubject(), $"Acting requested");
+
             if (!User.HasRole("CaseWorker")) return OperationResult<AccessDelegationAct>.Fail("User is not a Case Worker");
 
             var result = delegationService.StartActing(accessDelegationId, User.GetSubject());
@@ -100,10 +106,10 @@ namespace KMD.Identity.TestApplications.OpenID.API.Controllers
 
             if (string.IsNullOrEmpty(flowId))
             {
-                //not a delegation flow, returning something
+                //not a delegation flow
                 return new
                 {
-                    DelegationMessage = "No delegation flow"
+                    SomeCustomClaim = "Some claim value"
                 };
             }
 
@@ -124,7 +130,8 @@ namespace KMD.Identity.TestApplications.OpenID.API.Controllers
                     DelegationMessage = $"Access delegated for flow id{flowId}"
                 };
             }
-            else if (isCaseWorker)
+            
+            if (isCaseWorker)
             {
                 var result = delegationService.FinishActing(Guid.Parse(flowId), User.GetSubject());
 
@@ -138,7 +145,9 @@ namespace KMD.Identity.TestApplications.OpenID.API.Controllers
 
                 return new
                 {
-                    DelegationMessage = $"Acting finished for flow id{flowId}"
+                    DelegationMessage = $"Now you're acting as: {result.Result.UserData.Sub} for scope: {result.Result.Scope.OperationName}",
+                    DelegationSub = result.Result.UserData.Sub,
+                    DelegationScope = result.Result.Scope.OperationName
                 };
             }
 

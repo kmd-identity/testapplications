@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using KMD.Identity.TestApplications.OpenID.API.Models.Delegation;
 
@@ -6,7 +7,7 @@ namespace KMD.Identity.TestApplications.OpenID.API.Repositories.Delegation
 {
     public class InMemoryDelegationRepository : IDelegationRepository
     {
-        private static Dictionary<Guid, AccessDelegation> store = new();
+        private static ConcurrentDictionary<Guid, AccessDelegation> store = new();
 
         public void StoreAccessDelegation(AccessDelegation accessDelegation)
         {
@@ -61,7 +62,7 @@ namespace KMD.Identity.TestApplications.OpenID.API.Repositories.Delegation
 
         public void RemoveAccessDelegation(Guid accessDelegationId)
         {
-            store.Remove(accessDelegationId);
+            store.Remove(accessDelegationId, out var _);
         }
     }
 }

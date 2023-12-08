@@ -5,6 +5,8 @@
         public bool Success { get; set; }
 
         public string Error { get; set; }
+
+        public bool HasError => !string.IsNullOrWhiteSpace(Error);
     }
 
     public class ApiCallResult<T> : ApiCallResult

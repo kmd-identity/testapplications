@@ -85,17 +85,17 @@ namespace KMD.Identity.TestApplications.OpenID.API.Models.Delegation
             return OperationResult<AccessDelegationAct>.Pass(act);
         }
 
-        public OperationResult FinishActing(string actor)
+        public OperationResult<AccessDelegation> FinishActing(string actor)
         {
-            if (Status != AccessDelegationStatus.Delegated) return OperationResult.Fail("Not ready for delegation");
+            if (Status != AccessDelegationStatus.Delegated) return OperationResult<AccessDelegation>.Fail("Not ready for delegation");
 
             var act = Acts.FirstOrDefault(a => a.Who == actor && !a.ActingFinishedTimestamp.HasValue);
 
-            if(act == null) return OperationResult.Fail("Cannot finish acting when it was already completed or not started");
+            if(act == null) return OperationResult<AccessDelegation>.Fail("Cannot finish acting when it was already completed or not started");
 
             act.ActingFinishedTimestamp = DateTime.UtcNow;
             
-            return OperationResult.Pass();
+            return OperationResult<AccessDelegation>.Pass(this);
         }
     }
 }
