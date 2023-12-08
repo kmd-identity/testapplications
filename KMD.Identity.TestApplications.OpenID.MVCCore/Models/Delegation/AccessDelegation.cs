@@ -2,7 +2,7 @@
 
 namespace KMD.Identity.TestApplications.OpenID.MVCCore.Models.Delegation
 {
-    public class AccessDelegationViewModel
+    public class AccessDelegation
     {
         public Guid AccessDelegationId { get; set; }
 

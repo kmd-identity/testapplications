@@ -9,7 +9,9 @@ namespace KMD.Identity.TestApplications.OpenID.API.Repositories.Delegation
         void StoreAccessDelegation(AccessDelegation accessDelegation);
         AccessDelegation GetAccessDelegation(Guid accessDelegationId);
         AccessDelegation FindByFlowId(Guid flowId);
+        AccessDelegation FindByActFlowId(Guid flowId);
         IEnumerable<AccessDelegation> FindBySubject(string subject);
+        IEnumerable<AccessDelegation> FindAll();
         void RemoveAccessDelegation(Guid accessDelegationId);
     }
 }

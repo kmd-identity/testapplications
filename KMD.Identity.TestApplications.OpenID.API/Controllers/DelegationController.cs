@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Data;
 using System.Linq;
-using System.Security;
 using System.Threading.Tasks;
 using KMD.Identity.TestApplications.OpenID.API.Extensions;
+using KMD.Identity.TestApplications.OpenID.API.Models;
+using KMD.Identity.TestApplications.OpenID.API.Models.Delegation;
 using KMD.Identity.TestApplications.OpenID.API.Repositories.Delegation;
 using KMD.Identity.TestApplications.OpenID.API.Services.Delegation;
 using Microsoft.AspNetCore.Authorization;
@@ -32,20 +34,19 @@ namespace KMD.Identity.TestApplications.OpenID.API.Controllers
 
         [Route("/api/delegation/delegateaccess")]
         [HttpPost]
-        public async Task<object> DelegateAccess()
+        public async Task<OperationResult<AccessDelegation>> DelegateAccess()
         {
-            if (!User.HasRole("Citizen"))
-                throw new SecurityException("User is not a Citizen");
+            if (!User.HasRole("Citizen")) return OperationResult<AccessDelegation>.Fail("User is not a Citizen");
 
             var accessDelegation = delegationService.New(User.Claims, "all");
-            delegationService.StartDelegatingAccess(accessDelegation.FlowId, User.GetSubject());
+            var result = delegationService.StartDelegatingAccess(accessDelegation.FlowId, User.GetSubject());
 
-            return accessDelegation;
+            return result;
         }
 
         [Route("/api/delegation/revoke")]
         [HttpPost]
-        public async Task<object> RevokeAccess(Guid accessDelegationId)
+        public async Task<OperationResult> RevokeAccess(Guid accessDelegationId)
         {
             var result = delegationService.Revoke(
                 User.HasRole("Citizen"),
@@ -58,12 +59,31 @@ namespace KMD.Identity.TestApplications.OpenID.API.Controllers
 
         [Route("/api/delegation/delegatedbysubject")]
         [HttpGet]
-        public async Task<object> DelegatedBySubject()
+        public async Task<OperationResult<AccessDelegation[]>> DelegatedBySubject()
         {
-            if (!User.HasRole("Citizen"))
-                throw new SecurityException("User is not a Citizen");
+            if (!User.HasRole("Citizen")) return OperationResult<AccessDelegation[]>.Fail("User is not a Citizen");
 
-            return delegationRepository.FindBySubject(User.GetSubject()).ToArray();
+            return OperationResult<AccessDelegation[]>.Pass(delegationRepository.FindBySubject(User.GetSubject()).ToArray());
+        }
+
+        [Route("/api/delegation/delegated")]
+        [HttpGet]
+        public async Task<OperationResult<AccessDelegation[]>> Delegated()
+        {
+            if (!User.HasRole("CaseWorker")) return OperationResult<AccessDelegation[]>.Fail("User is not a Case Worker");
+
+            return OperationResult<AccessDelegation[]>.Pass(delegationRepository.FindAll().ToArray());
+        }
+
+        [Route("/api/delegation/act")]
+        [HttpPost]
+        public async Task<OperationResult<AccessDelegationAct>> Act(Guid accessDelegationId)
+        {
+            if (!User.HasRole("CaseWorker")) return OperationResult<AccessDelegationAct>.Fail("User is not a Case Worker");
+
+            var result = delegationService.StartActing(accessDelegationId, User.GetSubject());
+
+            return result;
         }
 
         [Route("GetCustomClaims")]
@@ -73,47 +93,58 @@ namespace KMD.Identity.TestApplications.OpenID.API.Controllers
             var claims = User.Claims.ToArray();
 
             var flowId = claims.FirstOrDefault(c => c.Type.Equals("flowid", StringComparison.InvariantCultureIgnoreCase))?.Value;
-            var role = claims.FirstOrDefault(c => c.Type.Equals("role", StringComparison.InvariantCultureIgnoreCase))?.Value;
+            var isCitizen = claims.Any(c => c.Type.Equals("role", StringComparison.InvariantCultureIgnoreCase) 
+                                            && c.Value.Equals("citizen", StringComparison.InvariantCultureIgnoreCase));
+            var isCaseWorker = claims.Any(c => c.Type.Equals("role", StringComparison.InvariantCultureIgnoreCase)
+                                            && c.Value.Equals("caseworker", StringComparison.InvariantCultureIgnoreCase));
 
             if (string.IsNullOrEmpty(flowId))
             {
                 //not a delegation flow, returning something
                 return new
                 {
-                    Message = "Thanks for using Custom Claims"
+                    DelegationMessage = "No delegation flow"
                 };
             }
 
-            if (string.Equals(role, "citizen", StringComparison.InvariantCultureIgnoreCase))
+            if (isCitizen)
             {
                 var result = delegationService.FinishDelegatingAccess(Guid.Parse(flowId), User.GetSubject());
 
-                if (!result.success)
+                if (!result.Success)
                 {
                     return new
                     {
-                        Message = result.error
+                        DelegationError = result.Error
                     };
                 }
 
                 return new
                 {
-                    Message = $"Access delegated for flow id{flowId}"
+                    DelegationMessage = $"Access delegated for flow id{flowId}"
                 };
             }
-
-            if (string.Equals(role, "caseworker", StringComparison.InvariantCultureIgnoreCase))
+            else if (isCaseWorker)
             {
-                //acting
+                var result = delegationService.FinishActing(Guid.Parse(flowId), User.GetSubject());
+
+                if (!result.Success)
+                {
+                    return new
+                    {
+                        DelegationError = result.Error
+                    };
+                }
+
                 return new
                 {
-                    Message = "Access Delegation process"
+                    DelegationMessage = $"Acting finished for flow id{flowId}"
                 };
             }
 
             return new
             {
-                Message = "Nothing to process"
+                DelegationMessage = "Nothing to process"
             };
         }
     }

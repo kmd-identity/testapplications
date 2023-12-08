@@ -30,11 +30,32 @@ namespace KMD.Identity.TestApplications.OpenID.API.Repositories.Delegation
             return null;
         }
 
+        public AccessDelegation FindByActFlowId(Guid flowId)
+        {
+            foreach (var storeValue in store.Values)
+            {
+                foreach (var act in storeValue.Acts)
+                {
+                    if (act.FlowId == flowId) return storeValue;
+                }
+            }
+
+            return null;
+        }
+
         public IEnumerable<AccessDelegation> FindBySubject(string subject)
         {
             foreach (var storeValue in store.Values)
             {
                 if (storeValue.UserData.Sub == subject) yield return storeValue;
+            }
+        }
+
+        public IEnumerable<AccessDelegation> FindAll()
+        {
+            foreach (var storeValue in store.Values)
+            {
+                yield return storeValue;
             }
         }
 

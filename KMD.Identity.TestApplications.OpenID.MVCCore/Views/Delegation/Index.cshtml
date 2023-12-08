@@ -1,4 +1,4 @@
-﻿@model KMD.Identity.TestApplications.OpenID.MVCCore.Models.Delegation.AccessDelegationsViewModel
+﻿@model KMD.Identity.TestApplications.OpenID.MVCCore.Models.Delegation.DelegationViewModel
 @using KMD.Identity.TestApplications.OpenID.MVCCore.Extensions
 @using KMD.Identity.TestApplications.OpenID.MVCCore.Models.Delegation
 @{
@@ -19,6 +19,26 @@
     <p>Case worker (Actor) can revoke delegated access</p>
 </div>
 
+@if (Model.HasError)
+{
+    @foreach (var error in Model.Errors)
+    {
+        <div class="alert alert-danger" role="alert">
+            @Html.Raw(@error)
+        </div>
+    }
+}
+
+@if (Model.HasMessages)
+{
+    @foreach (var msg in Model.Messages)
+    {
+        <div class="alert alert-primary" role="alert">
+            @Html.Raw(@msg)
+        </div>
+    }
+}
+
 @if (User.HasRole("Citizen"))
 {
     <h1><b>Your now a Citizen</b></h1>
@@ -31,7 +51,6 @@
     <table class="table">
         <thead>
             <tr>
-                <th scope="col">Access Delegation ID</th>
                 <th scope="col">Flow ID</th>
                 <th scope="col">Status</th>
                 <th scope="col">Delegated At</th>
@@ -43,16 +62,16 @@
             @foreach (var ud in Model.DelegatedAccess)
             {
                 <tr>
-                    <td>@ud.AccessDelegationId</td>
                     <td>@ud.FlowId</td>
                     <td>@ud.Status.ToString()</td>
                     <td>@(ud.DelegatedAt.HasValue ? ud.DelegatedAt.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm") : "")</td>
                     <td>@(ud.RevokedAt.HasValue ? ud.RevokedAt.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm") : "")</td>
                     <td>
-                        @if (ud.Status != AccessDelegationStatus.Revoked)
-                        {
-                            <a id="btnRevokeAccess_@ud.AccessDelegationId" class="btn btn-sm btn-secondary btnRevokeAccess" href='@Url.Action("RevokeAccess", "Delegation", new { accessDelegationId = @ud.AccessDelegationId })'>Revoke</a>
-                        }
+                        @*  @if (ud.Status != AccessDelegationStatus.Revoked)
+                {
+                <a id="btnRevokeAccess_@ud.AccessDelegationId" class="btn btn-sm btn-secondary btnRevokeAccess" href='@Url.Action("RevokeAccess", "Delegation", new { accessDelegationId = @ud.AccessDelegationId })'>Revoke</a>
+                } *@
+                        <a id="btnRevokeAccess_@ud.AccessDelegationId" class="btn btn-sm btn-secondary btnRevokeAccess" href='@Url.Action("RevokeAccess", "Delegation", new { accessDelegationId = @ud.AccessDelegationId })'>Revoke</a>
                     </td>
                 </tr>
             }
@@ -67,17 +86,50 @@
 
 
     --Audit
-        When|What
-
-
-    Revoke
-    - Are you sure you want to Revoke Delegated Access
-    - YES/NO *@
+        When|What*@
 }
 
 @if (User.HasRole("CaseWorker"))
 {
-    <p>Your now a Case Worker</p>
+    <h1><b>Your now a Case Worker</b></h1>
+
+    <h2>List of delegated access</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Who</th>
+                <th scope="col">Flow ID</th>
+                <th scope="col">Status</th>
+                <th scope="col">Delegated At</th>
+                <th scope="col">Revoked At</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var ud in Model.DelegatedAccess)
+            {
+                <tr>
+                    <td>@ud.UserData.Sub</td>
+                    <td>@ud.FlowId</td>
+                    <td>@ud.Status.ToString()</td>
+                    <td>@(ud.DelegatedAt.HasValue ? ud.DelegatedAt.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm") : "")</td>
+                    <td>@(ud.RevokedAt.HasValue ? ud.RevokedAt.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm") : "")</td>
+                    <td>
+                        @* @if (ud.Status != AccessDelegationStatus.Revoked)
+                {
+                <a id="btnRevokeAccess_@ud.AccessDelegationId" class="btn btn-sm btn-secondary btnRevokeAccess" href='@Url.Action("RevokeAccess", "Delegation", new { accessDelegationId = @ud.AccessDelegationId })'>Revoke</a>
+                }
+                @if (ud.Status == AccessDelegationStatus.Delegated)
+                {
+                <a id="btnAct_@ud.AccessDelegationId" class="btn btn-sm btn-secondary btnAct" href='@Url.Action("Act", "Delegation", new { accessDelegationId = @ud.AccessDelegationId })'>Act</a>
+                } *@
+                        <a id="btnRevokeAccess_@ud.AccessDelegationId" class="btn btn-sm btn-secondary btnRevokeAccess" href='@Url.Action("RevokeAccess", "Delegation", new { accessDelegationId = @ud.AccessDelegationId })'>Revoke</a>
+                        <a id="btnAct_@ud.AccessDelegationId" class="btn btn-sm btn-secondary btnAct" href='@Url.Action("Act", "Delegation", new { accessDelegationId = @ud.AccessDelegationId })'>Act</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
 
     @* LIST of delegated access
     Columns Who| What | When | Revoke | View Audit | Act (javascript confirm)
@@ -106,13 +158,23 @@
                 window.location = link.href;
             }
         });
-        
+
         $(".btnRevokeAccess").on("click", function (e) {
             var link = this;
 
             e.preventDefault();
 
             if (confirm("Are you sure you want to Revoke Access?")) {
+                window.location = link.href;
+            }
+        });
+
+        $(".btnAct").on("click", function (e) {
+            var link = this;
+
+            e.preventDefault();
+
+            if (confirm("Are you sure you want to Act on Behalf of Subject?")) {
                 window.location = link.href;
             }
         });
