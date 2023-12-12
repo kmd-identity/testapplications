@@ -159,7 +159,7 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore.Controllers
         [HttpGet]
         public async Task<IActionResult> Cleanup()
         {
-            var result = await ApiGet<ApiCallResult<string>>("/api/delegation/cleanup");
+            var result = await ApiPost<ApiCallResult<string>>("/api/delegation/cleanup", new { });
 
             return RedirectToAction(nameof(Index));
         }

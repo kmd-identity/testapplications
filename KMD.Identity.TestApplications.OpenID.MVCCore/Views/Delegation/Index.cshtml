@@ -42,10 +42,10 @@
 {
     <h2><b>Your now a Citizen (@User.GetClaimValue("email"))</b></h2>
     <div class="row">
-        <div class="col-10"></div>
-        <div class="col-2"><a id="btnDelegateAccess" class="btn btn-primary" href='@Url.Action("DelegateAccess", "Delegation")'>Delegate Access</a></div>
+        <div class="col-8"></div>
+        <div class="col-2"><a id="btnDelegateAccess" class="btn btn-primary m-2" href='@Url.Action("DelegateAccess", "Delegation")'>Delegate Access</a></div>
+        <div class="col-2"><a id="btnCleanupDelegation" class="btn btn-primary m-2" href='@Url.Action("Cleanup", "Delegation")'>Cleanup Access Delegation</a></div>
     </div>
-
     <h2>Delegated access</h2>
     <table class="table">
         <thead>
@@ -82,7 +82,10 @@
 @if (User.HasRole("CaseWorker"))
 {
     <h2><b>Your now a Case Worker (@User.GetClaimValue("email")) @(User.IsOperatingOnBehalf() ? $"Acting as {User.GetClaimValue("delegationsub")}" : string.Empty)</b></h2>
-
+    <div class="row">
+        <div class="col-10"></div>
+        <div class="col-2"><a id="btnCleanupDelegationActor" class="btn btn-primary m-2" href='@Url.Action("Cleanup", "Delegation")'>Cleanup Access Delegation</a></div>
+    </div>
     <h2>List of delegated access</h2>
     <table class="table">
         <thead>
@@ -190,6 +193,26 @@
             e.preventDefault();
 
             $("#payResult").load(link.href);
+        });
+        
+        $("#btnCleanupDelegation").on("click", function (e) {
+            var link = this;
+
+            e.preventDefault();
+
+            if (confirm("Are you sure you want to do cleanup? This will remove all data related to current Subject.")) {
+                window.location = link.href;
+            }
+        });
+
+        $("#btnCleanupDelegationActor").on("click", function (e) {
+            var link = this;
+
+            e.preventDefault();
+
+            if (confirm("Are you sure you want to do cleanup? This will remove all data related to all Subjects.")) {
+                window.location = link.href;
+            }
         });
     });
 </script>
