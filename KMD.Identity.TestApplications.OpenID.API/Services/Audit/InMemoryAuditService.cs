@@ -27,5 +27,20 @@ namespace KMD.Identity.TestApplications.OpenID.API.Services.Audit
 
             return Array.Empty<AuditItem>();
         }
+
+        //technical method
+        public void CleanupAll()
+        {
+            store.Clear();
+        }
+
+        //technical method
+        public void Cleanup(IEnumerable<Guid> entityIds)
+        {
+            foreach (var entityId in entityIds)
+            {
+                store.TryRemove(entityId, out var _);
+            }
+        }
     }
 }

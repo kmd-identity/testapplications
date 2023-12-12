@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using KMD.Identity.TestApplications.OpenID.API.Models;
 using KMD.Identity.TestApplications.OpenID.API.Models.Delegation;
 
 namespace KMD.Identity.TestApplications.OpenID.API.Repositories.Delegation
@@ -9,9 +10,13 @@ namespace KMD.Identity.TestApplications.OpenID.API.Repositories.Delegation
     {
         private static ConcurrentDictionary<Guid, AccessDelegation> store = new();
 
-        public void StoreAccessDelegation(AccessDelegation accessDelegation)
+        public OperationResult<AccessDelegation> StoreAccessDelegation(AccessDelegation accessDelegation)
         {
+            if(store.Count > 50)
+                return OperationResult<AccessDelegation>.Fail("Reached number of delegations storage. Ask Case Worker to do cleanup.");
             store[accessDelegation.AccessDelegationId] = accessDelegation;
+
+            return OperationResult<AccessDelegation>.Pass(accessDelegation);
         }
 
         public AccessDelegation GetAccessDelegation(Guid accessDelegationId)
@@ -60,9 +65,21 @@ namespace KMD.Identity.TestApplications.OpenID.API.Repositories.Delegation
             }
         }
 
-        public void RemoveAccessDelegation(Guid accessDelegationId)
+        //technical method
+        public void CleanupAll()
         {
-            store.Remove(accessDelegationId, out var _);
+            store.Clear();
+        }
+        
+        //technical method
+        public IEnumerable<Guid> Cleanup(string subject)
+        {
+            var subjectsAccessDelegations = FindBySubject(subject);
+            foreach (var accessDelegation in subjectsAccessDelegations)
+            {
+                store.Remove(accessDelegation.AccessDelegationId, out var _);
+                yield return accessDelegation.AccessDelegationId;
+            }
         }
     }
 }

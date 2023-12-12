@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,6 +7,7 @@ using KMD.Identity.TestApplications.OpenID.API.Models;
 using KMD.Identity.TestApplications.OpenID.API.Models.Delegation;
 using KMD.Identity.TestApplications.OpenID.API.Repositories.Delegation;
 using KMD.Identity.TestApplications.OpenID.API.Services.Audit;
+using KMD.Identity.TestApplications.OpenID.API.Services.Financial;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -22,28 +22,60 @@ namespace KMD.Identity.TestApplications.OpenID.API.Controllers
         private readonly ILogger<FinancialController> _logger;
         private readonly IAuditService auditService;
         private readonly IDelegationRepository delegationRepository;
-        private static readonly ConcurrentDictionary<string, List<decimal>> payments = new ConcurrentDictionary<string, List<decimal>>();
-        private readonly Random randomPayments = new Random();
+        private readonly IFinancialService financialService;
 
         public FinancialController(
             ILogger<FinancialController> logger,
             IAuditService auditService,
-            IDelegationRepository delegationRepository)
+            IDelegationRepository delegationRepository,
+            IFinancialService financialService)
         {
             _logger = logger;
             this.auditService = auditService;
             this.delegationRepository = delegationRepository;
+            this.financialService = financialService;
         }
 
+        /// <summary>
+        /// This is complete made up situation that shows usage of additional claims, that Case Worker got when Acting on behalf of subject
+        /// </summary>
+        /// <returns></returns>
+        [Route("/api/financial/get")]
+        [HttpGet]
+        public async Task<OperationResult<List<decimal>>> Get()
+        {
+            if (User.HasRole("Citizen"))
+            {
+                return financialService.Get(User.GetSubject());
+            }
+
+            if (User.HasRole("CaseWorker"))
+            {
+                var delegationSub = User.Claims.FirstOrDefault(c => c.Type.Equals("DelegationSub", StringComparison.InvariantCultureIgnoreCase))?.Value;
+                var delegationId = User.Claims.FirstOrDefault(c => c.Type.Equals("DelegationId", StringComparison.InvariantCultureIgnoreCase))?.Value;
+
+                if (string.IsNullOrWhiteSpace(delegationSub)) return OperationResult<List<decimal>>.Fail($"No access delegation granted");
+
+                var delegation = delegationRepository.GetAccessDelegation(Guid.Parse(delegationId));
+                if (delegation.Status != AccessDelegationStatus.Delegated) return OperationResult<List<decimal>>.Fail($"No access delegation granted");
+
+                auditService.Add(delegation.AccessDelegationId, User.GetSubject(), $"Payments loaded");
+                return financialService.Get(delegationSub);
+            }
+
+            return OperationResult<List<decimal>>.Fail("Unknown role");
+        }
+
+        /// <summary>
+        /// This is complete made up situation that shows usage of additional claims, that Case Worker got when Acting on behalf of subject
+        /// </summary>
+        /// <returns></returns>
         [Route("/api/financial/pay")]
         [HttpGet]
         public async Task<OperationResult<List<decimal>>> Pay()
         {
             if (User.HasRole("Citizen"))
             {
-                if(payments.ContainsKey(User.GetSubject()))
-                    return OperationResult<List<decimal>>.Pass(payments[User.GetSubject()]);
-
                 return OperationResult<List<decimal>>.Fail("You're not allowed to pay. Ask Case Worker.");
             }
 
@@ -57,27 +89,11 @@ namespace KMD.Identity.TestApplications.OpenID.API.Controllers
                 var delegation = delegationRepository.GetAccessDelegation(Guid.Parse(delegationId));
                 if(delegation.Status != AccessDelegationStatus.Delegated) return OperationResult<List<decimal>>.Fail($"No access delegation granted");
 
-                if (payments.ContainsKey(delegationSub))
-                {
-                    var existing = payments[delegationSub];
+                var result = financialService.Pay(delegationSub);
 
-                    if(existing.Count > 1) return OperationResult<List<decimal>>.Fail("Already paid. Only two payments allowed.");
+                auditService.Add(delegation.AccessDelegationId, User.GetSubject(), result.Success ? $"Paid {result.Result.Last()}$" : $"Payment failed with error: {result.Error}");
 
-                    existing.Add(randomPayments.Next(2, 100));
-
-                    auditService.Add(delegation.AccessDelegationId, User.GetSubject(), $"Paid {existing.Last()}$");
-
-                    payments[delegationSub] = existing;
-
-                    return OperationResult<List<decimal>>.Pass(existing);
-                }
-                else
-                {
-                    var newPay = new List<decimal> { randomPayments.Next(2, 100) };
-                    payments[delegationSub] = newPay;
-                    auditService.Add(delegation.AccessDelegationId, User.GetSubject(), $"Paid {newPay.Last()}$");
-                    return OperationResult<List<decimal>>.Pass(newPay);
-                }
+                return result;
             }
 
             return OperationResult<List<decimal>>.Fail("Unknown role");

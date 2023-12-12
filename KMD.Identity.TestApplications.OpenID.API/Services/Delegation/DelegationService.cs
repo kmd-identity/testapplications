@@ -39,9 +39,7 @@ namespace KMD.Identity.TestApplications.OpenID.API.Services.Delegation
                 }
             };
 
-            delegationRepository.StoreAccessDelegation(accessDelegation);
-
-            return OperationResult<AccessDelegation>.Pass(accessDelegation);
+            return delegationRepository.StoreAccessDelegation(accessDelegation);
         }
 
         public OperationResult<AccessDelegation> StartDelegatingAccess(Guid flowId, string subject)

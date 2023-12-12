@@ -40,7 +40,7 @@
 
 @if (User.HasRole("Citizen"))
 {
-    <h1><b>Your now a Citizen</b></h1>
+    <h2><b>Your now a Citizen (@User.GetClaimValue("email"))</b></h2>
     <div class="row">
         <div class="col-10"></div>
         <div class="col-2"><a id="btnDelegateAccess" class="btn btn-primary" href='@Url.Action("DelegateAccess", "Delegation")'>Delegate Access</a></div>
@@ -81,7 +81,7 @@
 
 @if (User.HasRole("CaseWorker"))
 {
-    <h1><b>Your now a Case Worker</b></h1>
+    <h2><b>Your now a Case Worker (@User.GetClaimValue("email")) @(User.IsOperatingOnBehalf() ? $"Acting as {User.GetClaimValue("delegationsub")}" : string.Empty)</b></h2>
 
     <h2>List of delegated access</h2>
     <table class="table">
@@ -129,11 +129,13 @@
 
 @if (User.HasRole("Citizen") || Model.OperatesOnBehalf)
 {
+    <h2>Financial operation (demonstration of operation on behalf)</h2>
     <div class="row">
         This operation for some reason cannot be completed by Citizen (Subject). Only Case Worker (Actor) acting on behalf Citizen (Subject) can do it.
     </div>
     <div class="row">
-        <a class="btn btn-secondary bntPay" href='@Url.Action("Pay", "Delegation")'>Make a Payment</a>
+        <a class="btn btn-secondary bntPayments m-2" href='@Url.Action("Pay", "Delegation")'>Make a Payment</a>
+        <a class="btn btn-secondary bntPayments m-2" href='@Url.Action("GetPayments", "Delegation")'>Get Payments</a>
     </div>
     <div id="payResult" class="row">
 
@@ -182,7 +184,7 @@
             $("#auditContainer").load(link.href);
         });
 
-        $(".bntPay").on("click", function (e) {
+        $(".bntPayments").on("click", function (e) {
             var link = this;
 
             e.preventDefault();

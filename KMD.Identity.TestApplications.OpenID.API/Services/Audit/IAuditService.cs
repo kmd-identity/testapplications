@@ -8,5 +8,10 @@ namespace KMD.Identity.TestApplications.OpenID.API.Services.Audit
     {
         void Add(Guid entityId, string subject, string operation);
         IEnumerable<AuditItem> Get(Guid entityId);
+
+        //technical method
+        void CleanupAll();
+        //technical method
+        void Cleanup(IEnumerable<Guid> entityIds);
     }
 }

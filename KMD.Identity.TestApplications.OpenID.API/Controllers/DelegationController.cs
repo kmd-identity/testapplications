@@ -8,6 +8,7 @@ using KMD.Identity.TestApplications.OpenID.API.Models.Delegation;
 using KMD.Identity.TestApplications.OpenID.API.Repositories.Delegation;
 using KMD.Identity.TestApplications.OpenID.API.Services.Audit;
 using KMD.Identity.TestApplications.OpenID.API.Services.Delegation;
+using KMD.Identity.TestApplications.OpenID.API.Services.Financial;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -23,17 +24,20 @@ namespace KMD.Identity.TestApplications.OpenID.API.Controllers
         private readonly IDelegationService delegationService;
         private readonly IDelegationRepository delegationRepository;
         private readonly IAuditService auditService;
+        private readonly IFinancialService financialService;
 
         public DelegationController(
             ILogger<DelegationController> logger,
             IDelegationService delegationService,
             IDelegationRepository delegationRepository,
-            IAuditService auditService)
+            IAuditService auditService,
+            IFinancialService financialService)
         {
             _logger = logger;
             this.delegationService = delegationService;
             this.delegationRepository = delegationRepository;
             this.auditService = auditService;
+            this.financialService = financialService;
         }
 
         [Route("/api/delegation/delegateaccess")]
@@ -92,6 +96,38 @@ namespace KMD.Identity.TestApplications.OpenID.API.Controllers
             var result = delegationService.StartActing(accessDelegationId, User.GetSubject());
 
             return result;
+        }
+
+        /// <summary>
+        /// This is only a technical method to remove everything related to delegation from memory.
+        /// You don't need such method in your system.
+        /// </summary>
+        /// <param name="accessDelegationId"></param>
+        /// <returns></returns>
+        [Route("/api/delegation/cleanup")]
+        [HttpPost]
+        public async Task<OperationResult<string>> Cleanup()
+        {
+            if (User.HasRole("CaseWorker"))
+            {
+                //cleanup everything
+                delegationRepository.CleanupAll();
+                auditService.CleanupAll();
+                financialService.CleanupAll();
+                return OperationResult<string>.Pass("Cleanup completed");
+            }
+            else if (User.HasRole("Citizen"))
+            {
+                //cleanup for specific citizen
+                var removedDelegations = delegationRepository.Cleanup(User.GetSubject());
+                auditService.Cleanup(removedDelegations);
+                financialService.Cleanup(User.GetSubject());
+                return OperationResult<string>.Pass("Cleanup completed");
+            }
+            else
+            {
+                return OperationResult<string>.Fail("Nothing to clear by you.");
+            }
         }
 
         [Route("GetCustomClaims")]

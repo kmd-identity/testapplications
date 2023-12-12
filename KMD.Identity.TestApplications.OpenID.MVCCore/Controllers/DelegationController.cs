@@ -148,6 +148,22 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore.Controllers
             return PartialView(result);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetPayments()
+        {
+            var result = await ApiGet<ApiCallResult<decimal[]>>("/api/financial/get");
+
+            return PartialView(nameof(Pay), result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Cleanup()
+        {
+            var result = await ApiGet<ApiCallResult<string>>("/api/delegation/cleanup");
+
+            return RedirectToAction(nameof(Index));
+        }
+
         private async Task<T> ApiGet<T>(string path)
         {
             using var httpClient = new HttpClient();
