@@ -18,6 +18,7 @@ using Newtonsoft.Json;
 using KMD.Identity.TestApplications.OpenID.MVCCore.Models.Delegation;
 using KMD.Identity.TestApplications.OpenID.MVCCore.Models;
 using KMD.Identity.TestApplications.OpenID.MVCCore.Models.Audit;
+using System.Reflection;
 
 namespace KMD.Identity.TestApplications.OpenID.MVCCore.Controllers
 {
@@ -29,6 +30,14 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore.Controllers
         public DelegationController(IConfiguration configuration)
         {
             this.configuration = configuration;
+        }
+
+        public async Task<IActionResult> IndexDelegated()
+        {
+            TempData["Error"] = User.Claims.FirstOrDefault(c => c.Type.Equals("DelegationError", StringComparison.InvariantCultureIgnoreCase))?.Value;
+            TempData["DelegationMessage"] = User.Claims.FirstOrDefault(c => c.Type.Equals("DelegationMessage", StringComparison.InvariantCultureIgnoreCase))?.Value;
+
+            return RedirectToAction(nameof(Index));
         }
 
         public async Task<IActionResult> Index()
@@ -51,20 +60,24 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore.Controllers
             }
 
             var delegationErrors = new List<string>();
-            delegationErrors.AddRange(User.Claims.Where(c => c.Type.Equals("DelegationError", StringComparison.InvariantCultureIgnoreCase)).Select(c => c.Value));
             if (TempData["Error"] != null)
             {
                 delegationErrors.Add((string)TempData["Error"]);
             }
 
-            model.Messages = User.Claims.Where(c => c.Type.Equals("DelegationMessage", StringComparison.InvariantCultureIgnoreCase)).Select(c => c.Value).ToArray();
+            var delegationMessages = new List<string>();
+            if (TempData["DelegationMessage"] != null)
+            {
+                delegationMessages.Add((string)TempData["DelegationMessage"]);
+            }
             model.Errors = delegationErrors.ToArray();
+            model.Messages = delegationMessages.ToArray();
             
             return View(model);
         }
 
         [HttpGet]
-        public async Task DelegateAccess(string returnUrl = "/Delegation")
+        public async Task DelegateAccess(string returnUrl = "/Delegation/IndexDelegated")
         {
             //start access delegation
             var result = await ApiPost<ApiCallResult<AccessDelegation>>("/api/delegation/delegateaccess", new { });
@@ -80,7 +93,7 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore.Controllers
         }
 
         [HttpGet]
-        public async Task RevokeAccess(Guid accessDelegationId, string returnUrl = "/Delegation")
+        public async Task RevokeAccess(Guid accessDelegationId, string returnUrl = "/Delegation/IndexDelegated")
         {
             var result = await ApiPost<ApiCallResult>($"/api/delegation/revoke?accessDelegationId={accessDelegationId}", new { });
 
@@ -104,7 +117,7 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore.Controllers
         }
         
         [HttpGet]
-        public async Task Act(Guid accessDelegationId, string returnUrl = "/Delegation")
+        public async Task Act(Guid accessDelegationId, string returnUrl = "/Delegation/IndexDelegated")
         {
             //start acting
             var result = await ApiPost<ApiCallResult<AccessDelegationAct>>($"/api/delegation/act?accessDelegationId={accessDelegationId}", new { });

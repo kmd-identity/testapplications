@@ -101,6 +101,10 @@ namespace KMD.Identity.TestApplications.OpenID.API.Controllers
             var claims = User.Claims.ToArray();
 
             var flowId = claims.FirstOrDefault(c => c.Type.Equals("flowid", StringComparison.InvariantCultureIgnoreCase))?.Value;
+
+            //below is something you probably won't get from KMD Identity (unless IdP will issue such claims)
+            // in other cases you would need to call your internal PMS to determine what roles/permissions given user has
+            // User.GetSubject() gives you the subject of the user
             var isCitizen = claims.Any(c => c.Type.Equals("role", StringComparison.InvariantCultureIgnoreCase) 
                                             && c.Value.Equals("citizen", StringComparison.InvariantCultureIgnoreCase));
             var isCaseWorker = claims.Any(c => c.Type.Equals("role", StringComparison.InvariantCultureIgnoreCase)
@@ -115,6 +119,8 @@ namespace KMD.Identity.TestApplications.OpenID.API.Controllers
                 };
             }
 
+            //citizen tries to finish delegating access process
+            //which will allow case workers to act on behalf of him
             if (isCitizen)
             {
                 var result = delegationService.FinishDelegatingAccess(Guid.Parse(flowId), User.GetSubject());
@@ -133,6 +139,8 @@ namespace KMD.Identity.TestApplications.OpenID.API.Controllers
                 };
             }
             
+            //case worker tries to finish acting process
+            //which will allow him to act on behalf of citizen
             if (isCaseWorker)
             {
                 var result = delegationService.FinishActing(Guid.Parse(flowId), User.GetSubject());
@@ -156,7 +164,7 @@ namespace KMD.Identity.TestApplications.OpenID.API.Controllers
 
             return new
             {
-                DelegationMessage = "Nothing to process"
+                DelegationMessage = "Nothing to process. Have you forgotten about selecting proper claims in KMD Identity Test IdP?"
             };
         }
     }

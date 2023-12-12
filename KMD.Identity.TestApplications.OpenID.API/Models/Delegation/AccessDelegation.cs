@@ -48,6 +48,7 @@ namespace KMD.Identity.TestApplications.OpenID.API.Models.Delegation
             if (isCitizen)
             {
                 if (subject != UserData.Sub) return OperationResult.Fail("Not your access delegation");
+                if (Status == AccessDelegationStatus.Revoked) return OperationResult.Fail($"It's already revoked");
 
                 Status  = AccessDelegationStatus.Revoked;
                 RevokedAt = DateTime.UtcNow;
@@ -56,6 +57,8 @@ namespace KMD.Identity.TestApplications.OpenID.API.Models.Delegation
             }
             else if (isCaseWorker)
             {
+                if (Status == AccessDelegationStatus.Revoked) return OperationResult.Fail($"It's already revoked");
+
                 Status = AccessDelegationStatus.Revoked;
                 RevokedAt = DateTime.UtcNow;
 

@@ -58,7 +58,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var ud in Model.DelegatedAccess)
+            @foreach (var ud in Model.DelegatedAccess.OrderByDescending(c => c.DelegatedAt ?? DateTime.MaxValue))
             {
                 <tr>
                     <td>@ud.FlowId</td>
@@ -96,7 +96,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var ud in Model.DelegatedAccess)
+            @foreach (var ud in Model.DelegatedAccess.OrderByDescending(c => c.DelegatedAt ?? DateTime.MaxValue))
             {
                 <tr>
                     <td>@ud.UserData.Sub</td>
@@ -149,7 +149,7 @@
 
             e.preventDefault();
 
-            if (confirm("Are you sure you want to Delegate Access?")) {
+            if (confirm("Are you sure you want to Delegate Access?\nThis will cause you to re-login.")) {
                 window.location = link.href;
             }
         });
