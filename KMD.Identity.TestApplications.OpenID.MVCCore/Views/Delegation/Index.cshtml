@@ -4,18 +4,48 @@
     ViewData["Title"] = "Delegation";
 }
 
-<div>
-    <p>Citizen (Subject) can delegate access to Case worker (Actor)</p>
-    <p> - You need to logout and login again with Role "Citizen" (use KMD Identity TestIdP to simulate roles)</p>
-    <p>Citizen (Subject) can view delegated access (own)</p>
-    <p>Citizen (Subject) can view audit of delegated access (own)</p>
-    <p>Citizen (Subject) can revoke delegated access (own)</p>
+<div class="row">
+    <input type="button" id="bInstructions" class="btn btn-info" value="Show information and instructions"/>
+</div>
 
-    <p>Case worker (Actor) can view delegated access</p>
-    <p> - You need to logout and login again with Role "CaseWorker" (use KMD Identity TestIdP to simulate roles)</p>
-    <p>Case worker (Actor) can act on behalf of Citizen (Subject)</p>
-    <p>Case worker (Actor) can view audit of delegated access (own)</p>
-    <p>Case worker (Actor) can revoke delegated access</p>
+<div class="container" id="dInstructions" style="display: none">
+    <div class="row">
+        <h3>Overview</h3>
+    </div>
+    <div class="row">
+        <p>This page is a workspace for testing delegation using KMD Identity. For more information about delegation visit <a href="https://github.com/kmd-identity/documentation/wiki">KMD Identity documentation</a></p>
+    </div>
+    <div class="row">
+        <h3>Scenario</h3>
+    </div>
+    <div class="row">
+        <p>Lets assume we have a Citizen who wants to pay for something. For some reason this operation is not permitted for him.</p>
+        <p>Citizen can ask Case Worker to perform this operation on behalf of him.</p>
+        <p>To allow that, Citizen must delegate access for Case Worker.</p>
+        <p>When access is delegated, then Case Worker can act on behalf of Citizen and complete the payment.</p>
+    </div>
+    <div class="row">
+        <h3>Setup for Citizen</h3>
+    </div>
+    <div class="row">
+        <ul>
+            <li>Logout from current session.</li>
+            <li>Start new login flow and select KMD Identity TestIdP to login with.</li>
+            <li>When presented with the TestIdP UI add claim called <b>Role</b> with value <b>Citizen</b>.</li>
+            <li>After successful login navigate to this page and your will be presented with Citizen UI.</li>
+        </ul>
+    </div>
+    <div class="row">
+        <h3>Setup for Case Worker</h3>
+    </div>
+    <div class="row">
+        <ul>
+            <li>Logout from current session (or if you want to test Citizen and Case Worker on the same machine, then open another browser window).</li>
+            <li>Start new login flow and select KMD Identity TestIdP to login with.</li>
+            <li>When presented with the TestIdP UI add claim called <b>Role</b> with value <b>CaseWorker</b>.</li>
+            <li>After successful login navigate to this page and your will be presented with Case Worker UI.</li>
+        </ul>
+    </div>
 </div>
 
 @if (Model.HasError)
@@ -127,7 +157,6 @@
 }
 
 <div id="auditContainer" class="row">
-
 </div>
 
 @if (User.HasRole("Citizen") || Model.OperatesOnBehalf)
@@ -141,12 +170,23 @@
         <a class="btn btn-secondary bntPayments m-2" href='@Url.Action("GetPayments", "Delegation")'>Get Payments</a>
     </div>
     <div id="payResult" class="row">
-
     </div>
 }
 
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script type="text/javascript">
+
+    function toggleInstructions() {
+        $("#dInstructions").toggle();
+
+        if ($("#dInstructions").is(":visible")) {
+            $("#bInstructions").val('Hide information and instructions');
+        }
+        else {
+            $("#bInstructions").val('Show information and instructions');
+        }
+    }
+
     $(function () {
 
         $("#btnDelegateAccess").on("click", function (e) {
@@ -178,7 +218,7 @@
                 window.location = link.href;
             }
         });
-        
+
         $(".btnShowAudit").on("click", function (e) {
             var link = this;
 
@@ -194,7 +234,7 @@
 
             $("#payResult").load(link.href);
         });
-        
+
         $("#btnCleanupDelegation").on("click", function (e) {
             var link = this;
 
@@ -214,5 +254,15 @@
                 window.location = link.href;
             }
         });
+
+        $("#bInstructions").on("click", function (e) {
+            toggleInstructions();
+        });
+        
+        @if (!User.HasRole("Citizen") && !User.HasRole("CaseWorker"))
+        {
+            @Html.Raw(" toggleInstructions();")
+        }
     });
+
 </script>

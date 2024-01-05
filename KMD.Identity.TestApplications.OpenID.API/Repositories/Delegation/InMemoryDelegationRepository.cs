@@ -12,7 +12,7 @@ namespace KMD.Identity.TestApplications.OpenID.API.Repositories.Delegation
 
         public OperationResult<AccessDelegation> StoreAccessDelegation(AccessDelegation accessDelegation)
         {
-            if(store.Count > 50)
+            if(store.Count > 100)
                 return OperationResult<AccessDelegation>.Fail("Reached number of delegations storage. Ask Case Worker to do cleanup.");
             store[accessDelegation.AccessDelegationId] = accessDelegation;
 
