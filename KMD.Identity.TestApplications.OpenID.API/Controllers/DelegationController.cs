@@ -15,6 +15,10 @@ using Microsoft.Extensions.Logging;
 
 namespace KMD.Identity.TestApplications.OpenID.API.Controllers
 {
+    /// <summary>
+    /// This controller is only for test purposes.
+    /// Use it as inspiration for building Delegation process in your system.
+    /// </summary>
     [ApiController]
     [Authorize]
     [Route("api/[controller]")]
@@ -102,7 +106,6 @@ namespace KMD.Identity.TestApplications.OpenID.API.Controllers
         /// This is only a technical method to remove everything related to delegation from memory.
         /// You don't need such method in your system.
         /// </summary>
-        /// <param name="accessDelegationId"></param>
         /// <returns></returns>
         [Route("/api/delegation/cleanup")]
         [HttpPost]
@@ -138,7 +141,7 @@ namespace KMD.Identity.TestApplications.OpenID.API.Controllers
 
             var flowId = claims.FirstOrDefault(c => c.Type.Equals("flowid", StringComparison.InvariantCultureIgnoreCase))?.Value;
 
-            //below is something you probably won't get from KMD Identity (unless IdP will issue such claims)
+            //Below is something you probably won't get from KMD Identity (unless IdP will issue such claims)
             // in other cases you would need to call your internal PMS to determine what roles/permissions given user has
             // User.GetSubject() gives you the subject of the user
             var isCitizen = claims.Any(c => c.Type.Equals("role", StringComparison.InvariantCultureIgnoreCase) 

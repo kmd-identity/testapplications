@@ -2,26 +2,26 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security;
 using System.Threading.Tasks;
 using KMD.Identity.TestApplications.OpenID.MVCCore.Extensions;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using System.Net.Http.Headers;
 using System.Net.Http;
-using System.Net.Http.Json;
 using System.Text;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using KMD.Identity.TestApplications.OpenID.MVCCore.Models.Delegation;
 using KMD.Identity.TestApplications.OpenID.MVCCore.Models;
 using KMD.Identity.TestApplications.OpenID.MVCCore.Models.Audit;
-using System.Reflection;
 
 namespace KMD.Identity.TestApplications.OpenID.MVCCore.Controllers
 {
+    /// <summary>
+    /// This controller is only for test purposes.
+    /// Use it as inspiration for building Delegation process in your system.
+    /// </summary>
     [Authorize]
     public class DelegationController : Controller
     {

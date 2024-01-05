@@ -12,6 +12,9 @@ using Microsoft.Extensions.Logging;
 
 namespace KMD.Identity.TestApplications.OpenID.API.Controllers
 {
+    /// <summary>
+    /// This controller is only for test purposes to show Delegation process possibilities.
+    /// </summary>
     [ApiController]
     [Authorize]
     [Route("api/[controller]")]

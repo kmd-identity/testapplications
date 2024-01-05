@@ -33,6 +33,7 @@
             <li>Start new login flow and select KMD Identity TestIdP to login with.</li>
             <li>When presented with the TestIdP UI add claim called <b>Role</b> with value <b>Citizen</b>.</li>
             <li>After successful login navigate to this page and your will be presented with Citizen UI.</li>
+            <li>HINT: In TestIdP UI save claims for easier tests. Remember to always select proper claims when logging in as Citizen.</li>
         </ul>
     </div>
     <div class="row">
@@ -44,6 +45,7 @@
             <li>Start new login flow and select KMD Identity TestIdP to login with.</li>
             <li>When presented with the TestIdP UI add claim called <b>Role</b> with value <b>CaseWorker</b>.</li>
             <li>After successful login navigate to this page and your will be presented with Case Worker UI.</li>
+            <li>HINT: In TestIdP UI save claims for easier tests. Remember to always select proper claims when logging in as Case Worker.</li>
         </ul>
     </div>
 </div>
@@ -70,13 +72,19 @@
 
 @if (User.HasRole("Citizen"))
 {
-    <h2><b>Your now a Citizen (@User.GetClaimValue("email"))</b></h2>
-    <div class="row">
-        <div class="col-8"></div>
-        <div class="col-2"><a id="btnDelegateAccess" class="btn btn-primary m-2" href='@Url.Action("DelegateAccess", "Delegation")'>Delegate Access</a></div>
+    <h3><b>Your now a Citizen (@User.GetClaimValue("email"))</b></h3>
+    <div class="row alert alert-info">
+        <div class="col-12">
+            <p>This UI is not production ready. It shows all possible options, even though sometimes they're not relevant. This is to show also unexpected user actions and system behavior.</p>
+        </div>
+        <div class="col-10">This is a test website, which serves purpose for many people. If you at some point want to start the process for current user from the beginning, you can use "Cleanup Access Delegation" button.</div>
         <div class="col-2"><a id="btnCleanupDelegation" class="btn btn-primary m-2" href='@Url.Action("Cleanup", "Delegation")'>Cleanup Access Delegation</a></div>
     </div>
-    <h2>Delegated access</h2>
+    <h3>Delegated access</h3>
+    <div class="row alert alert-light">
+        <div class="col-10">Below table show all access delegated by current user.</div>
+        <div class="col-2"><a id="btnDelegateAccess" class="btn btn-primary m-2" href='@Url.Action("DelegateAccess", "Delegation")'>Delegate Access</a></div>
+    </div>
     <table class="table">
         <thead>
             <tr>
@@ -100,8 +108,8 @@
                 {
                 <a id="btnRevokeAccess_@ud.AccessDelegationId" class="btn btn-sm btn-secondary btnRevokeAccess" href='@Url.Action("RevokeAccess", "Delegation", new { accessDelegationId = @ud.AccessDelegationId })'>Revoke</a>
                 } *@
-                        <a class="btn btn-sm btn-secondary btnRevokeAccess" href='@Url.Action("RevokeAccess", "Delegation", new { accessDelegationId = @ud.AccessDelegationId })'>Revoke</a>
-                        <a class="btn btn-sm btn-secondary btnShowAudit" href='@Url.Action("AuditInformation", "Delegation", new { accessDelegationId = @ud.AccessDelegationId })'>Show Audit</a>
+                        <a class="btn btn-sm btn-secondary btnRevokeAccess m-1" href='@Url.Action("RevokeAccess", "Delegation", new { accessDelegationId = @ud.AccessDelegationId })'>Revoke</a>
+                        <a class="btn btn-sm btn-secondary btnShowAudit m-1" href='@Url.Action("AuditInformation", "Delegation", new { accessDelegationId = @ud.AccessDelegationId })'>Show Audit</a>
                     </td>
                 </tr>
             }
@@ -111,12 +119,19 @@
 
 @if (User.HasRole("CaseWorker"))
 {
-    <h2><b>Your now a Case Worker (@User.GetClaimValue("email")) @(User.IsOperatingOnBehalf() ? $"Acting as {User.GetClaimValue("delegationsub")}" : string.Empty)</b></h2>
-    <div class="row">
-        <div class="col-10"></div>
+    <h3><b>Your now a Case Worker (@User.GetClaimValue("email")) @(User.IsOperatingOnBehalf() ? $"Acting as {User.GetClaimValue("delegationsub")}" : string.Empty)</b></h3>
+    <div class="row alert alert-info">
+        <div class="col-12">
+            <p>This UI is not production ready. It shows all possible options, even though sometimes they're not relevant. This is to show also unexpected user actions and system behavior.</p>
+        </div>
+        <div class="col-10">This is a test website, which serves purpose for many people. If you at some point want to start over, you can use "Cleanup Access Delegation" button to cleanup current data. Keep in mind
+            that you may influence other people using this test application.</div>
         <div class="col-2"><a id="btnCleanupDelegationActor" class="btn btn-primary m-2" href='@Url.Action("Cleanup", "Delegation")'>Cleanup Access Delegation</a></div>
     </div>
-    <h2>List of delegated access</h2>
+    <h3>List of delegated access</h3>
+    <div class="row alert alert-light">
+        <div class="col-10">Below table show all access delegated by Citizens.</div>
+    </div>
     <table class="table">
         <thead>
             <tr>
@@ -138,17 +153,9 @@
                     <td>@(ud.DelegatedAt.HasValue ? ud.DelegatedAt.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm") : "")</td>
                     <td>@(ud.RevokedAt.HasValue ? ud.RevokedAt.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm") : "")</td>
                     <td>
-                        @* @if (ud.Status != AccessDelegationStatus.Revoked)
-                {
-                <a id="btnRevokeAccess_@ud.AccessDelegationId" class="btn btn-sm btn-secondary btnRevokeAccess" href='@Url.Action("RevokeAccess", "Delegation", new { accessDelegationId = @ud.AccessDelegationId })'>Revoke</a>
-                }
-                @if (ud.Status == AccessDelegationStatus.Delegated)
-                {
-                <a id="btnAct_@ud.AccessDelegationId" class="btn btn-sm btn-secondary btnAct" href='@Url.Action("Act", "Delegation", new { accessDelegationId = @ud.AccessDelegationId })'>Act</a>
-                } *@
-                        <a class="btn btn-sm btn-secondary btnRevokeAccess" href='@Url.Action("RevokeAccess", "Delegation", new { accessDelegationId = @ud.AccessDelegationId })'>Revoke</a>
-                        <a class="btn btn-sm btn-secondary btnAct" href='@Url.Action("Act", "Delegation", new { accessDelegationId = @ud.AccessDelegationId })'>Act</a>
-                        <a class="btn btn-sm btn-secondary btnShowAudit" href='@Url.Action("AuditInformation", "Delegation", new { accessDelegationId = @ud.AccessDelegationId })'>Show Audit</a>
+                        <a class="btn btn-sm btn-secondary btnRevokeAccess m-1" href='@Url.Action("RevokeAccess", "Delegation", new { accessDelegationId = @ud.AccessDelegationId })'>Revoke</a>
+                        <a class="btn btn-sm btn-secondary btnAct m-1" href='@Url.Action("Act", "Delegation", new { accessDelegationId = @ud.AccessDelegationId })'>Act</a>
+                        <a class="btn btn-sm btn-secondary btnShowAudit m-1" href='@Url.Action("AuditInformation", "Delegation", new { accessDelegationId = @ud.AccessDelegationId })'>Show Audit</a>
                     </td>
                 </tr>
             }
@@ -161,8 +168,8 @@
 
 @if (User.HasRole("Citizen") || Model.OperatesOnBehalf)
 {
-    <h2>Financial operation (demonstration of operation on behalf)</h2>
-    <div class="row">
+    <h3>Financial operation (demonstration of operation on behalf)</h3>
+    <div class="row alert alert-info">
         This operation for some reason cannot be completed by Citizen (Subject). Only Case Worker (Actor) acting on behalf Citizen (Subject) can do it.
     </div>
     <div class="row">

@@ -14,6 +14,9 @@ using Microsoft.Extensions.Logging;
 
 namespace KMD.Identity.TestApplications.OpenID.API.Controllers
 {
+    /// <summary>
+    /// This controller is only for test purposes to show Delegation process possibilities.
+    /// </summary>
     [ApiController]
     [Authorize]
     [Route("api/[controller]")]
@@ -37,7 +40,7 @@ namespace KMD.Identity.TestApplications.OpenID.API.Controllers
         }
 
         /// <summary>
-        /// This is complete made up situation that shows usage of additional claims, that Case Worker got when Acting on behalf of subject
+        /// This is complete made up situation that shows usage of additional claims, that Case Worker got when Acting on behalf of subject.
         /// </summary>
         /// <returns></returns>
         [Route("/api/financial/get")]
@@ -67,7 +70,7 @@ namespace KMD.Identity.TestApplications.OpenID.API.Controllers
         }
 
         /// <summary>
-        /// This is complete made up situation that shows usage of additional claims, that Case Worker got when Acting on behalf of subject
+        /// This is complete made up situation that shows usage of additional claims, that Case Worker got when Acting on behalf of subject.
         /// </summary>
         /// <returns></returns>
         [Route("/api/financial/pay")]
