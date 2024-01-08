@@ -1,24 +1,29 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
+using KMD.Identity.TestApplications.OpenID.API.Models;
 using KMD.Identity.TestApplications.OpenID.API.Models.Delegation;
 using KMD.Identity.TestApplications.OpenID.API.Repositories.Delegation;
-using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
+using KMD.Identity.TestApplications.OpenID.API.Services.Audit;
 
 namespace KMD.Identity.TestApplications.OpenID.API.Services.Delegation
 {
     public class DelegationService : IDelegationService
     {
         private readonly IDelegationRepository delegationRepository;
+        private readonly IAuditService auditService;
 
-        public DelegationService(IDelegationRepository delegationRepository)
+        public DelegationService(IDelegationRepository delegationRepository, IAuditService auditService)
         {
             this.delegationRepository = delegationRepository;
+            this.auditService = auditService;
         }
 
-        public AccessDelegation New(IEnumerable<Claim> subjectClaims, string operation)
+        public OperationResult<AccessDelegation> New(string subject, string operation)
         {
+            var currentSubjectDelegations = delegationRepository.FindBySubject(subject);
+            if(currentSubjectDelegations.Any(s=>s.Status != AccessDelegationStatus.Revoked ))
+                return OperationResult<AccessDelegation>.Fail("Only one delegation possible. Revoke previous.");
+
             var accessDelegation = new AccessDelegation
             {
                 AccessDelegationId = Guid.NewGuid(),
@@ -30,51 +35,97 @@ namespace KMD.Identity.TestApplications.OpenID.API.Services.Delegation
                 Status = AccessDelegationStatus.New,
                 UserData = new AccessDelegationUserData
                 {
-                    Sub = subjectClaims.First(c => c.Type.Equals("sub", StringComparison.InvariantCultureIgnoreCase)).Value
+                    Sub = subject
                 }
             };
 
-            delegationRepository.StoreAccessDelegation(accessDelegation);
-
-            return accessDelegation;
+            return delegationRepository.StoreAccessDelegation(accessDelegation);
         }
 
-        public (bool success, string error) StartDelegatingAccess(Guid flowId, string subject)
+        public OperationResult<AccessDelegation> StartDelegatingAccess(Guid flowId, string subject)
         {
             var delegation = delegationRepository.FindByFlowId(flowId);
-            if (delegation == null) return (false, "Access delegation not exists");
-
+            if (delegation == null) return OperationResult<AccessDelegation>.Fail("Access delegation not exists");
+            
+            auditService.Add(delegation.AccessDelegationId, subject, $"Access delegation process starting");
+            
             var result = delegation.StartDelegatingAccess(subject);
 
-            if (!result.success) return result;
+            auditService.Add(delegation.AccessDelegationId, subject, $"Access delegation starting ended with {(result.Success ? "success" : $"error: {result.Error}")}");
+
+            if (!result.Success) return result;
 
             delegationRepository.StoreAccessDelegation(delegation);
 
             return result;
         }
 
-        public (bool success, string error) FinishDelegatingAccess(Guid flowId, string subject)
+        public OperationResult FinishDelegatingAccess(Guid flowId, string subject)
         {
             var delegation = delegationRepository.FindByFlowId(flowId);
-            if (delegation == null) return (false, "Access delegation not exists");
+            if (delegation == null) return OperationResult.Fail("Access delegation not exists");
+
+            auditService.Add(delegation.AccessDelegationId, subject, $"Access delegation process finishing");
 
             var result = delegation.FinishDelegatingAccess(subject);
 
-            if (!result.success) return result;
+            auditService.Add(delegation.AccessDelegationId, subject, $"Access delegation finishing ended with {(result.Success ? "success" : $"error: {result.Error}")}");
+
+            if (!result.Success) return result;
 
             delegationRepository.StoreAccessDelegation(delegation);
 
             return result;
         }
 
-        public (bool success, string error) Revoke(bool isCitizen, bool isCaseWorker, string subject, Guid accessDelegationId)
+        public OperationResult Revoke(bool isCitizen, bool isCaseWorker, string subject, Guid accessDelegationId)
         {
             var delegation = delegationRepository.GetAccessDelegation(accessDelegationId);
-            if (delegation == null) return (false, "Access delegation not exists");
+            if (delegation == null) return OperationResult.Fail("Access delegation not exists");
+
+            auditService.Add(delegation.AccessDelegationId, subject, $"Access revocation starting");
 
             var result = delegation.Revoke(isCitizen, isCaseWorker, subject);
 
-            if (!result.success) return result;
+            auditService.Add(delegation.AccessDelegationId, subject, $"Access revocation ended with {(result.Success ? "success" : $"error: {result.Error}")}");
+
+            if (!result.Success) return result;
+
+            delegationRepository.StoreAccessDelegation(delegation);
+
+            return result;
+        }
+
+        public OperationResult<AccessDelegationAct> StartActing(Guid accessDelegationId, string actor)
+        {
+            var delegation = delegationRepository.GetAccessDelegation(accessDelegationId);
+            if (delegation == null) return OperationResult<AccessDelegationAct>.Fail("Access delegation not exists");
+
+            auditService.Add(delegation.AccessDelegationId, actor, $"Acting process starting");
+
+            var result = delegation.StartActing(actor);
+
+            auditService.Add(delegation.AccessDelegationId, actor, $"Acting starting ended with {(result.Success ? "success" : $"error: {result.Error}")}");
+
+            if (!result.Success) return result;
+
+            delegationRepository.StoreAccessDelegation(delegation);
+
+            return result;
+        }
+
+        public OperationResult<AccessDelegation> FinishActing(Guid flowId, string actor)
+        {
+            var delegation = delegationRepository.FindByActFlowId(flowId);
+            if (delegation == null) return OperationResult<AccessDelegation>.Fail("Access delegation not exists");
+
+            auditService.Add(delegation.AccessDelegationId, actor, $"Acting process finishing");
+
+            var result = delegation.FinishActing(actor);
+
+            auditService.Add(delegation.AccessDelegationId, actor, $"Acting finishing ended with {(result.Success ? "success" : $"error: {result.Error}")}");
+
+            if (!result.Success) return result;
 
             delegationRepository.StoreAccessDelegation(delegation);
 

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace KMD.Identity.TestApplications.OpenID.API.Models.Delegation
 {
@@ -18,49 +20,85 @@ namespace KMD.Identity.TestApplications.OpenID.API.Models.Delegation
 
         public DateTime? RevokedAt { get; set; }
 
-        public (bool success, string error) StartDelegatingAccess(string subject)
+        public List<AccessDelegationAct> Acts { get; set; } = new List<AccessDelegationAct>();
+
+        public OperationResult<AccessDelegation> StartDelegatingAccess(string subject)
         {
-            if (subject != UserData.Sub) return (false, "Not your access delegation");
-            if (Status != AccessDelegationStatus.New) return (false, $"Invalid status {Status} for operation");
+            if (subject != UserData.Sub) return OperationResult<AccessDelegation>.Fail("Not your access delegation");
+            if (Status != AccessDelegationStatus.New) return OperationResult<AccessDelegation>.Fail($"Invalid status {Status} for operation");
             
             Status = AccessDelegationStatus.WaitingForDelegation;
 
-            return (true, null);
+            return OperationResult<AccessDelegation>.Pass(this);
         }
 
-        public (bool success, string error) FinishDelegatingAccess(string subject)
+        public OperationResult FinishDelegatingAccess(string subject)
         {
-            if (subject != UserData.Sub) return (false, "Not your access delegation");
-            if (Status != AccessDelegationStatus.WaitingForDelegation) return (false, $"Invalid status {Status} for operation");
+            if (subject != UserData.Sub) return OperationResult.Fail("Not your access delegation");
+            if (Status != AccessDelegationStatus.WaitingForDelegation) return OperationResult.Fail($"Invalid status {Status} for operation");
             
             Status = AccessDelegationStatus.Delegated;
             DelegatedAt = DateTime.UtcNow;
 
-            return (true, null);
+            return OperationResult.Pass();
         }
 
-        public (bool success, string error) Revoke(bool isCitizen, bool isCaseWorker, string subject)
+        public OperationResult Revoke(bool isCitizen, bool isCaseWorker, string subject)
         {
             if (isCitizen)
             {
-                if (subject != UserData.Sub) return (false, "Not your access delegation");
+                if (subject != UserData.Sub) return OperationResult.Fail("Not your access delegation");
+                if (Status == AccessDelegationStatus.Revoked) return OperationResult.Fail($"It's already revoked");
 
                 Status  = AccessDelegationStatus.Revoked;
                 RevokedAt = DateTime.UtcNow;
 
-                return (true, null);
+                return OperationResult.Pass();
             }
             else if (isCaseWorker)
             {
+                if (Status == AccessDelegationStatus.Revoked) return OperationResult.Fail($"It's already revoked");
+
                 Status = AccessDelegationStatus.Revoked;
                 RevokedAt = DateTime.UtcNow;
 
-                return (true, null);
+                return OperationResult.Pass();
             }
             else
             {
-                return (false, "No access for this method");
+                return OperationResult.Fail("No access for this method");
             }
+        }
+
+        public OperationResult<AccessDelegationAct> StartActing(string actor)
+        {
+            if(Status != AccessDelegationStatus.Delegated) return OperationResult<AccessDelegationAct>.Fail("Not ready for delegation");
+
+            var act = new AccessDelegationAct
+            {
+                AccessDelegationActId = Guid.NewGuid(),
+                ActingStartedTimestamp = DateTime.UtcNow,
+                FlowId = Guid.NewGuid(),
+                Status = AccessDelegationActingStatus.Started,
+                Who = actor
+            };
+
+            Acts.Add(act);
+
+            return OperationResult<AccessDelegationAct>.Pass(act);
+        }
+
+        public OperationResult<AccessDelegation> FinishActing(string actor)
+        {
+            if (Status != AccessDelegationStatus.Delegated) return OperationResult<AccessDelegation>.Fail("Not ready for delegation");
+
+            var act = Acts.FirstOrDefault(a => a.Who == actor && !a.ActingFinishedTimestamp.HasValue);
+
+            if(act == null) return OperationResult<AccessDelegation>.Fail("Cannot finish acting when it was already completed or not started");
+
+            act.ActingFinishedTimestamp = DateTime.UtcNow;
+            
+            return OperationResult<AccessDelegation>.Pass(this);
         }
     }
 }

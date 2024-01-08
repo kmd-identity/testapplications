@@ -1,37 +1,93 @@
-﻿@model KMD.Identity.TestApplications.OpenID.MVCCore.Models.Delegation.AccessDelegationsViewModel
+﻿@model KMD.Identity.TestApplications.OpenID.MVCCore.Models.Delegation.DelegationViewModel
 @using KMD.Identity.TestApplications.OpenID.MVCCore.Extensions
-@using KMD.Identity.TestApplications.OpenID.MVCCore.Models.Delegation
 @{
     ViewData["Title"] = "Delegation";
 }
 
-<div>
-    <p>Citizen (Subject) can delegate access to Case worker (Actor)</p>
-    <p> - You need to logout and login again with Role "Citizen" (use KMD Identity TestIdP to simulate roles)</p>
-    <p>Citizen (Subject) can view delegated access (own)</p>
-    <p>Citizen (Subject) can view audit of delegated access (own)</p>
-    <p>Citizen (Subject) can revoke delegated access (own)</p>
-
-    <p>Case worker (Actor) can view delegated access</p>
-    <p> - You need to logout and login again with Role "CaseWorker" (use KMD Identity TestIdP to simulate roles)</p>
-    <p>Case worker (Actor) can act on behalf of Citizen (Subject)</p>
-    <p>Case worker (Actor) can view audit of delegated access (own)</p>
-    <p>Case worker (Actor) can revoke delegated access</p>
+<div class="row">
+    <input type="button" id="bInstructions" class="btn btn-info" value="Show information and instructions"/>
 </div>
+
+<div class="container" id="dInstructions" style="display: none">
+    <div class="row">
+        <h3>Overview</h3>
+    </div>
+    <div class="row">
+        <p>This page is a workspace for testing delegation using KMD Identity. For more information about delegation visit <a href="https://github.com/kmd-identity/documentation/wiki">KMD Identity documentation</a></p>
+    </div>
+    <div class="row">
+        <h3>Scenario</h3>
+    </div>
+    <div class="row">
+        <p>Lets assume we have a Citizen who wants to pay for something. For some reason this operation is not permitted for him.</p>
+        <p>Citizen can ask Case Worker to perform this operation on behalf of him.</p>
+        <p>To allow that, Citizen must delegate access for Case Worker.</p>
+        <p>When access is delegated, then Case Worker can act on behalf of Citizen and complete the payment.</p>
+    </div>
+    <div class="row">
+        <h3>Setup for Citizen</h3>
+    </div>
+    <div class="row">
+        <ul>
+            <li>Logout from current session.</li>
+            <li>Start new login flow and select KMD Identity TestIdP to login with.</li>
+            <li>When presented with the TestIdP UI add claim called <b>Role</b> with value <b>Citizen</b>.</li>
+            <li>After successful login navigate to this page and your will be presented with Citizen UI.</li>
+            <li>HINT: In TestIdP UI save claims for easier tests. Remember to always select proper claims when logging in as Citizen.</li>
+        </ul>
+    </div>
+    <div class="row">
+        <h3>Setup for Case Worker</h3>
+    </div>
+    <div class="row">
+        <ul>
+            <li>Logout from current session (or if you want to test Citizen and Case Worker on the same machine, then open another browser window).</li>
+            <li>Start new login flow and select KMD Identity TestIdP to login with.</li>
+            <li>When presented with the TestIdP UI add claim called <b>Role</b> with value <b>CaseWorker</b>.</li>
+            <li>After successful login navigate to this page and your will be presented with Case Worker UI.</li>
+            <li>HINT: In TestIdP UI save claims for easier tests. Remember to always select proper claims when logging in as Case Worker.</li>
+        </ul>
+    </div>
+</div>
+
+@if (Model.HasError)
+{
+    @foreach (var error in Model.Errors)
+    {
+        <div class="alert alert-danger" role="alert">
+            @Html.Raw(@error)
+        </div>
+    }
+}
+
+@if (Model.HasMessages)
+{
+    @foreach (var msg in Model.Messages)
+    {
+        <div class="alert alert-primary" role="alert">
+            @Html.Raw(@msg)
+        </div>
+    }
+}
 
 @if (User.HasRole("Citizen"))
 {
-    <h1><b>Your now a Citizen</b></h1>
-    <div class="row">
-        <div class="col-10"></div>
-        <div class="col-2"><a id="btnDelegateAccess" class="btn btn-primary" href='@Url.Action("DelegateAccess", "Delegation")'>Delegate Access</a></div>
+    <h3><b>Your now a Citizen (@User.GetClaimValue("email"))</b></h3>
+    <div class="row alert alert-info">
+        <div class="col-12">
+            <p>This UI is not production ready. It shows all possible options, even though sometimes they're not relevant. This is to show also unexpected user actions and system behavior.</p>
+        </div>
+        <div class="col-10">This is a test website, which serves purpose for many people. If you at some point want to start the process for current user from the beginning, you can use "Cleanup Access Delegation" button.</div>
+        <div class="col-2"><a id="btnCleanupDelegation" class="btn btn-primary m-2" href='@Url.Action("Cleanup", "Delegation")'>Cleanup Access Delegation</a></div>
     </div>
-
-    <h2>Delegated access</h2>
+    <h3>Delegated access</h3>
+    <div class="row alert alert-light">
+        <div class="col-10">Below table show all access delegated by current user.</div>
+        <div class="col-2"><a id="btnDelegateAccess" class="btn btn-primary m-2" href='@Url.Action("DelegateAccess", "Delegation")'>Delegate Access</a></div>
+    </div>
     <table class="table">
         <thead>
             <tr>
-                <th scope="col">Access Delegation ID</th>
                 <th scope="col">Flow ID</th>
                 <th scope="col">Status</th>
                 <th scope="col">Delegated At</th>
@@ -40,61 +96,104 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var ud in Model.DelegatedAccess)
+            @foreach (var ud in Model.DelegatedAccess.OrderByDescending(c => c.DelegatedAt ?? DateTime.MaxValue))
             {
                 <tr>
-                    <td>@ud.AccessDelegationId</td>
                     <td>@ud.FlowId</td>
                     <td>@ud.Status.ToString()</td>
                     <td>@(ud.DelegatedAt.HasValue ? ud.DelegatedAt.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm") : "")</td>
                     <td>@(ud.RevokedAt.HasValue ? ud.RevokedAt.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm") : "")</td>
                     <td>
-                        @if (ud.Status != AccessDelegationStatus.Revoked)
-                        {
-                            <a id="btnRevokeAccess_@ud.AccessDelegationId" class="btn btn-sm btn-secondary btnRevokeAccess" href='@Url.Action("RevokeAccess", "Delegation", new { accessDelegationId = @ud.AccessDelegationId })'>Revoke</a>
-                        }
+                        @*  @if (ud.Status != AccessDelegationStatus.Revoked)
+                {
+                <a id="btnRevokeAccess_@ud.AccessDelegationId" class="btn btn-sm btn-secondary btnRevokeAccess" href='@Url.Action("RevokeAccess", "Delegation", new { accessDelegationId = @ud.AccessDelegationId })'>Revoke</a>
+                } *@
+                        <a class="btn btn-sm btn-secondary btnRevokeAccess m-1" href='@Url.Action("RevokeAccess", "Delegation", new { accessDelegationId = @ud.AccessDelegationId })'>Revoke</a>
+                        <a class="btn btn-sm btn-secondary btnShowAudit m-1" href='@Url.Action("AuditInformation", "Delegation", new { accessDelegationId = @ud.AccessDelegationId })'>Show Audit</a>
                     </td>
                 </tr>
             }
         </tbody>
     </table>
-
-
-    @* --Perform operation on behalf - DOESN'T Work
-
-    --LIST
-    Columns Who|What|When|Revoke|View Audit
-
-
-    --Audit
-        When|What
-
-
-    Revoke
-    - Are you sure you want to Revoke Delegated Access
-    - YES/NO *@
 }
 
 @if (User.HasRole("CaseWorker"))
 {
-    <p>Your now a Case Worker</p>
-
-    @* LIST of delegated access
-    Columns Who| What | When | Revoke | View Audit | Act (javascript confirm)
-
-    --Audit
-    When|What
-
-
-    --Perform operation on behalf
-
-
-    Revoke
-    - Are you sure you want to Revoke Delegated Access
-        - YES/NO *@
+    <h3><b>Your now a Case Worker (@User.GetClaimValue("email")) @(User.IsOperatingOnBehalf() ? $"Acting as {User.GetClaimValue("delegationsub")}" : string.Empty)</b></h3>
+    <div class="row alert alert-info">
+        <div class="col-12">
+            <p>This UI is not production ready. It shows all possible options, even though sometimes they're not relevant. This is to show also unexpected user actions and system behavior.</p>
+        </div>
+        <div class="col-10">This is a test website, which serves purpose for many people. If you at some point want to start over, you can use "Cleanup Access Delegation" button to cleanup current data. Keep in mind
+            that you may influence other people using this test application.</div>
+        <div class="col-2"><a id="btnCleanupDelegationActor" class="btn btn-primary m-2" href='@Url.Action("Cleanup", "Delegation")'>Cleanup Access Delegation</a></div>
+    </div>
+    <h3>List of delegated access</h3>
+    <div class="row alert alert-light">
+        <div class="col-10">Below table show all access delegated by Citizens.</div>
+    </div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Who</th>
+                <th scope="col">Flow ID</th>
+                <th scope="col">Status</th>
+                <th scope="col">Delegated At</th>
+                <th scope="col">Revoked At</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var ud in Model.DelegatedAccess.OrderByDescending(c => c.DelegatedAt ?? DateTime.MaxValue))
+            {
+                <tr>
+                    <td>@ud.UserData.Sub</td>
+                    <td>@ud.FlowId</td>
+                    <td>@ud.Status.ToString()</td>
+                    <td>@(ud.DelegatedAt.HasValue ? ud.DelegatedAt.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm") : "")</td>
+                    <td>@(ud.RevokedAt.HasValue ? ud.RevokedAt.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm") : "")</td>
+                    <td>
+                        <a class="btn btn-sm btn-secondary btnRevokeAccess m-1" href='@Url.Action("RevokeAccess", "Delegation", new { accessDelegationId = @ud.AccessDelegationId })'>Revoke</a>
+                        <a class="btn btn-sm btn-secondary btnAct m-1" href='@Url.Action("Act", "Delegation", new { accessDelegationId = @ud.AccessDelegationId })'>Act</a>
+                        <a class="btn btn-sm btn-secondary btnShowAudit m-1" href='@Url.Action("AuditInformation", "Delegation", new { accessDelegationId = @ud.AccessDelegationId })'>Show Audit</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
 }
+
+<div id="auditContainer" class="row">
+</div>
+
+@if (User.HasRole("Citizen") || Model.OperatesOnBehalf)
+{
+    <h3>Financial operation (demonstration of operation on behalf)</h3>
+    <div class="row alert alert-info">
+        This operation for some reason cannot be completed by Citizen (Subject). Only Case Worker (Actor) acting on behalf Citizen (Subject) can do it.
+    </div>
+    <div class="row">
+        <a class="btn btn-secondary bntPayments m-2" href='@Url.Action("Pay", "Delegation")'>Make a Payment</a>
+        <a class="btn btn-secondary bntPayments m-2" href='@Url.Action("GetPayments", "Delegation")'>Get Payments</a>
+    </div>
+    <div id="payResult" class="row">
+    </div>
+}
+
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script type="text/javascript">
+
+    function toggleInstructions() {
+        $("#dInstructions").toggle();
+
+        if ($("#dInstructions").is(":visible")) {
+            $("#bInstructions").val('Hide information and instructions');
+        }
+        else {
+            $("#bInstructions").val('Show information and instructions');
+        }
+    }
+
     $(function () {
 
         $("#btnDelegateAccess").on("click", function (e) {
@@ -102,11 +201,11 @@
 
             e.preventDefault();
 
-            if (confirm("Are you sure you want to Delegate Access?")) {
+            if (confirm("Are you sure you want to Delegate Access?\nThis will cause you to re-login.")) {
                 window.location = link.href;
             }
         });
-        
+
         $(".btnRevokeAccess").on("click", function (e) {
             var link = this;
 
@@ -116,5 +215,61 @@
                 window.location = link.href;
             }
         });
+
+        $(".btnAct").on("click", function (e) {
+            var link = this;
+
+            e.preventDefault();
+
+            if (confirm("Are you sure you want to Act on Behalf of Subject?")) {
+                window.location = link.href;
+            }
+        });
+
+        $(".btnShowAudit").on("click", function (e) {
+            var link = this;
+
+            e.preventDefault();
+
+            $("#auditContainer").load(link.href);
+        });
+
+        $(".bntPayments").on("click", function (e) {
+            var link = this;
+
+            e.preventDefault();
+
+            $("#payResult").load(link.href);
+        });
+
+        $("#btnCleanupDelegation").on("click", function (e) {
+            var link = this;
+
+            e.preventDefault();
+
+            if (confirm("Are you sure you want to do cleanup? This will remove all data related to current Subject.")) {
+                window.location = link.href;
+            }
+        });
+
+        $("#btnCleanupDelegationActor").on("click", function (e) {
+            var link = this;
+
+            e.preventDefault();
+
+            if (confirm("Are you sure you want to do cleanup? This will remove all data related to all Subjects.")) {
+                window.location = link.href;
+            }
+        });
+
+        $("#bInstructions").on("click", function (e) {
+            toggleInstructions();
+        });
+        
+        @if (!User.HasRole("Citizen") && !User.HasRole("CaseWorker"))
+        {
+            @Html.Raw(" toggleInstructions();")
+        }
     });
+
 </script>

@@ -1,0 +1,30 @@
+﻿@model KMD.Identity.TestApplications.OpenID.MVCCore.Models.ApiCallResult<KMD.Identity.TestApplications.OpenID.MVCCore.Models.Audit.AuditItem[]>
+
+@if (Model.HasError)
+{
+    <div class="alert alert-danger" role="alert">
+        @Html.Raw(Model.Error)
+    </div>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Who</th>
+                <th scope="col">When</th>
+                <th scope="col">Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var ud in Model.Result)
+            {
+                <tr>
+                    <td>@ud.Subject</td>
+                    <td>@ud.Timestamp.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
+                    <td>@ud.Operation</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
