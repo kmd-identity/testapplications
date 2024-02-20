@@ -5,6 +5,7 @@ using KMD.Identity.TestApplications.SAML.MVCCore.Config;
 using KMD.Identity.TestApplications.SAML.MVCCore.Extensions;
 using KMD.Identity.TestApplications.SAML.MVCCore.Identity;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System;
@@ -53,8 +54,8 @@ namespace KMD.Identity.TestApplications.SAML.MVCCore.Controllers
                 saml2AuthnResponse,
                 config
             );
-
-            await saml2AuthnResponse.CreateSession(HttpContext, claimsTransform: (claimsPrincipal) => ClaimsTransform.Transform(claimsPrincipal));
+            if (!HttpContext.User.Identity.IsAuthenticated)
+                await saml2AuthnResponse.CreateSession(HttpContext, claimsTransform: (claimsPrincipal) => ClaimsTransform.Transform(claimsPrincipal));
 
             var relayStateQuery = binding.GetRelayStateQuery();
             var returnUrl = relayStateQuery.ContainsKey(relayStateReturnUrl) ? relayStateQuery[relayStateReturnUrl] : Url.Content("~/");
