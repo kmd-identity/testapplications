@@ -30,6 +30,15 @@ namespace KMD.Identity.TestApplications.SAML.MVCCore.Controllers
         {
             var binding = new Saml2RedirectBinding();
             binding.SetRelayStateQuery(new Dictionary<string, string> { { relayStateReturnUrl, returnUrl ?? Url.Content("~/") } });
+            if (HttpContext.User.Identity.IsAuthenticated)
+                if (Url.IsLocalUrl(returnUrl))
+                {
+                    return Redirect(returnUrl);
+                }
+                else
+                {
+                    return Redirect(Url.Content("~/"));
+                }
             return binding.Bind(new Saml2AuthnRequest(config)).ToActionResultWithDomainHint(domainHint);
 
             //To use the Unilogin connection with a different flow than the default (one factor), 
@@ -54,8 +63,8 @@ namespace KMD.Identity.TestApplications.SAML.MVCCore.Controllers
                 saml2AuthnResponse,
                 config
             );
-            if (!HttpContext.User.Identity.IsAuthenticated)
-                await saml2AuthnResponse.CreateSession(HttpContext, claimsTransform: (claimsPrincipal) => ClaimsTransform.Transform(claimsPrincipal));
+
+            await saml2AuthnResponse.CreateSession(HttpContext, claimsTransform: (claimsPrincipal) => ClaimsTransform.Transform(claimsPrincipal));
 
             var relayStateQuery = binding.GetRelayStateQuery();
             var returnUrl = relayStateQuery.ContainsKey(relayStateReturnUrl) ? relayStateQuery[relayStateReturnUrl] : Url.Content("~/");
