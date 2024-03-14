@@ -31,6 +31,7 @@ namespace KMD.Identity.TestApplications.SAML.MVCCore.Controllers
             var binding = new Saml2RedirectBinding();
             binding.SetRelayStateQuery(new Dictionary<string, string> { { relayStateReturnUrl, returnUrl ?? Url.Content("~/") } });
             if (HttpContext.User.Identity.IsAuthenticated)
+            {
                 if (Url.IsLocalUrl(returnUrl))
                 {
                     return Redirect(returnUrl);
@@ -39,6 +40,7 @@ namespace KMD.Identity.TestApplications.SAML.MVCCore.Controllers
                 {
                     return Redirect(Url.Content("~/"));
                 }
+            }
             return binding.Bind(new Saml2AuthnRequest(config)).ToActionResultWithDomainHint(domainHint);
 
             //To use the Unilogin connection with a different flow than the default (one factor), 
