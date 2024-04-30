@@ -18,11 +18,11 @@ steps:
 - task: UseDotNet@2
   inputs:
     packageType: 'sdk'
-    version: '5.0.x'
+    version: '8.0.x'
     
 - task: NodeTool@0
   inputs:
-    versionSpec: '16.19.0'   
+    versionSpec: '18.13.0'   
       
 - task: DotNetCoreCLI@2
   inputs:
