@@ -1,18 +1,14 @@
-﻿using KMD.Identity.TestApplications.OpenID.MVCCore.Models;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Diagnostics;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
+using KMD.Identity.TestApplications.OpenID.MVCCore.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace KMD.Identity.TestApplications.OpenID.MVCCore.Controllers
 {
@@ -35,21 +31,36 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore.Controllers
         [Authorize]
         public async Task<IActionResult> CallApi()
         {
-            using (var httpClient = new HttpClient())
-            {
-                // If you have set options.SaveTokens = true (in Startup.cs) then you can retrieve access_token as stated below
-                //var rawAccessToken = await HttpContext.GetTokenAsync("AD FS", "access_token");
+            using var httpClient = new HttpClient();
+            // If you have set options.SaveTokens = true (in Startup.cs) then you can retrieve access_token as stated below
+            //var rawAccessToken = await HttpContext.GetTokenAsync("AD FS", "access_token");
 
-                // Retrieving access_token from session because that's how we stored it in OnTokenResponseReceived in Startup.cs
-                var rawAccessToken = HttpContext.Session.GetString("access_token");
-                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", rawAccessToken);
-                var response = await httpClient.GetAsync(Configuration["Security:ApiUrl"]);
-                var apiCallResult = await response.Content.ReadAsStringAsync();
+            // Retrieving access_token from session because that's how we stored it in OnTokenResponseReceived in Startup.cs
+            var rawAccessToken = HttpContext.Session.GetString("access_token");
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", rawAccessToken);
 
-                ViewBag.Result = apiCallResult;
+            ////-------------------------------------------------------------------------------------
+            ////-------------------------------------------------------------------------------------
+            //// FIRST PART - call API A
+            ////-------------------------------------------------------------------------------------
+            ////-------------------------------------------------------------------------------------
+            var response = await httpClient.GetAsync(new Uri(new Uri(Configuration["Security:ApiUrl"]!), "/api/claims"));
+            var apiCallResult = await response.Content.ReadAsStringAsync();
 
-                return View();
-            }
+            ViewBag.ResultApi = apiCallResult;
+
+            ////-------------------------------------------------------------------------------------
+            ////-------------------------------------------------------------------------------------
+            //// SECOND PART - call API B from API A using on behalf of
+            //// NOTE - This application is forbidden to call API B directly
+            ////-------------------------------------------------------------------------------------
+            ////-------------------------------------------------------------------------------------
+            var responseOnBehalfOf = await httpClient.GetAsync(new Uri(new Uri(Configuration["Security:ApiUrl"]!), "/api/claims/onbehalfof"));
+            var apiCallResultOnBehalfOf = await responseOnBehalfOf.Content.ReadAsStringAsync();
+
+            ViewBag.ResultApiOnBehalfOf = apiCallResultOnBehalfOf;
+
+            return View();
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

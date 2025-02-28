@@ -4,16 +4,24 @@
 
 <h3>Result from API (access_token)</h3>
 
-@if (ViewBag.Result != null)
+@if (ViewBag.ResultApi != null)
 {
     <pre id="result"></pre>
+}
+
+<h3>Result from API on behalf of (access_token)</h3>
+
+@if (ViewBag.ResultApiOnBehalfOf != null)
+{
+    <pre id="resultOnBehalfOf"></pre>
 }
 
 @section Scripts
 {
     <script>
         $(document).ready(function () {
-            document.getElementById("result").innerHTML = JSON.stringify(@Html.Raw(ViewBag.Result), undefined, 2);
+            document.getElementById("result").innerHTML = JSON.stringify(@Html.Raw(ViewBag.ResultApi), undefined, 2);
+            document.getElementById("resultOnBehalfOf").innerHTML = JSON.stringify(@Html.Raw(ViewBag.ResultApiOnBehalfOf), undefined, 2);
         });
     </script>
 }
