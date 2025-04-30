@@ -63,16 +63,7 @@ namespace KMD.Identity.TestApplications.SAML.MVCCore
                     //      saml2Configuration.DecryptionCertificates = [certificate];
                     //      certStore.Close();
                     //
-                    //   b. Loading from Disk - WEBSITE_LOAD_CERTIFICATES Environment Variable specified Thumbprint(s),
-                    //                          and you can use the Thumbprint to access locally stored certificate (Azure ensures it's copied to disk)
-                    //                          Configured SigningCertificateFile must be in format C:\appservice\certificates\private\THUMBPRINT.p12
-                    //
-                    //      var bytes = File.ReadAllBytes(saml2Configuration.SigningCertificateFile);
-                    //      var certificate = new X509Certificate2(bytes);
-                    //      saml2Configuration.SigningCertificate = certificate;
-                    //      saml2Configuration.DecryptionCertificates = [certificate];
-                    //
-                    //    c. Using KeyVault (look at https://github.com/ITfoxtec/ITfoxtec.Identity.Saml2/tree/main/test/TestWebAppCoreAzureKeyVault)
+                    //    b. Using KeyVault (look at https://github.com/ITfoxtec/ITfoxtec.Identity.Saml2/tree/main/test/TestWebAppCoreAzureKeyVault)
                     //
                     // - Hosting on Azure as Linux App Service
                     //   The most common way is to load it from disk:
