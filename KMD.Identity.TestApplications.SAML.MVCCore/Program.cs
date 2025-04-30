@@ -15,6 +15,13 @@ namespace KMD.Identity.TestApplications.SAML.MVCCore
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
+                })
+                .ConfigureWebHost(host =>
+                {
+                    host.ConfigureKestrel(options =>
+                    {
+                        options.AddServerHeader = false;
+                    });
                 });
     }
 }

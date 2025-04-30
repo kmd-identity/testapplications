@@ -21,6 +21,13 @@ namespace KMD.Identity.TestApplications.OpenID.Angular
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
+                })
+                .ConfigureWebHost(host =>
+                {
+                    host.ConfigureKestrel(options =>
+                    {
+                        options.AddServerHeader = false;
+                    });
                 });
     }
 }
