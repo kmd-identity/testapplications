@@ -5,17 +5,15 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.IO;
-using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel.Security;
-using ITfoxtec.Identity.Saml2;
 using ITfoxtec.Identity.Saml2.MvcCore;
 using ITfoxtec.Identity.Saml2.MvcCore.Configuration;
-using ITfoxtec.Identity.Saml2.Schemas.Metadata;
 using ITfoxtec.Identity.Saml2.Util;
 using KMD.Identity.TestApplications.SAML.MVCCore.Infrastructure.Saml;
 using KMD.Identity.TestApplications.SAML.MVCCore.Extensions;
 using KMD.Identity.TestApplications.SAML.MVCCore.Config;
+using System.Runtime.InteropServices;
 
 namespace KMD.Identity.TestApplications.SAML.MVCCore
 {
@@ -89,10 +87,23 @@ namespace KMD.Identity.TestApplications.SAML.MVCCore
                     //       saml2Configuration.DecryptionCertificates = [certificate];
                     //
                     //    b. Using KeyVault (look at https://github.com/ITfoxtec/ITfoxtec.Identity.Saml2/tree/main/test/TestWebAppCoreAzureKeyVault)
-                    var bytes = File.ReadAllBytes(saml2Configuration.SigningCertificateFile);
-                    var certificate = new X509Certificate2(bytes);
-                    saml2Configuration.SigningCertificate = certificate;
-                    saml2Configuration.DecryptionCertificates = [certificate];
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    {
+                        X509Store certStore = new X509Store(StoreName.My, StoreLocation.CurrentUser);
+                        certStore.Open(OpenFlags.ReadOnly);
+                        X509Certificate2Collection certCollection = certStore.Certificates.Find(X509FindType.FindByThumbprint, saml2Configuration.SigningCertificateThumbprint, false);
+                        var certificate = certCollection[0];
+                        saml2Configuration.SigningCertificate = certificate;
+                        saml2Configuration.DecryptionCertificates = [certificate];
+                        certStore.Close();
+                    }
+                    else
+                    {
+                        var bytes = File.ReadAllBytes(saml2Configuration.SigningCertificateFile);
+                        var certificate = new X509Certificate2(bytes);
+                        saml2Configuration.SigningCertificate = certificate;
+                        saml2Configuration.DecryptionCertificates = [certificate];
+                    }
                 }
 
                 if (saml2Configuration.CertificateValidationMode == X509CertificateValidationMode.Custom)
