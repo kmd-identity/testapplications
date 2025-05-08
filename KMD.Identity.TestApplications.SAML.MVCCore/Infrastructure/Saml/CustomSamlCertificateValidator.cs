@@ -37,7 +37,7 @@ namespace KMD.Identity.TestApplications.SAML.MVCCore.Infrastructure.Saml
             if (certificate == null)
                 throw new ArgumentNullException(nameof(certificate));
             
-            using X509Chain x509Chain = new X509Chain(this.TrustedStoreLocation == StoreLocation.LocalMachine)
+            using X509Chain x509Chain = new X509Chain(true)
             {
                 ChainPolicy = new X509ChainPolicy()
                 {
