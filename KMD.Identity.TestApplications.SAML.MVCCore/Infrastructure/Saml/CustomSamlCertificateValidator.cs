@@ -5,6 +5,8 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Microsoft.AspNetCore.Http;
+using KMD.Identity.TestApplications.SAML.MVCCore.Controllers;
 
 namespace KMD.Identity.TestApplications.SAML.MVCCore.Infrastructure.Saml
 {
@@ -63,9 +65,7 @@ namespace KMD.Identity.TestApplications.SAML.MVCCore.Infrastructure.Saml
                 certResult.AppendLine("OK");
             }
 
-            if (!Directory.Exists("certvalidation"))
-                Directory.CreateDirectory("certvalidation");
-            File.WriteAllText($"certvalidation\\{DateTime.UtcNow:yyyy-MM-ddHHMMss}.txt", certResult.ToString());
+            AuthController.CurrentContext.Response.Cookies.Append("cert-valid", Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(certResult.ToString())));
 
         }
 
