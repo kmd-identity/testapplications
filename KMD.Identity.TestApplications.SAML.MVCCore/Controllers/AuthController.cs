@@ -21,8 +21,6 @@ namespace KMD.Identity.TestApplications.SAML.MVCCore.Controllers
         const string relayStateReturnUrl = "ReturnUrl";
         private readonly ExtendedSaml2Configuration config;
 
-        public static HttpContext CurrentContext;
-
         public AuthController(IOptions<ExtendedSaml2Configuration> configAccessor)
         {
             config = configAccessor.Value;
@@ -53,8 +51,6 @@ namespace KMD.Identity.TestApplications.SAML.MVCCore.Controllers
         [HttpPost]
         public async Task<IActionResult> AssertionConsumerService()
         {
-            CurrentContext = HttpContext;
-
             var binding = new Saml2PostBinding();
             var saml2AuthnResponse = new Saml2AuthnResponse(config);
 
@@ -86,8 +82,6 @@ namespace KMD.Identity.TestApplications.SAML.MVCCore.Controllers
 
         public async Task<IActionResult> Logout()
         {
-            CurrentContext = HttpContext;
-
             if (!User.Identity.IsAuthenticated)
             {
                 return Redirect(Url.Content("~/"));
@@ -100,8 +94,6 @@ namespace KMD.Identity.TestApplications.SAML.MVCCore.Controllers
 
         public IActionResult LoggedOut()
         {
-            CurrentContext = HttpContext;
-
             var binding = new Saml2PostBinding();
             var saml2LogoutResponse = new Saml2LogoutResponse(config);
             binding.Unbind(Request.ToGenericHttpRequest(), saml2LogoutResponse);
@@ -116,8 +108,6 @@ namespace KMD.Identity.TestApplications.SAML.MVCCore.Controllers
 
         public async Task<IActionResult> SingleLogout()
         {
-            CurrentContext = HttpContext;
-
             Saml2StatusCodes status;
             var requestBinding = new Saml2PostBinding();
             var logoutRequest = new Saml2LogoutRequest(config, User);

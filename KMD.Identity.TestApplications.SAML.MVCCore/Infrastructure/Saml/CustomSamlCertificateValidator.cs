@@ -2,11 +2,7 @@
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Cryptography.X509Certificates;
 using System;
-using System.IO;
 using System.Linq;
-using System.Text;
-using Microsoft.AspNetCore.Http;
-using KMD.Identity.TestApplications.SAML.MVCCore.Controllers;
 
 namespace KMD.Identity.TestApplications.SAML.MVCCore.Infrastructure.Saml
 {
@@ -37,7 +33,7 @@ namespace KMD.Identity.TestApplications.SAML.MVCCore.Infrastructure.Saml
             if (certificate == null)
                 throw new ArgumentNullException(nameof(certificate));
             
-            using X509Chain x509Chain = new X509Chain(true)
+            using X509Chain x509Chain = new X509Chain(this.TrustedStoreLocation == StoreLocation.LocalMachine)
             {
                 ChainPolicy = new X509ChainPolicy()
                 {
@@ -49,24 +45,6 @@ namespace KMD.Identity.TestApplications.SAML.MVCCore.Infrastructure.Saml
             if (!x509Chain.Build(certificate))
                 throw new SecurityTokenValidationException(
                     "Invalid X509 certificate chain." + GetCertificateInformation(certificate) + GetChainStatusInformation(x509Chain.ChainStatus) + ".");
-
-            var certResult = new StringBuilder();
-            certResult.AppendLine($"{certificate.Thumbprint} Checking {certificate.Subject}");
-            if (x509Chain.ChainStatus.Length > 0)
-            {
-                certResult.AppendLine(string.Join(" ", x509Chain.ChainStatus.Select(r => r.StatusInformation)));
-                foreach (var elem in x509Chain.ChainElements)
-                {
-                    certResult.AppendLine(elem.Certificate.Subject + " " + string.Join(" ", elem.ChainElementStatus.Select(r => r.StatusInformation)));
-                }
-            }
-            else
-            {
-                certResult.AppendLine("OK");
-            }
-
-            AuthController.CurrentContext.Response.Cookies.Append("cert-valid", Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(certResult.ToString())));
-
         }
 
         /// <summary>
