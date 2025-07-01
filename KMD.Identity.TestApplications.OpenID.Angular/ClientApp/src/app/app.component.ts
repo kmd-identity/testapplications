@@ -23,6 +23,7 @@ export class AppComponent implements OnInit {
   showTestApiCall: boolean = false;
   codeLogin: LoginResponse | undefined = undefined;
   tokenExchangeLogin: LoginResponse | undefined = undefined;
+  isNavbarCollapsed = true;
 
   ngOnInit() {
     this.errorService.isError$.subscribe(isError => this.isError = isError);
