@@ -59,6 +59,7 @@ namespace KMD.Identity.TestApplications.OpenID.Angular
 
             app.Use(async (context, next) =>
             {
+                //This is needed because any other requests than GET results in an exception
                 if (!context.Request.Method.Equals("GET", StringComparison.OrdinalIgnoreCase))
                 {
                     context.Response.StatusCode = StatusCodes.Status405MethodNotAllowed;
