@@ -59,10 +59,11 @@ namespace KMD.Identity.TestApplications.OpenID.Angular
 
             app.Use(async (context, next) =>
             {
-                //This is needed because any other requests than GET results in an exception
+                //This is needed because any other requests than GET results in an exception.
+                //404 Was chosen to be consistent with the other test applications.
                 if (!context.Request.Method.Equals("GET", StringComparison.OrdinalIgnoreCase))
                 {
-                    context.Response.StatusCode = StatusCodes.Status405MethodNotAllowed;
+                    context.Response.StatusCode = StatusCodes.Status404NotFound;
                     await context.Response.CompleteAsync();
                     return;
                 }
