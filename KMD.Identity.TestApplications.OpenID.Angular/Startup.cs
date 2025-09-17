@@ -1,10 +1,12 @@
 using KMD.Identity.TestApplications.OpenID.Angular.Config;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System;
 
 namespace KMD.Identity.TestApplications.OpenID.Angular
 {
@@ -54,6 +56,20 @@ namespace KMD.Identity.TestApplications.OpenID.Angular
             }
 
             app.UseRouting();
+
+            app.Use(async (context, next) =>
+            {
+                //This is needed because any other requests than GET results in an exception.
+                //404 Was chosen to be consistent with the other test applications.
+                if (!context.Request.Method.Equals("GET", StringComparison.OrdinalIgnoreCase))
+                {
+                    context.Response.StatusCode = StatusCodes.Status404NotFound;
+                    await context.Response.CompleteAsync();
+                    return;
+                }
+                await next();
+            });
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
