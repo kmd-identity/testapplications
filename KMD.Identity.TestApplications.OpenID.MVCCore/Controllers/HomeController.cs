@@ -47,13 +47,13 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore.Controllers
         [Authorize]
         public async Task<IActionResult> CallApi()
         {
-            var httpClient = _httpClientFactory.CreateClient();
-
+          
             // If you have set options.SaveTokens = true (in Startup.cs) then you can retrieve access_token as stated below
             //var rawAccessToken = await HttpContext.GetTokenAsync("AD FS", "access_token");
 
             // Retrieving access_token from session because that's how we stored it in OnTokenResponseReceived in Startup.cs
             var rawAccessToken = HttpContext.Session.GetString("access_token");
+            var httpClient = _httpClientFactory.CreateClient();
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", rawAccessToken);
             var response = await httpClient.GetAsync(Configuration["Security:ApiUrl"]);
             var apiCallResult = await response.Content.ReadAsStringAsync();
