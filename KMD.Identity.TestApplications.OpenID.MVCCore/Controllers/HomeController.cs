@@ -1,6 +1,7 @@
 ﻿using KMD.Identity.TestApplications.OpenID.MVCCore.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -12,10 +13,12 @@ using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Runtime.InteropServices;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Hosting;
 
 namespace KMD.Identity.TestApplications.OpenID.MVCCore.Controllers
 {
@@ -23,6 +26,7 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IWebHostEnvironment _environment;
         private string ClientId => Configuration["Security:ClientId"];
         private string ClientSecret => Configuration["Security:ClientSecret"];
         private string TokenEndpoint => Configuration["Security:TokenEndpoint"];
@@ -32,11 +36,12 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore.Controllers
 
         public IConfiguration Configuration { get; }
 
-        public HomeController(ILogger<HomeController> logger, IConfiguration configuration, IHttpClientFactory httpClientFactory)
+        public HomeController(ILogger<HomeController> logger, IConfiguration configuration, IHttpClientFactory httpClientFactory, IWebHostEnvironment environment)
         {
             _logger = logger;
             Configuration = configuration;
             _httpClientFactory = httpClientFactory;
+            _environment = environment;
         }
 
         public IActionResult Index()
@@ -47,7 +52,7 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore.Controllers
         [Authorize]
         public async Task<IActionResult> CallApi()
         {
-          
+
             // If you have set options.SaveTokens = true (in Startup.cs) then you can retrieve access_token as stated below
             //var rawAccessToken = await HttpContext.GetTokenAsync("AD FS", "access_token");
 
@@ -95,7 +100,16 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore.Controllers
         [Authorize]
         public async Task<IActionResult> GetClientCredentialsWithCertificate()
         {
-            var clientCertificate = new X509Certificate2(ClientCredentialsCertificate, ClientCredentialsCertificatePassword);
+            X509Certificate2 clientCertificate;
+            if (_environment.IsDevelopment())
+            {
+                clientCertificate = new X509Certificate2(ClientCredentialsCertificate, ClientCredentialsCertificatePassword);
+            }
+            else
+            {
+                var bytes = await System.IO.File.ReadAllBytesAsync(ClientCredentialsCertificate);
+                clientCertificate = new X509Certificate2(bytes);
+            }
 
             var now = DateTime.UtcNow;
             var securityKey = new X509SecurityKey(clientCertificate);
