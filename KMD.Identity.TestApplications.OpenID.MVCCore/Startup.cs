@@ -23,6 +23,7 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddApplicationInsightsTelemetry();
+            services.AddHttpClient();
 
             services.AddSession(options =>
             {

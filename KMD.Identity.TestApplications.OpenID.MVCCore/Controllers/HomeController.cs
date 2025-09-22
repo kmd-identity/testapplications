@@ -22,6 +22,7 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly IHttpClientFactory _httpClientFactory;
         private string ClientId => Configuration["Security:ClientId"];
         private string ClientSecret => Configuration["Security:ClientSecret"];
         private string TokenEndpoint => Configuration["Security:TokenEndpoint"];
@@ -31,10 +32,11 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore.Controllers
 
         public IConfiguration Configuration { get; }
 
-        public HomeController(ILogger<HomeController> logger, IConfiguration configuration)
+        public HomeController(ILogger<HomeController> logger, IConfiguration configuration, IHttpClientFactory httpClientFactory)
         {
             _logger = logger;
             Configuration = configuration;
+            _httpClientFactory = httpClientFactory;
         }
 
         public IActionResult Index()
@@ -45,21 +47,21 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore.Controllers
         [Authorize]
         public async Task<IActionResult> CallApi()
         {
-            using (var httpClient = new HttpClient())
-            {
-                // If you have set options.SaveTokens = true (in Startup.cs) then you can retrieve access_token as stated below
-                //var rawAccessToken = await HttpContext.GetTokenAsync("AD FS", "access_token");
+            var httpClient = _httpClientFactory.CreateClient();
 
-                // Retrieving access_token from session because that's how we stored it in OnTokenResponseReceived in Startup.cs
-                var rawAccessToken = HttpContext.Session.GetString("access_token");
-                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", rawAccessToken);
-                var response = await httpClient.GetAsync(Configuration["Security:ApiUrl"]);
-                var apiCallResult = await response.Content.ReadAsStringAsync();
+            // If you have set options.SaveTokens = true (in Startup.cs) then you can retrieve access_token as stated below
+            //var rawAccessToken = await HttpContext.GetTokenAsync("AD FS", "access_token");
 
-                ViewBag.Result = apiCallResult;
+            // Retrieving access_token from session because that's how we stored it in OnTokenResponseReceived in Startup.cs
+            var rawAccessToken = HttpContext.Session.GetString("access_token");
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", rawAccessToken);
+            var response = await httpClient.GetAsync(Configuration["Security:ApiUrl"]);
+            var apiCallResult = await response.Content.ReadAsStringAsync();
 
-                return View();
-            }
+            ViewBag.Result = apiCallResult;
+
+            return View();
+
         }
 
         [Authorize]
@@ -73,22 +75,21 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore.Controllers
                 new KeyValuePair<string, string>("client_id", ClientId),
                 new KeyValuePair<string, string>("client_secret", ClientSecret)
             });
-            using (var httpClient = new HttpClient())
-            {
 
-                var response = await httpClient.SendAsync(request);
-                var token = await response.Content.ReadAsStringAsync();
-                var jsonDoc = JsonDocument.Parse(token);
-                var accessToken = jsonDoc.RootElement.GetProperty("access_token").GetString();
+            var httpClient = _httpClientFactory.CreateClient();
 
-                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-                var apiResponse = await httpClient.GetAsync(Configuration["Security:ApiUrl"]);
-                var apiCallResult = await apiResponse.Content.ReadAsStringAsync();
+            var response = await httpClient.SendAsync(request);
+            var token = await response.Content.ReadAsStringAsync();
+            var jsonDoc = JsonDocument.Parse(token);
+            var accessToken = jsonDoc.RootElement.GetProperty("access_token").GetString();
 
-                ViewBag.Result = apiCallResult;
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+            var apiResponse = await httpClient.GetAsync(Configuration["Security:ApiUrl"]);
+            var apiCallResult = await apiResponse.Content.ReadAsStringAsync();
 
-                return View("CallApi");
-            }
+            ViewBag.Result = apiCallResult;
+
+            return View("CallApi");
         }
 
         [Authorize]
@@ -128,22 +129,19 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore.Controllers
                 new KeyValuePair<string, string>("client_assertion", jwt)
             });
 
+            var httpClient = _httpClientFactory.CreateClient();
+            var response = await client.SendAsync(request);
+            var token = await response.Content.ReadAsStringAsync();
+            var jsonDoc = JsonDocument.Parse(token);
+            var accessToken = jsonDoc.RootElement.GetProperty("access_token").GetString();
 
-            using (var httpClient = new HttpClient())
-            {
-                var response = await client.SendAsync(request);
-                var token = await response.Content.ReadAsStringAsync();
-                var jsonDoc = JsonDocument.Parse(token);
-                var accessToken = jsonDoc.RootElement.GetProperty("access_token").GetString();
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+            var apiResponse = await httpClient.GetAsync(Configuration["Security:ApiUrl"]);
+            var apiCallResult = await apiResponse.Content.ReadAsStringAsync();
 
-                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-                var apiResponse = await httpClient.GetAsync(Configuration["Security:ApiUrl"]);
-                var apiCallResult = await apiResponse.Content.ReadAsStringAsync();
+            ViewBag.Result = apiCallResult;
 
-                ViewBag.Result = apiCallResult;
-
-                return View("CallApi");
-            }
+            return View("CallApi");
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
