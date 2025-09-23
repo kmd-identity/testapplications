@@ -107,6 +107,33 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore.Controllers
             }
             else
             {
+                // Depending on the hosting environment you may load the Signing Certificate in different way, below are examples:
+                // - Hosting on Azure as Windows App Service
+                //   There are several options:
+                //
+                //   a. Loading from Certificate Store 
+                //
+                //      X509Store certStore = new X509Store(StoreName.My, StoreLocation.CurrentUser);
+                //      certStore.Open(OpenFlags.ReadOnly);
+                //      X509Certificate2Collection certCollection = certStore.Certificates.Find(
+                //          X509FindType.FindByThumbprint, clientCertificateThumbprint, false);
+                //      var certificate = certCollection[0];
+                //     clientCertificate = certificate;
+                //      certStore.Close();
+                //
+                //    b. Using KeyVault (look at https://github.com/ITfoxtec/ITfoxtec.Identity.Saml2/tree/main/test/TestWebAppCoreAzureKeyVault)
+                //
+                // - Hosting on Azure as Linux App Service
+                //   The most common way is to load it from disk:
+                //
+                //    a. Loading from Disk - WEBSITE_LOAD_CERTIFICATES Environment Variable specified Thumbprint(s),
+                //                          and you can use the Thumbprint to access locally stored certificate (Azure ensures it's copied to disk)
+                //                          Configured ClientCredentialsCertificate must be in format /var/ssl/private/THUMBPRINT.p12
+                //
+                //       var bytes = File.ReadAllBytes(ClientCredentialsCertificate);
+                //       clientCertificate = new X509Certificate2(bytes);;
+                //    b. Using KeyVault (look at https://github.com/ITfoxtec/ITfoxtec.Identity.Saml2/tree/main/test/TestWebAppCoreAzureKeyVault)
+
                 var bytes = await System.IO.File.ReadAllBytesAsync(ClientCredentialsCertificate);
                 clientCertificate = new X509Certificate2(bytes);
             }
