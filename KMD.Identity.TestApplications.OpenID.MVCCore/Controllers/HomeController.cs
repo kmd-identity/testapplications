@@ -135,7 +135,7 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore.Controllers
                 //    b. Using KeyVault (look at https://github.com/ITfoxtec/ITfoxtec.Identity.Saml2/tree/main/test/TestWebAppCoreAzureKeyVault)
 
                 var bytes = await System.IO.File.ReadAllBytesAsync(ClientCredentialsCertificate);
-                clientCertificate = new X509Certificate2(bytes, ClientCredentialsCertificatePassword, X509KeyStorageFlags.MachineKeySet);
+                clientCertificate = new X509Certificate2(bytes);
             }
 
             var now = DateTime.UtcNow;
