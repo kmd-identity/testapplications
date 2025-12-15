@@ -1,9 +1,15 @@
-﻿using ITfoxtec.Identity.Saml2;
+﻿using System.Security.Cryptography.X509Certificates;
+using System.Text;
+using ITfoxtec.Identity.Saml2;
 using ITfoxtec.Identity.Saml2.MvcCore;
+using ITfoxtec.Identity.Saml2.MvcCore.Configuration;
 using ITfoxtec.Identity.Saml2.Schemas;
+using ITfoxtec.Identity.Saml2.Util;
 using KMD.Identity.TestApplications.SAML.MVCCore.Config;
 using KMD.Identity.TestApplications.SAML.MVCCore.Extensions;
 using KMD.Identity.TestApplications.SAML.MVCCore.Identity;
+using KMD.Identity.TestApplications.SAML.MVCCore.Infrastructure.Saml;
+using KMD.Identity.TestApplications.SAML.MVCCore.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -57,7 +63,11 @@ namespace KMD.Identity.TestApplications.SAML.MVCCore.Controllers
             binding.ReadSamlResponse(Request.ToGenericHttpRequest(), saml2AuthnResponse);
             if (saml2AuthnResponse.Status != Saml2StatusCodes.Success)
             {
-                throw new AuthenticationException($"SAML Response status: {saml2AuthnResponse.Status}");
+                return View("Error", new SamlErrorViewModel
+                {
+                    Error = $"{saml2AuthnResponse.Status}",
+                    Description = saml2AuthnResponse.StatusMessage
+                });
             }
 
             binding.UnbindWithMetadataRefreshOnValidationError(
