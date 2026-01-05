@@ -1,0 +1,53 @@
+@model KMD.Identity.TestApplications.SAML.MVCCore.Models.SamlErrorViewModel
+@{
+    ViewData["Title"] = "Error";
+}
+
+<h2 class="text-danger">There was an error</h2>
+
+<pre class="bg-light border p-3">
+{
+    "Error": "@Model.Error"@{
+        if (Model.HasDescription)
+        {
+            <text>,
+    "Description": "@Model.Description"</text>
+        }
+    }
+
+}
+</pre>
+
+<p>You are currently not logged-in.</p>
+<div>
+    <input class="form-control" type="text" id="txtDomainHint" placeholder="Optional domain hint" />
+</div>
+<div>
+    Possible domain hints
+    <ul>
+        <li>kmd-ad-prod</li>
+        <li>contexthandler-test-kmdidentitytestapplications</li>
+        <li>nemlogin-3-test-public</li>
+        <li>nemlogin-3-test-private</li>
+    </ul>
+</div>
+<div>
+    <a id="lnkLogin" class="font-weight-bold" href="#">Click here to log-in</a>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        (function () {
+            var loginUrl = '@Url.Action("Login", "Auth")';
+            var loginLink = document.getElementById('lnkLogin');
+            if (loginLink) {
+                loginLink.onclick = function (event) {
+                    event.preventDefault();
+                    var domainHintInput = document.getElementById('txtDomainHint');
+                    var domainHint = domainHintInput ? domainHintInput.value : '';
+                    window.location = loginUrl + "?domainHint=" + domainHint;
+                };
+            }
+        })();
+    </script>
+}
