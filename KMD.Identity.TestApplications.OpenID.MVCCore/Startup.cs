@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -7,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Http;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 
 namespace KMD.Identity.TestApplications.OpenID.MVCCore
 {
@@ -120,6 +122,46 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore
                         context.HttpContext.Session.Remove("access_token");
                         return Task.FromResult(0);
                     },
+                    OnRemoteFailure = context =>
+                    {
+                        var failure = context.Failure;
+                        
+                        var errorMessage = "unknown_error";
+                        var errorDescription = string.Empty;
+
+                        if (failure is OpenIdConnectProtocolException oex)
+                        {
+                            // The exception message contains the error details in format:
+                            // "Message contains error: 'server_error', error_description: 'description', error_uri: 'uri'."
+                            var message = failure.Message;
+                            
+                            var errorIndex = message.IndexOf("error: '");
+                            if (errorIndex >= 0)
+                            {
+                                var errorStart = errorIndex + 8;
+                                var errorEnd = message.IndexOf("'", errorStart);
+                                if (errorEnd > errorStart)
+                                {
+                                    errorMessage = message.Substring(errorStart, errorEnd - errorStart);
+                                }
+                            }
+                            
+                            var descIndex = message.IndexOf("error_description: '");
+                            if (descIndex >= 0)
+                            {
+                                var descStart = descIndex + 20;
+                                var descEnd = message.IndexOf("'", descStart);
+                                if (descEnd > descStart)
+                                {
+                                    errorDescription = message.Substring(descStart, descEnd - descStart);
+                                }
+                            }
+                        }
+
+                        context.Response.Redirect($"/Home/Error?error={Uri.EscapeDataString(errorMessage)}&errorDescription={Uri.EscapeDataString(errorDescription)}");
+                        context.HandleResponse();
+                        return Task.CompletedTask;
+                    }
                 };
             });
 
