@@ -125,7 +125,7 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore
                     OnRemoteFailure = context =>
                     {
                         var failure = context.Failure;
-                        
+
                         var errorMessage = "unknown_error";
                         var errorDescription = string.Empty;
 
@@ -134,27 +134,27 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore
                             // The exception message contains the error details in format:
                             // "Message contains error: 'server_error', error_description: 'description', error_uri: 'uri'."
                             var message = failure.Message;
-                            
-                            var errorIndex = message.IndexOf("error: '");
-                            if (errorIndex >= 0)
+
+                            errorMessage = GetPart("error");
+                            if (string.IsNullOrEmpty(errorMessage))
+                                errorMessage = "unknown_error";
+
+                            errorDescription = GetPart("error_description");
+
+                            string GetPart(string key)
                             {
-                                var errorStart = errorIndex + 8;
-                                var errorEnd = message.IndexOf("'", errorStart);
-                                if (errorEnd > errorStart)
+                                var keyPattern = $"{key}: '";
+                                var keyIndex = message.IndexOf(keyPattern);
+                                if (keyIndex >= 0)
                                 {
-                                    errorMessage = message.Substring(errorStart, errorEnd - errorStart);
+                                    var valueStart = keyIndex + keyPattern.Length;
+                                    var valueEnd = message.IndexOf("'", valueStart);
+                                    if (valueEnd > valueStart)
+                                    {
+                                        return message.Substring(valueStart, valueEnd - valueStart);
+                                    }
                                 }
-                            }
-                            
-                            var descIndex = message.IndexOf("error_description: '");
-                            if (descIndex >= 0)
-                            {
-                                var descStart = descIndex + 20;
-                                var descEnd = message.IndexOf("'", descStart);
-                                if (descEnd > descStart)
-                                {
-                                    errorDescription = message.Substring(descStart, descEnd - descStart);
-                                }
+                                return string.Empty;
                             }
                         }
 
