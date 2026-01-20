@@ -7,5 +7,11 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore.Models
         public string RequestId { get; set; }
 
         public bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
+
+        public string Error { get; set; }
+
+        public string ErrorDescription { get; set; }
+
+        public bool ShowError => !string.IsNullOrEmpty(Error);
     }
 }

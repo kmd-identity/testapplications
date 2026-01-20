@@ -1,11 +1,13 @@
 ﻿using KMD.Identity.TestApplications.OpenID.MVCCore.Models;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -13,12 +15,10 @@ using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Runtime.InteropServices;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Hosting;
 
 namespace KMD.Identity.TestApplications.OpenID.MVCCore.Controllers
 {
@@ -188,7 +188,29 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore.Controllers
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            ErrorViewModel errorViewModel;
+            var exceptionHandlerPathFeature = HttpContext.Features.Get<IExceptionHandlerPathFeature>();
+            if (exceptionHandlerPathFeature?.Error?.InnerException is OpenIdConnectProtocolException oex)
+            {
+                var error_description = oex.Data["error_description"];
+                var error = oex.Data["error"];
+                
+                errorViewModel = new ErrorViewModel
+                {
+                    Error = error?.ToString(),
+                    ErrorDescription = error_description?.ToString(),
+                    RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
+                };
+            }
+            else
+            {
+                errorViewModel = new ErrorViewModel
+                {
+                    RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
+                };
+            }
+
+            return View(errorViewModel);
         }
     }
 }
