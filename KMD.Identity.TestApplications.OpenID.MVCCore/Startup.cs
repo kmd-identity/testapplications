@@ -1,4 +1,3 @@
-using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -8,7 +7,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Http;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 
 namespace KMD.Identity.TestApplications.OpenID.MVCCore
 {
@@ -121,7 +119,7 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore
                         context.HttpContext.Session.Remove("id_token");
                         context.HttpContext.Session.Remove("access_token");
                         return Task.FromResult(0);
-                    }
+                    },
                 };
             });
 
