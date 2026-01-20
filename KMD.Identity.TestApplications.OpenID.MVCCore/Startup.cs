@@ -121,46 +121,6 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore
                         context.HttpContext.Session.Remove("id_token");
                         context.HttpContext.Session.Remove("access_token");
                         return Task.FromResult(0);
-                    },
-                    OnRemoteFailure = context =>
-                    {
-                        var failure = context.Failure;
-
-                        var errorMessage = "unknown_error";
-                        var errorDescription = string.Empty;
-
-                        if (failure is OpenIdConnectProtocolException oex)
-                        {
-                            // The exception message contains the error details in format:
-                            // "Message contains error: 'server_error', error_description: 'description', error_uri: 'uri'."
-                            var message = failure.Message;
-
-                            errorMessage = GetPart("error");
-                            if (string.IsNullOrEmpty(errorMessage))
-                                errorMessage = "unknown_error";
-
-                            errorDescription = GetPart("error_description");
-
-                            string GetPart(string key)
-                            {
-                                var keyPattern = $"{key}: '";
-                                var keyIndex = message.IndexOf(keyPattern);
-                                if (keyIndex >= 0)
-                                {
-                                    var valueStart = keyIndex + keyPattern.Length;
-                                    var valueEnd = message.IndexOf("'", valueStart);
-                                    if (valueEnd > valueStart)
-                                    {
-                                        return message.Substring(valueStart, valueEnd - valueStart);
-                                    }
-                                }
-                                return string.Empty;
-                            }
-                        }
-
-                        context.Response.Redirect($"/Home/Error?error={Uri.EscapeDataString(errorMessage)}&errorDescription={Uri.EscapeDataString(errorDescription)}");
-                        context.HandleResponse();
-                        return Task.CompletedTask;
                     }
                 };
             });

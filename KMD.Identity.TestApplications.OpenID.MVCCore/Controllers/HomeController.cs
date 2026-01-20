@@ -1,11 +1,13 @@
 ﻿using KMD.Identity.TestApplications.OpenID.MVCCore.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -184,15 +186,30 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore.Controllers
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error(string error = null, string errorDescription = null)
+        public IActionResult Error()
         {
-            var errorViewModel = new ErrorViewModel
+            ErrorViewModel errorViewModel;
+            var exceptionHandlerPathFeature = HttpContext.Features.Get<IExceptionHandlerPathFeature>();
+            if (exceptionHandlerPathFeature?.Error?.InnerException is OpenIdConnectProtocolException oex)
             {
-                RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier,
-                Error = error,
-                ErrorDescription = errorDescription
-            };
-            
+                var error_description = oex.Data["error_description"];
+                var error = oex.Data["error"];
+                
+                errorViewModel = new ErrorViewModel
+                {
+                    Error = error?.ToString(),
+                    ErrorDescription = error_description?.ToString(),
+                    RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
+                };
+            }
+            else
+            {
+                errorViewModel = new ErrorViewModel
+                {
+                    RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
+                };
+            }
+
             return View(errorViewModel);
         }
     }
