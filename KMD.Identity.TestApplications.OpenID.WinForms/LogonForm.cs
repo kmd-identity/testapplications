@@ -135,5 +135,76 @@ namespace KMD.Identity.TestApplications.OpenID.WinForms
 
             DialogResult = DialogResult.OK;
         }
+
+        private async void bAuthenticateWithLoginHint_Click(object sender, EventArgs e)
+        {
+            // Prompt user for login hint
+            var loginHint = PromptForInput("Login Hint", "Enter login hint:");
+            
+            if (string.IsNullOrWhiteSpace(loginHint))
+            {
+                MessageBox.Show("Login hint is required.", "Input Required", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            //Set to specify how to properly sign out when authenticating this way
+            LogoutType = LogoutType.UseBrowser;
+
+            var clientApp = PublicClientApplicationBuilder.Create(Properties.Settings.Default.ClientId)
+                .WithAdfsAuthority(Properties.Settings.Default.AuthorityUrl)
+                // Perhaps have a list of ports and check if any of them are available on the machine. Make sure the list of ports are also defined on KMD Identity as "approved" redirect uris.
+                .WithRedirectUri(Properties.Settings.Default.RedirectUri)
+                .Build();
+
+            var authResult = await clientApp
+                .AcquireTokenInteractive(Properties.Settings.Default.Scopes.Cast<string>().ToArray())
+                // Must be false, due to embedded view not supporting javascript correctly
+                .WithUseEmbeddedWebView(false)
+                .WithSystemWebViewOptions(new SystemWebViewOptions()
+                {
+                    HtmlMessageSuccess = "You have successfully logged in. Close this browser and continue in your application.",
+                    HtmlMessageError = "An error occurred. Close this browser and try logging in again."
+                })
+                .WithExtraQueryParameters(new Dictionary<string, string>() { { "login_hint", loginHint } })
+                .ExecuteAsync();
+
+            if (string.IsNullOrWhiteSpace(authResult.AccessToken) || string.IsNullOrWhiteSpace(authResult.AccessToken))
+                return;
+
+            UserContext.FromResult(authResult);
+
+            DialogResult = DialogResult.OK;
+        }
+
+        private string PromptForInput(string title, string promptText)
+        {
+            var prompt = new Form()
+            {
+                Width = 400,
+                Height = 150,
+                FormBorderStyle = FormBorderStyle.FixedDialog,
+                Text = title,
+                StartPosition = FormStartPosition.CenterParent,
+                MaximizeBox = false,
+                MinimizeBox = false
+            };
+
+            var textLabel = new Label() { Left = 20, Top = 20, Width = 350, Text = promptText };
+            var textBox = new TextBox() { Left = 20, Top = 45, Width = 350 };
+            var confirmation = new Button() { Text = "OK", Left = 220, Width = 75, Top = 75, DialogResult = DialogResult.OK };
+            var cancel = new Button() { Text = "Cancel", Left = 300, Width = 75, Top = 75, DialogResult = DialogResult.Cancel };
+
+            confirmation.Click += (sender, e) => { prompt.Close(); };
+            cancel.Click += (sender, e) => { prompt.Close(); };
+
+            prompt.Controls.Add(textLabel);
+            prompt.Controls.Add(textBox);
+            prompt.Controls.Add(confirmation);
+            prompt.Controls.Add(cancel);
+            prompt.AcceptButton = confirmation;
+            prompt.CancelButton = cancel;
+
+            return prompt.ShowDialog() == DialogResult.OK ? textBox.Text : string.Empty;
+        }
     }
 }
