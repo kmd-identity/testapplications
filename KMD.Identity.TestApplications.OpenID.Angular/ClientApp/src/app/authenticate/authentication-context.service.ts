@@ -48,9 +48,9 @@ export class AuthenticationContext {
         });
     }
 
-  login(configId: string, domainHint: string | undefined) {
+  login(configId: string, domainHint: string | undefined, loginHint: string | undefined) {
     this.errorService.reset();
-    this.oidcSecurityService.authorize(configId, { customParams: { "domain_hint": domainHint ?? "" } });
+    this.oidcSecurityService.authorize(configId, { customParams: { "domain_hint": domainHint ?? "", "login_hint": loginHint ?? "" } });
 
     //To use the Unilogin connection with a different flow than the default (one factor),
     //add a query string parameter, to read more about this go to our Wiki, example below: 

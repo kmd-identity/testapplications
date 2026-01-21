@@ -49,7 +49,7 @@ export class AppComponent implements OnInit {
   login() {
     this.showTestApiCall = false;
 
-    this.authenticationContext.login(ConfigIds.Code, undefined);
+    this.authenticationContext.login(ConfigIds.Code, undefined, undefined);
   }
 
   logout() {

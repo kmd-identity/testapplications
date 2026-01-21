@@ -10,6 +10,7 @@ import { AuthenticationContext } from './authentication-context.service';
 export class AuthenticateComponent implements OnInit {
 
   domainHint = "";
+  loginHint = "";
   domainHints: string[] = [
     IdentityProviders.KmdAd, 
     IdentityProviders.ContextHandlerTestApplications, 
@@ -26,7 +27,7 @@ export class AuthenticateComponent implements OnInit {
     // todo: This MUST be removed before merging.
     // this.domainHint = this.domainHint === "" ? IdentityProviders.KmdAd : this.domainHint;
 
-    this.authenticationContext.login(ConfigIds.Code, this.domainHint);
+    this.authenticationContext.login(ConfigIds.Code, this.domainHint, this.loginHint);
   }
 
 }
