@@ -93,6 +93,18 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore
 
                             context.Properties.Items.Remove(flowIdKey);
                         }
+
+                        const string loginHintKey = "login_hint";
+                        if (context.Properties.Items.ContainsKey(loginHintKey))
+                        {
+                            var loginHint = context.Properties.Items[loginHintKey];
+                            if (!string.IsNullOrWhiteSpace(loginHint))
+                            {
+                                context.ProtocolMessage.LoginHint = loginHint;
+                            }
+
+                            context.Properties.Items.Remove(loginHintKey);
+                        }
                         return Task.FromResult(0);
                     },
                     OnTokenResponseReceived = (context) =>

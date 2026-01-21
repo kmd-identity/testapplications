@@ -16,8 +16,11 @@
     else
     {
         <p>You are currently not logged-in.</p>
+        <div class="mb-2">
+            <input class="form-control" type="text" id="txtLoginHint" placeholder="Optional login hint" />
+        </div>
         <div>
-            <input class="form-control" type="text" id="txtDomainHint" placeholder="Optional domain hint"/>
+            <input class="form-control" type="text" id="txtDomainHint" placeholder="Optional domain hint" />
         </div>
         <div>
             Possible domain hints
@@ -49,7 +52,7 @@
     <script type="text/javascript">
         var loginUrl = '@Url.Action("Login", "Account")';
         document.getElementById('lnkLogin').onclick = function() {
-            window.location = loginUrl + "?domainHint=" + document.getElementById('txtDomainHint').value;
+            window.location = loginUrl + "?domainHint=" + document.getElementById('txtDomainHint').value + "&loginHint=" + document.getElementById('txtLoginHint').value;
         }
     </script>
 }
