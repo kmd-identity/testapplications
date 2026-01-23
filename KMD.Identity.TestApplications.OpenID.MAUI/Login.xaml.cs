@@ -34,7 +34,7 @@ public partial class Login : ContentPage
     private async void OnLoginStart(object sender, EventArgs e)
     {
         var parentApp = (App)Application.Current!;
-        await parentApp.Login(viewModel.DomainHint);
+        await parentApp.Login(viewModel.DomainHint, viewModel.LoginHint);
     }
 
     private async void Login_OnLoaded(object sender, EventArgs e)
