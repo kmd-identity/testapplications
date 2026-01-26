@@ -60,9 +60,8 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore
                     OnRedirectToIdentityProvider = context =>
                     {
                         const string domainHintKey = "domain_hint";
-                        if (context.Properties.Items.ContainsKey(domainHintKey))
+                        if (context.Properties.Items.TryGetValue(domainHintKey, out var domainHint))
                         {
-                            var domainHint = context.Properties.Items[domainHintKey];
                             if (!string.IsNullOrWhiteSpace(domainHint))
                             {
                                 context.ProtocolMessage.DomainHint = domainHint;
@@ -71,9 +70,8 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore
                             context.Properties.Items.Remove(domainHintKey);
                         }
                         const string uniloginLOAKey = "unilogin_loa";
-                        if (context.Properties.Items.ContainsKey(uniloginLOAKey))
+                        if (context.Properties.Items.TryGetValue(uniloginLOAKey, out var uniloginLOA))
                         {
-                            var uniloginLOA = context.Properties.Items[uniloginLOAKey];
                             if (!string.IsNullOrWhiteSpace(uniloginLOA))
                             {
                                 context.ProtocolMessage.Parameters.Add(uniloginLOAKey, uniloginLOA);
@@ -83,9 +81,8 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore
                         }
 
                         const string flowIdKey = "flowid";
-                        if (context.Properties.Items.ContainsKey(flowIdKey))
+                        if (context.Properties.Items.TryGetValue(flowIdKey, out var flowId))
                         {
-                            var flowId = context.Properties.Items[flowIdKey];
                             if (!string.IsNullOrWhiteSpace(flowId))
                             {
                                 context.ProtocolMessage.Parameters.Add(flowIdKey, flowId);
@@ -95,9 +92,8 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore
                         }
 
                         const string loginHintKey = "login_hint";
-                        if (context.Properties.Items.ContainsKey(loginHintKey))
+                        if (context.Properties.Items.TryGetValue(loginHintKey, out var loginHint))
                         {
-                            var loginHint = context.Properties.Items[loginHintKey];
                             if (!string.IsNullOrWhiteSpace(loginHint))
                             {
                                 context.ProtocolMessage.LoginHint = loginHint;

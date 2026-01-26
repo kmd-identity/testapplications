@@ -48,7 +48,7 @@ export class AuthenticationContext {
         });
     }
 
-  login(configId: string, domainHint: string | undefined, loginHint: string | undefined) {
+  login(configId: string, domainHint?: string, loginHint?: string) {
     this.errorService.reset();
     this.oidcSecurityService.authorize(configId, { customParams: { "domain_hint": domainHint ?? "", "login_hint": loginHint ?? "" } });
 
