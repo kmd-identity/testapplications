@@ -54,7 +54,7 @@ namespace KMD.Identity.TestApplications.OpenID.MAUI
             }
         }
 
-        public async Task Login(string domainHint)
+        public async Task Login(string domainHint, string loginHint)
         {
             EnsureIdentityClientInitialized();
 
@@ -67,6 +67,9 @@ namespace KMD.Identity.TestApplications.OpenID.MAUI
                 var extraParameters = new Dictionary<string, string>();
                 if (!string.IsNullOrWhiteSpace(domainHint))
                     extraParameters.Add("domain_hint", domainHint);
+
+                if (!string.IsNullOrWhiteSpace(loginHint))
+                    extraParameters.Add("login_hint", loginHint);
 #if ANDROID
                 extraParameters.Add("platform", "android");
 #elif IOS

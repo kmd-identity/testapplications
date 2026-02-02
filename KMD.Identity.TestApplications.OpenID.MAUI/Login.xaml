@@ -21,6 +21,10 @@
             FontSize="14"
             HorizontalOptions="Center" />
         <Entry
+            Placeholder="Optional login hint"
+            Text="{Binding LoginHint, Mode=TwoWay}">
+        </Entry>
+        <Entry
             Placeholder="Optional domain hint"
             Text="{Binding DomainHint, Mode=TwoWay}">
         </Entry>

@@ -11,6 +11,7 @@ namespace KMD.Identity.TestApplications.OpenID.MAUI.ViewModels
         public event PropertyChangedEventHandler PropertyChanged;
 
         public string DomainHint { get; set; }
+        public string LoginHint { get; set; }
 
         public AuthenticationResult AuthenticationResult { get; set; }
 

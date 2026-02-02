@@ -9,13 +9,7 @@ namespace KMD.Identity.TestApplications.SAML.MVCCore.Extensions
 {
     public static class CustomSaml2BindingExtensions
     {
-        public static IActionResult
-            ToActionResultWithDomainHint(this Saml2RedirectBinding binding, string domainHint) =>
-            string.IsNullOrEmpty(domainHint)
-                ? new RedirectResult($"{binding.RedirectLocation.OriginalString}")
-                : new RedirectResult($"{binding.RedirectLocation.OriginalString}&domain_hint={domainHint}");
-
-        public static IActionResult ToActionResultWithParameters(this Saml2RedirectBinding binding, string domainHint, string uniloginLOA)
+        public static IActionResult ToActionResultWithParameters(this Saml2RedirectBinding binding, string domainHint, string loginHint = null, string uniloginLOA = null)
         {
             var parametersToAdd = "";
             if (!string.IsNullOrEmpty(domainHint))
@@ -25,6 +19,10 @@ namespace KMD.Identity.TestApplications.SAML.MVCCore.Extensions
             if (!string.IsNullOrEmpty(uniloginLOA))
             {
                 parametersToAdd += $"&unilogin_loa={uniloginLOA}";
+            }
+            if (!string.IsNullOrEmpty(loginHint))
+            {
+                parametersToAdd += $"&login_hint={loginHint}";
             }
 
             return new RedirectResult($"{binding.RedirectLocation.OriginalString}{parametersToAdd}");

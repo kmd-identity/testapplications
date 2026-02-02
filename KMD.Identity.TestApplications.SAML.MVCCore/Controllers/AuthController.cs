@@ -26,7 +26,7 @@ namespace KMD.Identity.TestApplications.SAML.MVCCore.Controllers
             config = configAccessor.Value;
         }
 
-        public IActionResult Login(string returnUrl = null, string domainHint = null)
+        public IActionResult Login(string returnUrl = null, string domainHint = null, string loginHint = null)
         {
             var binding = new Saml2RedirectBinding();
             binding.SetRelayStateQuery(new Dictionary<string, string> { { relayStateReturnUrl, returnUrl ?? Url.Content("~/") } });
@@ -41,11 +41,11 @@ namespace KMD.Identity.TestApplications.SAML.MVCCore.Controllers
                     return Redirect(Url.Content("~/"));
                 }
             }
-            return binding.Bind(new Saml2AuthnRequest(config)).ToActionResultWithDomainHint(domainHint);
+            return binding.Bind(new Saml2AuthnRequest(config)).ToActionResultWithParameters(domainHint, loginHint: loginHint);
 
             //To use the Unilogin connection with a different flow than the default (one factor), 
             //add a query string parameter, to read more about this go to our Wiki, example below: 
-            //return binding.Bind(new Saml2AuthnRequest(config)).ToActionResultWithParameters(domainHint, "TwoFactor");
+            //return binding.Bind(new Saml2AuthnRequest(config)).ToActionResultWithParameters(domainHint, uniloginLOA: "TwoFactor");
         }
 
         [HttpPost]

@@ -33,6 +33,7 @@
             this.bAuthenticateWindows = new System.Windows.Forms.Button();
             this.bAuthenticateWithHint = new System.Windows.Forms.Button();
             this.bAuthenticateWebView2 = new System.Windows.Forms.Button();
+            this.bAuthenticateWithLoginHint = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // lAuthRequired
@@ -85,15 +86,26 @@
             this.bAuthenticateWebView2.UseVisualStyleBackColor = true;
             this.bAuthenticateWebView2.Click += new System.EventHandler(this.bAuthenticateWebView2_Click);
             // 
+            // bAuthenticateWithLoginHint
+            // 
+            this.bAuthenticateWithLoginHint.Location = new System.Drawing.Point(43, 275);
+            this.bAuthenticateWithLoginHint.Name = "bAuthenticateWithLoginHint";
+            this.bAuthenticateWithLoginHint.Size = new System.Drawing.Size(214, 41);
+            this.bAuthenticateWithLoginHint.TabIndex = 5;
+            this.bAuthenticateWithLoginHint.Text = "Login with KMD Identity (Login Hint)";
+            this.bAuthenticateWithLoginHint.UseVisualStyleBackColor = true;
+            this.bAuthenticateWithLoginHint.Click += new System.EventHandler(this.bAuthenticateWithLoginHint_Click);
+            // 
             // LogonForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(301, 283);
+            this.ClientSize = new System.Drawing.Size(301, 330);
             this.Controls.Add(this.bAuthenticateWebView2);
             this.Controls.Add(this.bAuthenticateWithHint);
             this.Controls.Add(this.bAuthenticateWindows);
             this.Controls.Add(this.bAuthenticateDefault);
+            this.Controls.Add(this.bAuthenticateWithLoginHint);
             this.Controls.Add(this.lAuthRequired);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
@@ -114,5 +126,6 @@
         private System.Windows.Forms.Button bAuthenticateWindows;
         private System.Windows.Forms.Button bAuthenticateWithHint;
         private System.Windows.Forms.Button bAuthenticateWebView2;
+        private System.Windows.Forms.Button bAuthenticateWithLoginHint;
     }
 }
