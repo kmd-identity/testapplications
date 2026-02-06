@@ -5,7 +5,8 @@ import { ConfigIds } from '../config/auth-config.module';
 @Component({
   selector: 'app-user-claims',
   templateUrl: './user-claims.component.html',
-  styleUrls: ['./user-claims.component.css']
+  styleUrls: ['./user-claims.component.css'],
+  standalone: false
 })
 export class UserClaimsComponent implements OnInit {
 

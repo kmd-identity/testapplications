@@ -63,7 +63,7 @@ namespace KMD.Identity.TestApplications.SAML.MVCCore.Controllers
                 {
                     new AttributeConsumingService
                     {
-                        ServiceName = new ServiceName("Some SP", "en")
+                        ServiceNames = new[] { new LocalizedNameType("Some SP", "en") }
                     }
                 },
             };

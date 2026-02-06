@@ -5,7 +5,8 @@ import { AuthenticationContext } from './authentication-context.service';
 @Component({
   selector: 'app-authenticate',
   templateUrl: './authenticate.component.html',
-  styleUrls: ['./authenticate.component.css']
+  styleUrls: ['./authenticate.component.css'],
+  standalone: false
 })
 export class AuthenticateComponent implements OnInit {
 

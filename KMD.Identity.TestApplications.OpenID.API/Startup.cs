@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using KMD.Identity.TestApplications.OpenID.API.Handlers;
 using KMD.Identity.TestApplications.OpenID.API.Repositories.Delegation;
 using KMD.Identity.TestApplications.OpenID.API.Services.Audit;
@@ -9,7 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace KMD.Identity.TestApplications.OpenID.API
@@ -40,18 +39,9 @@ namespace KMD.Identity.TestApplications.OpenID.API
                     Type = SecuritySchemeType.Http,
                     Scheme = "bearer"
                 });
-                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                c.AddSecurityRequirement(document => new OpenApiSecurityRequirement
                 {
-                    {
-                        new OpenApiSecurityScheme
-                        {
-                            Reference = new OpenApiReference
-                            {
-                                Type = ReferenceType.SecurityScheme,
-                                Id = "Bearer"
-                            }
-                        }, new List<string>()
-                    }
+                    [new OpenApiSecuritySchemeReference("Bearer", document)] = []
                 });
             });
 
