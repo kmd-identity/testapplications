@@ -3,13 +3,13 @@ using KMD.Identity.TestApplications.OpenID.API.Repositories.Delegation;
 using KMD.Identity.TestApplications.OpenID.API.Services.Audit;
 using KMD.Identity.TestApplications.OpenID.API.Services.Delegation;
 using KMD.Identity.TestApplications.OpenID.API.Services.Financial;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace KMD.Identity.TestApplications.OpenID.API
 {
@@ -25,7 +25,9 @@ namespace KMD.Identity.TestApplications.OpenID.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddApplicationInsightsTelemetry();
+            var appInsightsConnectionString = Configuration["ApplicationInsights:ConnectionString"] ?? Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"];
+            if (!string.IsNullOrWhiteSpace(appInsightsConnectionString))
+                services.AddApplicationInsightsTelemetry();
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
