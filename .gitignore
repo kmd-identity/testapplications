@@ -339,3 +339,5 @@ ASALocalRun/
 healthchecksdb
 /src/KMD.Identity.API/.config/dotnet-tools.json
 /src/KMD.Identity.API/Properties/ServiceDependencies/kmd-identity-api - Web Deploy/profile.arm.json
+
+.env.local

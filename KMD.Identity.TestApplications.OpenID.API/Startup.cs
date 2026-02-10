@@ -1,16 +1,15 @@
-using System.Collections.Generic;
 using KMD.Identity.TestApplications.OpenID.API.Handlers;
 using KMD.Identity.TestApplications.OpenID.API.Repositories.Delegation;
 using KMD.Identity.TestApplications.OpenID.API.Services.Audit;
 using KMD.Identity.TestApplications.OpenID.API.Services.Delegation;
 using KMD.Identity.TestApplications.OpenID.API.Services.Financial;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.OpenApi.Models;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.OpenApi;
 
 namespace KMD.Identity.TestApplications.OpenID.API
 {
@@ -26,7 +25,9 @@ namespace KMD.Identity.TestApplications.OpenID.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddApplicationInsightsTelemetry();
+            var appInsightsConnectionString = Configuration["ApplicationInsights:ConnectionString"] ?? Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"];
+            if (!string.IsNullOrWhiteSpace(appInsightsConnectionString))
+                services.AddApplicationInsightsTelemetry();
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
@@ -40,18 +41,9 @@ namespace KMD.Identity.TestApplications.OpenID.API
                     Type = SecuritySchemeType.Http,
                     Scheme = "bearer"
                 });
-                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                c.AddSecurityRequirement(document => new OpenApiSecurityRequirement
                 {
-                    {
-                        new OpenApiSecurityScheme
-                        {
-                            Reference = new OpenApiReference
-                            {
-                                Type = ReferenceType.SecurityScheme,
-                                Id = "Bearer"
-                            }
-                        }, new List<string>()
-                    }
+                    [new OpenApiSecuritySchemeReference("Bearer", document)] = []
                 });
             });
 

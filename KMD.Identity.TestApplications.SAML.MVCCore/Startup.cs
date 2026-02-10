@@ -1,3 +1,9 @@
+using ITfoxtec.Identity.Saml2.MvcCore;
+using ITfoxtec.Identity.Saml2.MvcCore.Configuration;
+using ITfoxtec.Identity.Saml2.Util;
+using KMD.Identity.TestApplications.SAML.MVCCore.Config;
+using KMD.Identity.TestApplications.SAML.MVCCore.Extensions;
+using KMD.Identity.TestApplications.SAML.MVCCore.Infrastructure.Saml;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -5,15 +11,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel.Security;
-using ITfoxtec.Identity.Saml2.MvcCore;
-using ITfoxtec.Identity.Saml2.MvcCore.Configuration;
-using ITfoxtec.Identity.Saml2.Util;
-using KMD.Identity.TestApplications.SAML.MVCCore.Infrastructure.Saml;
-using KMD.Identity.TestApplications.SAML.MVCCore.Extensions;
-using KMD.Identity.TestApplications.SAML.MVCCore.Config;
-using System.Runtime.InteropServices;
 
 namespace KMD.Identity.TestApplications.SAML.MVCCore
 {
@@ -32,7 +32,9 @@ namespace KMD.Identity.TestApplications.SAML.MVCCore
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddApplicationInsightsTelemetry();
+            var appInsightsConnectionString = Configuration["ApplicationInsights:ConnectionString"] ?? Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"];
+            if (!string.IsNullOrWhiteSpace(appInsightsConnectionString))
+                services.AddApplicationInsightsTelemetry();
 
             services.Configure<ExtendedSaml2Configuration>(Configuration.GetSection("Saml2"));
             //Note we're using the same certificate for signing and encryption 
