@@ -1,1 +1,0 @@
-For Git operations, export the Github PAT from .enc.local (GH_TOKEN).
