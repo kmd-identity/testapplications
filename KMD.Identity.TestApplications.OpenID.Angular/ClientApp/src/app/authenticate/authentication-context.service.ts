@@ -1,4 +1,4 @@
-import { Injectable, NgZone } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { OidcSecurityService, LoginResponse } from 'angular-auth-oidc-client';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { AppConfig } from '../config/app.config';
@@ -24,8 +24,7 @@ export class AuthenticationContext {
   constructor(
     private oidcSecurityService: OidcSecurityService, 
     private errorService: ErrorService,
-    private appConfig: AppConfig,
-    private ngZone: NgZone) { 
+    private appConfig: AppConfig) { 
 
       console.log("Initializing authentication context");
 
@@ -35,9 +34,7 @@ export class AuthenticationContext {
 
         if(loginResponse.configId === ConfigIds.Code) {
           console.log("User is authenticated with code flow, updating authentication context");
-          this.ngZone.run(() => {
-            this.codeLogin.next(loginResponse);
-          });
+          this.codeLogin.next(loginResponse);
         } 
 
           if (!loginResponse.isAuthenticated) {
@@ -77,9 +74,7 @@ export class AuthenticationContext {
     
     this.errorService.reset();
     this.oidcSecurityService.logoff(undefined, authOptions).subscribe(() => {
-      this.ngZone.run(() => {
-        this.codeLogin.next(undefined);
-      });
+      this.codeLogin.next(undefined);
     });
     this.oidcSecurityService.logoffLocalMultiple();
   }
