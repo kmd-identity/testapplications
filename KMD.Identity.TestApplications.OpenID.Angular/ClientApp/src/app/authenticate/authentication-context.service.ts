@@ -26,15 +26,23 @@ export class AuthenticationContext {
     private errorService: ErrorService,
     private appConfig: AppConfig) { 
 
+      console.log("Initializing authentication context");
+
       this.oidcSecurityService.checkAuth().subscribe((loginResponse: LoginResponse) => {
 
+        console.log("Authentication check completed", loginResponse);
+
         if(loginResponse.configId === ConfigIds.Code) {
+          console.log("User is authenticated with code flow, updating authentication context");
           this.codeLogin.next(loginResponse);
         } 
+
           if (!loginResponse.isAuthenticated) {
             const urlParams = new URLSearchParams(window.location.search);
             const oidcError = urlParams.get('error');
             const oidcErrorDescription = urlParams.get('error_description');
+
+            console.log("User is not authenticated, checking for OIDC errors in query parameters", { oidcError, oidcErrorDescription });
 
             if (oidcError || oidcErrorDescription) {
               const error = {
