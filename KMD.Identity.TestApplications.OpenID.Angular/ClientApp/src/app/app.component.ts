@@ -4,6 +4,8 @@ import { AppConfig } from './config/app.config';
 import { AuthenticationContext } from './authenticate/authentication-context.service';
 import { ErrorService } from './error.service';
 import { LoginResponse } from 'angular-auth-oidc-client';
+import { Observable } from 'rxjs';
+import { distinctUntilChanged, map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -15,10 +17,15 @@ export class AppComponent implements OnInit {
   constructor(
     private authenticationContext: AuthenticationContext,
     private errorService: ErrorService,
-    private appConfig: AppConfig) { }
+    private appConfig: AppConfig) { 
+      this.isAuthenticated$ = this.authenticationContext.codeLogin$.pipe(
+        map(login => !!login?.isAuthenticated),
+        distinctUntilChanged()
+      );
+    }
 
   title = 'IdentityApp';
-  isAuthenticated = false;
+  isAuthenticated$: Observable<boolean>;
   userData: any = null;
   isError: boolean = false;
   showTestApiCall: boolean = false;
@@ -36,11 +43,6 @@ export class AppComponent implements OnInit {
     this.InitiateAutoLogInFlowIfConfigured();
   }
 
-  requireAuthentication(): boolean {
-    console.log("Checking if authentication is required", { codeLogin: this.codeLogin, tokenExchangeLogin: this.tokenExchangeLogin });
-    return !(this.codeLogin?.isAuthenticated)
-    && (!this.tokenExchangeLogin?.isAuthenticated)
-  }
 
   InitiateAutoLogInFlowIfConfigured() {
     if (window.location.search.indexOf('autologin') > -1) {
