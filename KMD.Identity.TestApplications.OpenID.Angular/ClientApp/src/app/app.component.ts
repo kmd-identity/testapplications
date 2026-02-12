@@ -37,6 +37,7 @@ export class AppComponent implements OnInit {
   }
 
   requireAuthentication(): boolean {
+    console.log("Checking if authentication is required", { codeLogin: this.codeLogin, tokenExchangeLogin: this.tokenExchangeLogin });
     return !(this.codeLogin?.isAuthenticated)
     && (!this.tokenExchangeLogin?.isAuthenticated)
   }
