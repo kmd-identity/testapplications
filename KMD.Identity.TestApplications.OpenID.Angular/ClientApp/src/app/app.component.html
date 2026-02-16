@@ -7,7 +7,7 @@
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between" [ngClass]="{'show': !isNavbarCollapsed}">
-        <ul class="navbar-nav flex-grow-1" *ngIf="!requireAuthentication()">
+        <ul class="navbar-nav flex-grow-1" *ngIf="isAuthenticated$ | async">
           <li class="nav-item">
             <a class="nav-link text-dark" href="#" (click)="logout()">Logout</a>
           </li>
@@ -25,7 +25,7 @@
     <div *ngIf="isError">
       <app-error></app-error>
     </div>
-      <ng-container *ngIf="requireAuthentication(); then authenticationPrompt; else authenticated"></ng-container>
+      <ng-container *ngIf="isAuthenticated$ | async; then authenticated; else authenticationPrompt"></ng-container>
   </div>
 </div>  
 
