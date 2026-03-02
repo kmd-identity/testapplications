@@ -73,6 +73,7 @@ namespace KMD.Identity.TestApplications.OpenID.API
             }
 
             app.UseHttpsRedirection();
+            app.UseStaticFiles();
 
             app.UseCors(options =>
             {
