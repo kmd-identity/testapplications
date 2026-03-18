@@ -6,6 +6,7 @@ import { ErrorService } from './error.service';
 import { LoginResponse } from 'angular-auth-oidc-client';
 import { Observable } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
+import { TestApiCallService } from './test-api-call/test-api-call.service';
 
 @Component({
   selector: 'app-root',
@@ -17,7 +18,8 @@ export class AppComponent implements OnInit {
   constructor(
     private authenticationContext: AuthenticationContext,
     private errorService: ErrorService,
-    private appConfig: AppConfig) { 
+    private appConfig: AppConfig,
+    private testApiCallService: TestApiCallService) { 
       this.isAuthenticated$ = this.authenticationContext.codeLogin$.pipe(
         map(login => !!login?.isAuthenticated),
         distinctUntilChanged()
@@ -64,6 +66,7 @@ export class AppComponent implements OnInit {
   
   callApi() {
     this.showTestApiCall = true;
+    this.testApiCallService.callTestApi();
   }
 }
 
