@@ -25,7 +25,6 @@ export class TestApiCallService {
       });
 
       this.httpClient.get(this.appConfig.security.apiUrl, { headers: bearerHeaders }).subscribe((response: any) => {
-        console.log('HTTP response received:', response);
         this.testApiResponse.next(response);
       });
     });
