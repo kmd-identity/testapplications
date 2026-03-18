@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { TestApiCallService } from './test-api-call.service';
 
 @Component({
@@ -10,10 +10,14 @@ import { TestApiCallService } from './test-api-call.service';
 export class TestApiCallComponent implements OnInit {
   apiResponse: any;
 
-  constructor(private testApiCallService: TestApiCallService) { 
+  constructor(
+    private testApiCallService: TestApiCallService,
+    private cdr: ChangeDetectorRef
+  ) { 
     this.testApiCallService.testApiResponse$.subscribe(response => {
       console.log('Subscription received:', response);
       this.apiResponse = response;
+      this.cdr.detectChanges(); 
     });
   }
 
