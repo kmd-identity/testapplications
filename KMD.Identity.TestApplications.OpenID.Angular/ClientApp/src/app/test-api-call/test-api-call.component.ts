@@ -17,7 +17,10 @@ export class TestApiCallComponent implements OnInit {
     this.testApiCallService.testApiResponse$.subscribe(response => {
       console.log('Subscription received:', response);
       this.apiResponse = response;
-      this.cdr.detectChanges(); 
+      if (response) {
+        this.cdr.detectChanges(); 
+      }
+     
     });
   }
 
