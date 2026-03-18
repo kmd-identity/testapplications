@@ -1,4 +1,4 @@
-<div *ngIf="apiResponse">
+<div *ngIf="apiResponse$ | async as apiResponse">
     <h3>Result from API (access_token)</h3>
     <pre>{{ apiResponse | json }}</pre>
 </div>

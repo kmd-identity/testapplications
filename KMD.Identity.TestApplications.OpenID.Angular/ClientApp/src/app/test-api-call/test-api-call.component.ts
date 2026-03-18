@@ -1,5 +1,7 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { TestApiCallService } from './test-api-call.service';
+import { Component, OnInit } from '@angular/core';
+import { TestApiCallService } from './test-api-call.service'; 
+import { Observable } from 'rxjs';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-test-api-call',
@@ -8,20 +10,12 @@ import { TestApiCallService } from './test-api-call.service';
   standalone: false
 })
 export class TestApiCallComponent implements OnInit {
-  apiResponse: any;
+  apiResponse$: Observable<any>;
 
-  constructor(
-    private testApiCallService: TestApiCallService,
-    private cdr: ChangeDetectorRef
-  ) { 
-    this.testApiCallService.testApiResponse$.subscribe(response => {
-      console.log('Subscription received:', response);
-      this.apiResponse = response;
-      if (response) {
-        this.cdr.detectChanges(); 
-      }
-     
-    });
+  constructor(private testApiCallService: TestApiCallService) { 
+    this.apiResponse$ = this.testApiCallService.testApiResponse$.pipe(
+      filter(response => response !== null)
+    );
   }
 
   ngOnInit() { 
