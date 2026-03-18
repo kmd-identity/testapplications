@@ -62,7 +62,7 @@ export class AppComponent implements OnInit {
     this.authenticationContext.logout()
   }
   
-  callApi() {
+  callApi() { 
     this.showTestApiCall = true;
   }
 }
