@@ -17,8 +17,8 @@ export class TestApiCallComponent implements OnInit {
     });
   }
 
-  async ngOnInit() { 
-    await this.testApiCallService.callTestApi();
+  ngOnInit() { 
+    this.testApiCallService.callTestApi();
   }
 
 }
