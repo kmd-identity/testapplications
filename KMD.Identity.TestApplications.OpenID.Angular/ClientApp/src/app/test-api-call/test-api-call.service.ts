@@ -24,6 +24,9 @@ export class TestApiCallService {
       'Authorization': 'Bearer ' + await this.authenticationContext.accessToken().toPromise()
     });
 
-    this.httpClient.get(this.appConfig.security.apiUrl, { headers: bearerHeaders }).subscribe((response: any) => this.testApiResponse.next(response));
+    this.httpClient.get(this.appConfig.security.apiUrl, { headers: bearerHeaders }).subscribe((response: any) => {
+      console.log('HTTP response received:', response);
+      this.testApiResponse.next(response);
+    });
   }
 }
