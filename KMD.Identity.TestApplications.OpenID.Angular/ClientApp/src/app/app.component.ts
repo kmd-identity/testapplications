@@ -17,7 +17,7 @@ export class AppComponent implements OnInit {
   constructor(
     private authenticationContext: AuthenticationContext,
     private errorService: ErrorService,
-    private appConfig: AppConfig) { 
+    private appConfig: AppConfig) {
       this.isAuthenticated$ = this.authenticationContext.codeLogin$.pipe(
         map(login => !!login?.isAuthenticated),
         distinctUntilChanged()
@@ -62,7 +62,7 @@ export class AppComponent implements OnInit {
     this.authenticationContext.logout()
   }
   
-  callApi() {
+  callApi() { 
     this.showTestApiCall = true;
   }
 }

@@ -17,13 +17,16 @@ export class TestApiCallService {
     private httpClient: HttpClient, 
     private appConfig: AppConfig) { }
 
-  public async callTestApi() {
+  public callTestApi() {
+    this.authenticationContext.accessToken().subscribe(token => {
+      const bearerHeaders = new HttpHeaders({
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token
+      });
 
-    const bearerHeaders = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + await this.authenticationContext.accessToken().toPromise()
+      this.httpClient.get(this.appConfig.security.apiUrl, { headers: bearerHeaders }).subscribe((response: any) => {
+        this.testApiResponse.next(response);
+      });
     });
-
-    this.httpClient.get(this.appConfig.security.apiUrl, { headers: bearerHeaders }).subscribe((response: any) => this.testApiResponse.next(response));
   }
 }
