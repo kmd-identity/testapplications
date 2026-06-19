@@ -1,19 +1,27 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication;
+﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace KMD.Identity.TestApplications.OpenID.MVCCore.Controllers
 {
     public class AccountController : Controller
     {
-        public async Task Login(string returnUrl = "/", string domainHint = null, string loginHint = null)
+        public async Task Login(string loginMethod, string returnUrl = "/", string domainHint = null, string loginHint = null)
         {
-            await HttpContext.ChallengeAsync("AD FS", new AuthenticationProperties() { RedirectUri = returnUrl, Items = { { "domain_hint", domainHint }, { "login_hint", loginHint } } });
+            var authProperties = new AuthenticationProperties 
+            { 
+                RedirectUri = returnUrl, 
+                Items = 
+                { 
+                    { "domain_hint", domainHint }, 
+                    { "login_hint", loginHint },
+                    { "AuthenticationMethod", loginMethod },
+                } 
+            };
+            
+            await HttpContext.ChallengeAsync("AD FS", authProperties);
 
             //To use the Unilogin connection with a different flow than the default (one factor), 
             //add a query string parameter, to read more about this go to our Wiki, example below, additional code in Startup.cs: 
@@ -21,9 +29,13 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore.Controllers
         }
 
         [Authorize]
-        public async Task Logout()
+        public async Task Logout(string logoutMethod)
         {
-            await HttpContext.SignOutAsync("AD FS");
+            var authProperties = new AuthenticationProperties();
+           
+            authProperties.Items.Add("AuthenticationMethod", logoutMethod);
+
+            await HttpContext.SignOutAsync("AD FS", authProperties);
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         }
 

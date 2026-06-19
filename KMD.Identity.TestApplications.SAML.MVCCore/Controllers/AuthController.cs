@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using System;
 using System.Collections.Generic;
 using System.Security.Authentication;
 using System.Threading.Tasks;
@@ -26,22 +27,25 @@ namespace KMD.Identity.TestApplications.SAML.MVCCore.Controllers
             config = configAccessor.Value;
         }
 
-        public IActionResult Login(string returnUrl = null, string domainHint = null, string loginHint = null)
+        public IActionResult Login(string loginMethod = null, string returnUrl = null, string domainHint = null, string loginHint = null)
         {
-            var binding = new Saml2RedirectBinding();
-            binding.SetRelayStateQuery(new Dictionary<string, string> { { relayStateReturnUrl, returnUrl ?? Url.Content("~/") } });
             if (HttpContext.User.Identity.IsAuthenticated)
             {
-                if (Url.IsLocalUrl(returnUrl))
-                {
-                    return Redirect(returnUrl);
-                }
-                else
-                {
-                    return Redirect(Url.Content("~/"));
-                }
+                return Redirect(Url.IsLocalUrl(returnUrl) ? returnUrl : Url.Content("~/"));
             }
-            return binding.Bind(new Saml2AuthnRequest(config)).ToActionResultWithParameters(domainHint, loginHint: loginHint);
+
+            if (string.Equals(loginMethod, "Post", StringComparison.OrdinalIgnoreCase))
+            {
+                var binding = new Saml2PostBinding();
+                binding.SetRelayStateQuery(new Dictionary<string, string> { { relayStateReturnUrl, returnUrl ?? Url.Content("~/") } });
+                return binding.Bind(new Saml2AuthnRequest(config)).ToActionResultWithParameters(domainHint, loginHint: loginHint);
+            }
+            else
+            {
+                var binding = new Saml2RedirectBinding();
+                binding.SetRelayStateQuery(new Dictionary<string, string> { { relayStateReturnUrl, returnUrl ?? Url.Content("~/") } });
+                return binding.Bind(new Saml2AuthnRequest(config)).ToActionResultWithParameters(domainHint, loginHint: loginHint);
+            }
 
             //To use the Unilogin connection with a different flow than the default (one factor), 
             //add a query string parameter, to read more about this go to our Wiki, example below: 
@@ -74,26 +78,28 @@ namespace KMD.Identity.TestApplications.SAML.MVCCore.Controllers
 
             var relayStateQuery = binding.GetRelayStateQuery();
             var returnUrl = relayStateQuery.ContainsKey(relayStateReturnUrl) ? relayStateQuery[relayStateReturnUrl] : Url.Content("~/");
-            if (Url.IsLocalUrl(returnUrl))
-            {
-                return Redirect(returnUrl);
-            }
-            else
-            {
-                return Redirect(Url.Content("~/"));
-            }
+            return Redirect(Url.IsLocalUrl(returnUrl) ? returnUrl : Url.Content("~/"));
         }
 
-        public async Task<IActionResult> Logout()
+        public async Task<IActionResult> Logout(string logoutMethod = null)
         {
             if (!User.Identity.IsAuthenticated)
             {
                 return Redirect(Url.Content("~/"));
             }
 
-            var binding = new Saml2PostBinding();
             var saml2LogoutRequest = await new Saml2LogoutRequest(config, User).DeleteSession(HttpContext);
-            return binding.Bind(saml2LogoutRequest).ToActionResult();
+
+            if (string.Equals(logoutMethod, "Redirect", StringComparison.OrdinalIgnoreCase))
+            {
+                var binding = new Saml2RedirectBinding();
+                return binding.Bind(saml2LogoutRequest).ToActionResult();
+}
+            else
+            {
+                var binding = new Saml2PostBinding();
+                return binding.Bind(saml2LogoutRequest).ToActionResult();
+            }
         }
 
         public IActionResult LoggedOut()

@@ -13,7 +13,7 @@
         <div class="col-lg-6 mx-auto">
             <p class="fs-6 mb-4"><a href="@ViewBag.SAMLBaseUrl">@ViewBag.SAMLBaseUrl</a></p>
             <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
-                <a href="@(ViewBag.SAMLBaseUrl+"/Auth/Login")" class="btn btn-outline-info btn-lg px-4 me-sm-3 fw-bold" role="button" aria-pressed="true">Log-in</a>
+                <a href="@(ViewBag.SAMLBaseUrl+"/Auth/Login?loginMethod=Redirect")" class="btn btn-outline-info btn-lg px-4 me-sm-3 fw-bold" role="button" aria-pressed="true">Log-in</a>
             </div>
         </div>
     </div>
@@ -27,7 +27,7 @@
         <div class="col-lg-6 mx-auto">
             <p class="fs-6 mb-4"><a href="@ViewBag.OpenIDWebBaseUrl">@ViewBag.OpenIDWebBaseUrl</a></p>
             <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
-                <a href="@(ViewBag.OpenIDWebBaseUrl+"/Account/Login")" class="btn btn-outline-info btn-lg px-4 me-sm-3 fw-bold" role="button" aria-pressed="true">Log-in</a>
+                <a href="@(ViewBag.OpenIDWebBaseUrl+"/Account/Login?loginMethod=Redirect")" class="btn btn-outline-info btn-lg px-4 me-sm-3 fw-bold" role="button" aria-pressed="true">Log-in</a>
             </div>
         </div>
     </div>

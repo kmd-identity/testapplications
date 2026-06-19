@@ -62,6 +62,17 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore
                 {
                     OnRedirectToIdentityProvider = context =>
                     {
+                        const string authMethodKey = "AuthenticationMethod";
+                        if (context.Properties.Items.TryGetValue(authMethodKey, out var authMethod))
+                        {
+                            if (!string.IsNullOrWhiteSpace(authMethod))
+                            {
+                                context.Options.AuthenticationMethod = authMethod == "Redirect" 
+                                    ? OpenIdConnectRedirectBehavior.RedirectGet : OpenIdConnectRedirectBehavior.FormPost;
+                            }
+                            context.Properties.Items.Remove(authMethodKey);
+                        }
+
                         const string domainHintKey = "domain_hint";
                         if (context.Properties.Items.TryGetValue(domainHintKey, out var domainHint))
                         {
@@ -119,6 +130,17 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore
                     },
                     OnRedirectToIdentityProviderForSignOut = context =>
                     {
+                        const string authMethodKey = "AuthenticationMethod";
+                        if (context.Properties.Items.TryGetValue(authMethodKey, out var authMethod))
+                        {
+                            if (!string.IsNullOrWhiteSpace(authMethod))
+                            {
+                                context.Options.AuthenticationMethod = authMethod == "Redirect" 
+                                    ? OpenIdConnectRedirectBehavior.RedirectGet : OpenIdConnectRedirectBehavior.FormPost;
+                            }
+                            context.Properties.Items.Remove(authMethodKey);
+                        }
+
                         // Id token hint is needed to redirect back to application
                         context.ProtocolMessage.IdTokenHint = context.HttpContext.Session.GetString("id_token");
                         // Client-id is required by kmd.identity
