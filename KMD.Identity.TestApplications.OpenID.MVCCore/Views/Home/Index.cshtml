@@ -55,7 +55,7 @@
     <script type="text/javascript">
         var loginUrl = '@Url.Action("Login", "Account")';
         document.getElementById('lnkLoginRedirect').onclick = function() {
-            window.location = loginUrl + "?loginMethod=Redirect&domainHint=" + document.getElementById('txtDomainHint').value + "&loginHint=" + document.getElementById('txtLoginHint').value;
+            window.location = loginUrl + "?domainHint=" + document.getElementById('txtDomainHint').value + "&loginHint=" + document.getElementById('txtLoginHint').value;
         }
 
         document.getElementById('lnkLoginPost').onclick = function() {
