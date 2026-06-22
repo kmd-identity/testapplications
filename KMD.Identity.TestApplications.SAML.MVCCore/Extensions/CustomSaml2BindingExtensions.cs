@@ -30,8 +30,13 @@ namespace KMD.Identity.TestApplications.SAML.MVCCore.Extensions
 
         public static IActionResult ToActionResultWithParameters(this Saml2PostBinding binding, string domainHint, string loginHint = null, string uniloginLOA = null)
         {
-            var originalHtml = binding.PostContent;
+            var additionalFields = CreateAdditionalHiddenFormFields(domainHint, uniloginLOA, loginHint);
+            var responseHtml = CreateResponseForm(binding.PostContent, additionalFields);
+            return new ContentResult { ContentType = "text/html", Content = responseHtml };
+        }
 
+        private static string CreateAdditionalHiddenFormFields(string domainHint, string uniloginLOA, string loginHint)
+        {
             var additionalFields = "";
             if (!string.IsNullOrEmpty(domainHint))
             {
@@ -45,27 +50,23 @@ namespace KMD.Identity.TestApplications.SAML.MVCCore.Extensions
             {
                 additionalFields += $"\n        <input type=\"hidden\" name=\"login_hint\" value=\"{loginHint}\" />";
             }
+            return additionalFields;
+        }
 
-            var modifiedHtml = originalHtml;
+        private static string CreateResponseForm(string originalHtml, string additionalFields)
+        {
             if (string.IsNullOrEmpty(additionalFields))
-                return new ContentResult
-                {
-                    ContentType = "text/html",
-                    Content = modifiedHtml
-                };
-
-            var formCloseTag = "</form>";
-            var insertPosition = modifiedHtml.IndexOf(formCloseTag);
-            if (insertPosition >= 0)
             {
-                modifiedHtml = modifiedHtml.Insert(insertPosition, additionalFields);
+                return originalHtml;
             }
 
-            return new ContentResult
+            var insertPosition = originalHtml.IndexOf("</form>");
+            if (insertPosition < 0)
             {
-                ContentType = "text/html",
-                Content = modifiedHtml
-            };
+                throw new InvalidOperationException("Unable to find closing </form> tag in SAML POST binding HTML content. Cannot add additional parameters.");
+            }
+
+            return originalHtml.Insert(insertPosition, additionalFields);
         }
 
         public static void UnbindWithMetadataRefreshOnValidationError(this Saml2PostBinding binding, HttpRequest request, Saml2AuthnResponse saml2AuthnResponse, ExtendedSaml2Configuration saml2Configuration)

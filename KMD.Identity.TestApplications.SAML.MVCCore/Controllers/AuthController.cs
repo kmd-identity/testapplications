@@ -6,7 +6,6 @@ using KMD.Identity.TestApplications.SAML.MVCCore.Extensions;
 using KMD.Identity.TestApplications.SAML.MVCCore.Identity;
 using KMD.Identity.TestApplications.SAML.MVCCore.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System;

@@ -8,7 +8,7 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore.Controllers
 {
     public class AccountController : Controller
     {
-        public async Task Login(string loginMethod, string returnUrl = "/", string domainHint = null, string loginHint = null)
+        public async Task Login(string loginMethod = "Redirect", string returnUrl = "/", string domainHint = null, string loginHint = null)
         {
             var authProperties = new AuthenticationProperties 
             { 
@@ -29,7 +29,7 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore.Controllers
         }
 
         [Authorize]
-        public async Task Logout(string logoutMethod)
+        public async Task Logout(string logoutMethod = "Post")
         {
             var authProperties = new AuthenticationProperties();
            

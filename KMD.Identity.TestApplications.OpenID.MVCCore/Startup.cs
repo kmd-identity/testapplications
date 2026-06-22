@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
@@ -67,8 +68,7 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore
                         {
                             if (!string.IsNullOrWhiteSpace(authMethod))
                             {
-                                context.Options.AuthenticationMethod = authMethod == "Redirect" 
-                                    ? OpenIdConnectRedirectBehavior.RedirectGet : OpenIdConnectRedirectBehavior.FormPost;
+                                SetAuthenticationMethod(authMethod, context);
                             }
                             context.Properties.Items.Remove(authMethodKey);
                         }
@@ -135,8 +135,7 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore
                         {
                             if (!string.IsNullOrWhiteSpace(authMethod))
                             {
-                                context.Options.AuthenticationMethod = authMethod == "Redirect" 
-                                    ? OpenIdConnectRedirectBehavior.RedirectGet : OpenIdConnectRedirectBehavior.FormPost;
+                                SetAuthenticationMethod(authMethod, context);
                             }
                             context.Properties.Items.Remove(authMethodKey);
                         }
@@ -157,6 +156,15 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore
             });
 
             services.AddControllersWithViews();
+        }
+
+        private static void SetAuthenticationMethod(string authMethod, RedirectContext context)
+        {
+            if (string.Equals(authMethod, "Redirect", StringComparison.OrdinalIgnoreCase))
+                context.Options.AuthenticationMethod = OpenIdConnectRedirectBehavior.RedirectGet;
+
+            else if (string.Equals(authMethod, "Post", StringComparison.OrdinalIgnoreCase))
+                context.Options.AuthenticationMethod = OpenIdConnectRedirectBehavior.FormPost;
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
