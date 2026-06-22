@@ -55,7 +55,7 @@ namespace KMD.Identity.TestApplications.SAML.MVCCore.Extensions
 
         private static string CreateResponseForm(string originalHtml, string additionalFields)
         {
-            if (string.IsNullOrEmpty(additionalFields))
+            if (additionalFields == "")
             {
                 return originalHtml;
             }
