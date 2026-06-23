@@ -83,15 +83,15 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore
 
                             context.Properties.Items.Remove(domainHintKey);
                         }
-                        const string uniloginLOAKey = "unilogin_loa";
-                        if (context.Properties.Items.TryGetValue(uniloginLOAKey, out var uniloginLOA))
+                        const string accrKey = "accr";
+                        if (context.Properties.Items.TryGetValue(accrKey, out var accr))
                         {
-                            if (!string.IsNullOrWhiteSpace(uniloginLOA))
+                            if (!string.IsNullOrWhiteSpace(accr))
                             {
-                                context.ProtocolMessage.Parameters.Add(uniloginLOAKey, uniloginLOA);
+                                context.ProtocolMessage.Parameters.Add(accrKey, accr);
                             }
 
-                            context.Properties.Items.Remove(uniloginLOAKey);
+                            context.Properties.Items.Remove(accrKey);
                         }
 
                         const string flowIdKey = "flowid";

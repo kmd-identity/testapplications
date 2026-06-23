@@ -4,69 +4,58 @@ using ITfoxtec.Identity.Saml2.Http;
 using KMD.Identity.TestApplications.SAML.MVCCore.Config;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Web;
 
 namespace KMD.Identity.TestApplications.SAML.MVCCore.Extensions
 {
     public static class CustomSaml2BindingExtensions
     {
-        public static IActionResult ToActionResultWithParameters(this Saml2RedirectBinding binding, string domainHint, string loginHint = null, string uniloginLOA = null)
+        public static Saml2RedirectBinding BindWithParameters(this Saml2RedirectBinding binding, Saml2AuthnRequest request, string domainHint = null, string loginHint = null, string accr = null)
         {
-            var parametersToAdd = "";
+            var builder = new UriBuilder(request.Destination);
+            var query = HttpUtility.ParseQueryString(builder.Query);
+
             if (!string.IsNullOrEmpty(domainHint))
             {
-                parametersToAdd  = $"&domain_hint={domainHint}";
-            }
-            if (!string.IsNullOrEmpty(uniloginLOA))
-            {
-                parametersToAdd += $"&unilogin_loa={uniloginLOA}";
+                query.Add("domain_hint", domainHint);
             }
             if (!string.IsNullOrEmpty(loginHint))
             {
-                parametersToAdd += $"&login_hint={loginHint}";
+                query.Add("login_hint", loginHint);
+            }
+            if (!string.IsNullOrEmpty(accr))
+            {
+                query.Add("accr", accr);
             }
 
-            return new RedirectResult($"{binding.RedirectLocation.OriginalString}{parametersToAdd}");
+            builder.Query = query.ToString();
+            request.Destination = builder.Uri;
+
+            return binding.Bind(request);
         }
 
-        public static IActionResult ToActionResultWithParameters(this Saml2PostBinding binding, string domainHint, string loginHint = null, string uniloginLOA = null)
+        public static Saml2PostBinding BindWithParameters(this Saml2PostBinding binding, Saml2AuthnRequest request, string domainHint = null, string loginHint = null, string accr = null)
         {
-            var additionalFields = CreateAdditionalHiddenFormFields(domainHint, uniloginLOA, loginHint);
-            var responseHtml = CreateResponseForm(binding.PostContent, additionalFields);
-            return new ContentResult { ContentType = "text/html", Content = responseHtml };
-        }
+            var builder = new UriBuilder(request.Destination);
+            var query = HttpUtility.ParseQueryString(builder.Query);
 
-        private static string CreateAdditionalHiddenFormFields(string domainHint, string uniloginLOA, string loginHint)
-        {
-            var additionalFields = "";
             if (!string.IsNullOrEmpty(domainHint))
             {
-                additionalFields += $"\n        <input type=\"hidden\" name=\"domain_hint\" value=\"{domainHint}\" />";
-            }
-            if (!string.IsNullOrEmpty(uniloginLOA))
-            {
-                additionalFields += $"\n        <input type=\"hidden\" name=\"unilogin_loa\" value=\"{uniloginLOA}\" />";
+                query.Add("domain_hint", domainHint);
             }
             if (!string.IsNullOrEmpty(loginHint))
             {
-                additionalFields += $"\n        <input type=\"hidden\" name=\"login_hint\" value=\"{loginHint}\" />";
+                query.Add("login_hint", loginHint);
             }
-            return additionalFields;
-        }
-
-        private static string CreateResponseForm(string originalHtml, string additionalFields)
-        {
-            if (additionalFields == "")
+            if (!string.IsNullOrEmpty(accr))
             {
-                return originalHtml;
+                query.Add("accr", accr);
             }
 
-            var insertPosition = originalHtml.IndexOf("</form>");
-            if (insertPosition < 0)
-            {
-                throw new InvalidOperationException("Unable to find closing </form> tag in SAML POST binding HTML content. Cannot add additional parameters.");
-            }
+            builder.Query = query.ToString();
+            request.Destination = builder.Uri;
 
-            return originalHtml.Insert(insertPosition, additionalFields);
+            return binding.Bind(request);
         }
 
         public static void UnbindWithMetadataRefreshOnValidationError(this Saml2PostBinding binding, HttpRequest request, Saml2AuthnResponse saml2AuthnResponse, ExtendedSaml2Configuration saml2Configuration)
