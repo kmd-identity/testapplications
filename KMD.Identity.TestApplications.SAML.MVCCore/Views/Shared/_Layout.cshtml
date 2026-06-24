@@ -24,7 +24,10 @@
                         @if (User.Identity.IsAuthenticated)
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Auth" asp-action="Logout">Logout</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Auth" asp-action="Logout" asp-route-logoutMethod="Redirect">Logout with Redirect</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Auth" asp-action="Logout" asp-route-logoutMethod="Post">Logout with POST</a>
                             </li>
                         }
                     </ul>

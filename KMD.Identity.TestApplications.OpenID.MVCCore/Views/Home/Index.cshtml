@@ -40,7 +40,10 @@
             </ul>
         </div>
         <div>
-            <a id="lnkLogin" class="font-weight-bold" href="#">Click here to log-in</a>
+            <a id="lnkLoginRedirect" class="font-weight-bold" href="#">Click here to log-in with Redirect</a>
+        </div>
+        <div>
+            <a id="lnkLoginPost" class="font-weight-bold" href="#">Click here to log-in with POST</a>
         </div>
 
 
@@ -51,8 +54,12 @@
 {
     <script type="text/javascript">
         var loginUrl = '@Url.Action("Login", "Account")';
-        document.getElementById('lnkLogin').onclick = function() {
+        document.getElementById('lnkLoginRedirect').onclick = function() {
             window.location = loginUrl + "?domainHint=" + document.getElementById('txtDomainHint').value + "&loginHint=" + document.getElementById('txtLoginHint').value;
+        }
+
+        document.getElementById('lnkLoginPost').onclick = function() {
+            window.location = loginUrl + "?loginMethod=Post&domainHint=" + document.getElementById('txtDomainHint').value + "&loginHint=" + document.getElementById('txtLoginHint').value;
         }
     </script>
 }

@@ -53,8 +53,8 @@ export class AuthenticationContext {
     this.oidcSecurityService.authorize(configId, { customParams: { "domain_hint": domainHint ?? "", "login_hint": loginHint ?? "" } });
 
     //To use the Unilogin connection with a different flow than the default (one factor),
-    //add a query string parameter, to read more about this go to our Wiki, example below: 
-    //this.oidcSecurityService.authorize(configId, { customParams: { "domain_hint": domainHint ?? "", "unilogin_loa": "TwoFactor" } });
+    //add a query string parameter, to read more about this go to our Wiki, example below:
+    //this.oidcSecurityService.authorize(configId, { customParams: { "domain_hint": domainHint ?? "", "accr": "Loasubstantial" } });
   }
 
   logout() {
