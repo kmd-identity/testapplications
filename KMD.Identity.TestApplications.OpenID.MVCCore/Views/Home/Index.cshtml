@@ -7,7 +7,7 @@
     {
         <p class="text-center">You have logged in successfully. Your claims are:</p>
         <h3>id_token:</h3>
-        foreach (var userClaim in User.Claims)
+        @foreach (var userClaim in User.Claims.OrderBy(claim => claim.Type, StringComparer.OrdinalIgnoreCase))
         {
             <p class="font-weight-bold">@userClaim.Type</p>
             <p>@userClaim.Value</p>

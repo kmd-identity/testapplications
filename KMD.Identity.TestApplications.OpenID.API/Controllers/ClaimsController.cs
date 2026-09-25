@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 
@@ -23,7 +24,7 @@ namespace KMD.Identity.TestApplications.OpenID.API.Controllers
             return new
             {
                 Title = "Hello from API",
-                Claims = User.Claims.Select(c => $"{c.Type}: {c.Value}").ToArray()
+                Claims = User.Claims.OrderBy(c => c.Type, StringComparer.OrdinalIgnoreCase).Select(c => $"{c.Type}: {c.Value}").ToArray()
             };
         }
     }
