@@ -29,7 +29,12 @@ export class UserClaimsComponent implements OnInit {
     return Object.keys(userData)
       .sort((left, right) => left.toLowerCase().localeCompare(right.toLowerCase()))
       .reduce((sortedUserData: any, claimType) => {
-        sortedUserData[claimType] = userData[claimType];
+        Object.defineProperty(sortedUserData, claimType, {
+          value: userData[claimType],
+          enumerable: true,
+          configurable: true,
+          writable: true
+        });
         return sortedUserData;
       }, {});
   }
