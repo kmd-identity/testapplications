@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
@@ -62,6 +63,16 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore
                 {
                     OnRedirectToIdentityProvider = context =>
                     {
+                        const string authMethodKey = "AuthenticationMethod";
+                        if (context.Properties.Items.TryGetValue(authMethodKey, out var authMethod))
+                        {
+                            if (!string.IsNullOrWhiteSpace(authMethod))
+                            {
+                                SetAuthenticationMethod(authMethod, context);
+                            }
+                            context.Properties.Items.Remove(authMethodKey);
+                        }
+
                         const string domainHintKey = "domain_hint";
                         if (context.Properties.Items.TryGetValue(domainHintKey, out var domainHint))
                         {
@@ -72,15 +83,15 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore
 
                             context.Properties.Items.Remove(domainHintKey);
                         }
-                        const string uniloginLOAKey = "unilogin_loa";
-                        if (context.Properties.Items.TryGetValue(uniloginLOAKey, out var uniloginLOA))
+                        const string accrKey = "accr";
+                        if (context.Properties.Items.TryGetValue(accrKey, out var accr))
                         {
-                            if (!string.IsNullOrWhiteSpace(uniloginLOA))
+                            if (!string.IsNullOrWhiteSpace(accr))
                             {
-                                context.ProtocolMessage.Parameters.Add(uniloginLOAKey, uniloginLOA);
+                                context.ProtocolMessage.Parameters.Add(accrKey, accr);
                             }
 
-                            context.Properties.Items.Remove(uniloginLOAKey);
+                            context.Properties.Items.Remove(accrKey);
                         }
 
                         const string flowIdKey = "flowid";
@@ -119,6 +130,16 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore
                     },
                     OnRedirectToIdentityProviderForSignOut = context =>
                     {
+                        const string authMethodKey = "AuthenticationMethod";
+                        if (context.Properties.Items.TryGetValue(authMethodKey, out var authMethod))
+                        {
+                            if (!string.IsNullOrWhiteSpace(authMethod))
+                            {
+                                SetAuthenticationMethod(authMethod, context);
+                            }
+                            context.Properties.Items.Remove(authMethodKey);
+                        }
+
                         // Id token hint is needed to redirect back to application
                         context.ProtocolMessage.IdTokenHint = context.HttpContext.Session.GetString("id_token");
                         // Client-id is required by kmd.identity
@@ -135,6 +156,15 @@ namespace KMD.Identity.TestApplications.OpenID.MVCCore
             });
 
             services.AddControllersWithViews();
+        }
+
+        private static void SetAuthenticationMethod(string authMethod, RedirectContext context)
+        {
+            if (string.Equals(authMethod, "Redirect", StringComparison.OrdinalIgnoreCase))
+                context.Options.AuthenticationMethod = OpenIdConnectRedirectBehavior.RedirectGet;
+
+            else if (string.Equals(authMethod, "Post", StringComparison.OrdinalIgnoreCase))
+                context.Options.AuthenticationMethod = OpenIdConnectRedirectBehavior.FormPost;
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
